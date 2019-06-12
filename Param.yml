@@ -1,0 +1,10 @@
+%YAML:1.0
+---
+perCircle: 480     #320   # 模型每圈有多少个三角面
+blend_offset: 0           # 融合区占多少个四边形面
+modleCircle: 80    #79   # 模型在高度方向上有多少圈面
+loop_right: 1             # 模型STL文件中四边形面的排列方向 1:顺时针 0:逆时针
+isdynamic: 0              # 是否启动动态检测融合区
+value_threshold: 3.5 #5.5 # 动态检测的阈值
+blend_head: 5             # 前向融合区边界缩小多少面
+blend_rear: 1             # 后向融合区边界缩小多少面
