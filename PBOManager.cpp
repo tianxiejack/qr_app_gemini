@@ -174,13 +174,6 @@ else if(idx==1)
 			}
 	// copy pixels from PBO to texture object
 	// Use offset instead of pointer.
-#if 0
-if(idx==0)//10路拼接中1*6
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height*m_ratio_1, pixel_format, GL_UNSIGNED_BYTE, 0);
-else if(idx==1)//10路拼接中1*4
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, height*m_ratio_1, width, height*m_ratio_2, pixel_format, GL_UNSIGNED_BYTE, 0);
-else
-#endif
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, pixel_format, GL_UNSIGNED_BYTE, 0);
     // it is good idea to release PBOs with ID 0 after use.
     // Once bound with 0, all pixel operations behave normal ways.

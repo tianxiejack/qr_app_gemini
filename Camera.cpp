@@ -193,9 +193,29 @@ void SmallVCap::saveOverLap()
 //	overLap.updateGap(m_chId,yuvImg);
 }
 
+void YUYV2UYVx(unsigned char *ptr,unsigned char *Yuyv, int ImgWidth, int ImgHeight)
+{
+	for(int j =0;j<ImgHeight;j++)
+	{
+		for(int i=0;i<ImgWidth*2/4;i++)
+		{
+			*(ptr+j*ImgWidth*4+i*8+1)=*(Yuyv+j*ImgWidth*2+i*4);
+			*(ptr+j*ImgWidth*4+i*8+0)=*(Yuyv+j*ImgWidth*2+i*4+1);
+			*(ptr+j*ImgWidth*4+i*8+2)=*(Yuyv+j*ImgWidth*2+i*4+3);
+			*(ptr+j*ImgWidth*4+i*8+3)=0;
+
+			*(ptr+j*ImgWidth*4+i*8+5)=*(Yuyv+j*ImgWidth*2+i*4+2);
+			*(ptr+j*ImgWidth*4+i*8+4)=*(Yuyv+j*ImgWidth*2+i*4+1);
+			*(ptr+j*ImgWidth*4+i*8+6)=*(Yuyv+j*ImgWidth*2+i*4+3);
+			*(ptr+j*ImgWidth*4+i*8+7)=0;
+		}
+	}
 
 
-
+	
+}
+//unsigned char *tmp_buffer=NULL;
+//unsigned char *tmp_ptr=NULL;
 void HDVCap::SavePic(const char* name)
 {
 	static unsigned char buffer[SDI_WIDTH*SDI_HEIGHT*2];
@@ -439,14 +459,7 @@ void HDVCap::Capture(char* ptr){
 #if ENABLE_ENHANCE_FUNCTION
 		if(ptr[0]==SRCUYVY)
 		{
-			if(m_qid==MAIN_FPGA_FOUR)
-			{
-				YUYVEnhanceFour((unsigned char *)ptr,(unsigned char *)ptr,1280,1080);
-			}
-			else if(m_qid==MAIN_FPGA_SIX)
-			{
-				YUYVEnhance((unsigned char *)ptr,(unsigned char *)ptr,1920,1080);
-			}
+				YUYVEnhanceFour((unsigned char *)ptr,(unsigned char *)ptr,1280,720);
 			ptr[0]=SRCUYVY;
 		}
 #endif

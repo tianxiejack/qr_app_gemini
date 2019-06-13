@@ -3,12 +3,12 @@ using namespace std;
 thread_idle tIdle;
 thread_idle::thread_idle()
 {
-Idle[FPGA_FOUR_CN]=false;
-Idle[SUB_CN]=true;
-Idle[MAIN_CN]=false;
-Idle[MVDECT_CN]=false;
-Idle[FPGA_SIX_CN]=false;
-Idle[MVDECT_ADD_CN]=false;
+Idle[0]=false;
+Idle[1]=false;
+Idle[2]=false;
+Idle[3]=false;
+Idle[4]=false;
+Idle[5]=false;
 }
 bool thread_idle::isToIdle(int idx){
 	return Idle[idx];}

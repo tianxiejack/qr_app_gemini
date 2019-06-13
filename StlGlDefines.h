@@ -97,7 +97,7 @@ enum
 #define PARTITIONS1 10
 #define PARTITIONS2 4
 #define FPGA_SCREEN_WIDTH 1280
-#define FPGA_SCREEN_HEIGHT 1080
+#define FPGA_SCREEN_HEIGHT 720
 
 
 
@@ -217,8 +217,8 @@ enum{
 #define VGA_WIDTH 1024
 #define VGA_HEIGHT 768
 
-#define SDI_WIDTH 1920
-#define SDI_HEIGHT 1080
+#define SDI_WIDTH 1280
+#define SDI_HEIGHT 720
 #define FPGA_SINGLE_PIC_W 640
 #define FPGA_SINGLE_PIC_H 540
 #define VGA_DEV_NUM 5

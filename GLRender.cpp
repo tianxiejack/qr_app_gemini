@@ -3334,7 +3334,6 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 		if (p_petalNum[i] != -1) {
 			glActiveTexture(GL_TextureIDs[0]);
 			//glActiveTexture(renderTGATextures[0]);
-
 				//SEND_TEXTURE_TO_PETAL(i, m_env,Isenhdata);
 				p_EnhStateMachineGroup->SendData(k,needSendData);
 

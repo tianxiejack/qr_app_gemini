@@ -53,7 +53,7 @@ unsigned char * target_data[CAM_COUNT];
 
 
 
-
+unsigned char * sigle_yuyv[3] = {NULL,NULL,NULL};
 unsigned char * select_bgr_data_sub=NULL;
 unsigned char * select_bgr_data_main=NULL;
 unsigned char * FPGA6_bgr_data_sub=NULL;
@@ -73,7 +73,7 @@ HDv4l_cam::HDv4l_cam(int devId,int width,int height):io(IO_METHOD_USERPTR),imgwi
 imgheight(height),buffers(NULL),memType(MEMORY_NORMAL),cur_CHANnum(0),
 force_format(1),m_devFd(-1),n_buffers(0),bRun(false),Id(devId),BaseVCap()
 {
-		imgformat 	= V4L2_PIX_FMT_GREY;//当成YUYV来采集，实际此时芯片为UYVY
+		imgformat 	= V4L2_PIX_FMT_YUYV;//当成YUYV来采
 		sprintf(dev_name, "/dev/video%d",devId);
 			imgstride 	= imgwidth*2;
 			bufSize 	= imgwidth * imgheight * 2;
@@ -97,25 +97,24 @@ HDv4l_cam::~HDv4l_cam()
 	uninit_device();
 	close_device();
 }
-
-void YUYV2UYVx(unsigned char *ptr,unsigned char *Yuyv, int ImgWidth, int ImgHeight)
+void HDv4l_cam::HD_YUYV2UYV(unsigned char *dst,unsigned char *src, int ImgWidth, int ImgHeight)
 {
 	for(int j =0;j<ImgHeight;j++)
 	{
 		for(int i=0;i<ImgWidth*2/4;i++)
 		{
-			*(ptr+j*ImgWidth*4+i*8+1)=*(Yuyv+j*ImgWidth*2+i*4);
-			*(ptr+j*ImgWidth*4+i*8+0)=*(Yuyv+j*ImgWidth*2+i*4+1);
-			*(ptr+j*ImgWidth*4+i*8+2)=*(Yuyv+j*ImgWidth*2+i*4+3);
-			*(ptr+j*ImgWidth*4+i*8+3)=0;
+			*(dst+j*ImgWidth*3+i*6+0)=*(src+j*ImgWidth*2+i*4+1);
+			*(dst+j*ImgWidth*3+i*6+1)=*(src+j*ImgWidth*2+i*4+0);
+			*(dst+j*ImgWidth*3+i*6+2)=*(src+j*ImgWidth*2+i*4+3);
 
-			*(ptr+j*ImgWidth*4+i*8+5)=*(Yuyv+j*ImgWidth*2+i*4+2);
-			*(ptr+j*ImgWidth*4+i*8+4)=*(Yuyv+j*ImgWidth*2+i*4+1);
-			*(ptr+j*ImgWidth*4+i*8+6)=*(Yuyv+j*ImgWidth*2+i*4+3);
-			*(ptr+j*ImgWidth*4+i*8+7)=0;
+			*(dst+j*ImgWidth*3+i*6+3)=*(src+j*ImgWidth*2+i*4+1);
+			*(dst+j*ImgWidth*3+i*6+4)=*(src+j*ImgWidth*2+i*4+2);
+			*(dst+j*ImgWidth*3+i*6+5)=*(src+j*ImgWidth*2+i*4+3);
+
 		}
 	}
 }
+
 void HDv4l_cam::RectFromPixels(unsigned char *src)
 {
 	int len=SDI_WIDTH-FPGA_SCREEN_WIDTH;
@@ -155,6 +154,7 @@ void HDv4l_cam::UYVnoXquar(unsigned char *dst,unsigned char *src, int ImgWidth, 
 
 void HDv4l_cam::UYVY2UYV(unsigned char *dst,unsigned char *src, int ImgWidth, int ImgHeight)
 {
+#if 0
 	if (ImgWidth==FPGA_SCREEN_WIDTH) //4副先进行切割
 		{
 //#pragma omp parallel for
@@ -172,6 +172,9 @@ void HDv4l_cam::UYVY2UYV(unsigned char *dst,unsigned char *src, int ImgWidth, in
 		UYVnoXquar(dst+i*ImgWidth*ImgHeight*3,src+i*ImgWidth*ImgHeight*2,ImgWidth,ImgHeight);
 		}
 	}
+#endif
+	UYVnoXquar(dst,src,1280,720);
+
 }
 
 
@@ -475,7 +478,7 @@ int HDv4l_cam::init_device(void)
 		fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		if (force_format) {
 			fprintf(stderr, "Set HDyuyv\r\n");
-			fmt.fmt.pix.width       = imgwidth*2; //replace  因为假设成GREY 来采集UYVY,所以GREY的宽度要乘以2
+			fmt.fmt.pix.width       = imgwidth; //replace  因为假设成GREY 来采集UYVY,所以GREY的宽度要乘以2
 			fmt.fmt.pix.height      = imgheight; //replace
 			fmt.fmt.pix.pixelformat = imgformat;
 			fmt.fmt.pix.field       = V4L2_FIELD_ANY;
@@ -496,7 +499,7 @@ int HDv4l_cam::init_device(void)
 
 
 		/* Buggy driver paranoia. */
-		min = fmt.fmt.pix.width * 2;
+		min = fmt.fmt.pix.width;
 		if (fmt.fmt.pix.bytesperline < min)
 			fmt.fmt.pix.bytesperline = min;
 		min = fmt.fmt.pix.bytesperline * fmt.fmt.pix.height;
@@ -634,177 +637,39 @@ int HDv4l_cam::read_frame(int now_pic_format)
 					unsigned char **transformed_src_sub=NULL;
 					switch(now_pic_format)
 					{
-					case FPGA_FOUR_CN:
-						chid[MAIN]=MAIN_FPGA_FOUR;
+					case 0:
+						chid[MAIN]=0;
 				//		chid[SUB]=SUB_FPGA_FOUR;
 						nowpicW=FPGA_SCREEN_WIDTH;
 						nowpicH=FPGA_SCREEN_HEIGHT;
-						transformed_src_main=&FPGA4_bgr_data_main;
+						transformed_src_main=&sigle_yuyv[0];
 			//			transformed_src_sub=&FPGA4_bgr_data_sub;
 						break;
-					case SUB_CN:
-						chid[SUB]=SUB_ONE_OF_TEN;
-						transformed_src_sub=&select_bgr_data_sub;
+					case 1:
+						chid[MAIN]=1;
+						nowpicW=FPGA_SCREEN_WIDTH;
+						nowpicH=FPGA_SCREEN_HEIGHT;
+						transformed_src_main=&sigle_yuyv[1];
 						break;
-					case MAIN_CN:
-						chid[MAIN]=MAIN_ONE_OF_TEN;
-						chid_touch[MAIN]=MAIN_ONE_OF_TEN_TOUCH;
-						transformed_src_main=&select_bgr_data_main;
-						transformed_src_main_touch=&select_bgr_data_main_touch;
-
-						break;
-					case MVDECT_CN:
-					case MVDECT_ADD_CN:
-					//	chid[MAIN]=ChangeIdx2chid(MAIN);
-						nowGrayidx=GetNowPicIdx((unsigned char *)buffers[buf.index].start);
-			//todo  change
-						if(nowGrayidx>=8||nowGrayidx<=0)
-						{
-							if (-1 ==xioctl(m_devFd, VIDIOC_QBUF, &buf)){
-												fprintf(stderr, "VIDIOC_QBUF error %d, %s\n", errno, strerror(errno));
-												exit(EXIT_FAILURE);
-											}
-							return 0;
-						}
-						else
-						{
-							chid[MAIN]=nowGrayidx+1;
-							transformed_src_main=&MVDECT_data_main[nowGrayidx-1];
-						}
-						break;
-					case FPGA_SIX_CN:
-						chid[MAIN]=MAIN_FPGA_SIX;
-						transformed_src_main=&FPGA6_bgr_data_main;
+					case 2:
+						chid[MAIN]=2;
+						nowpicW=FPGA_SCREEN_WIDTH;
+						nowpicH=FPGA_SCREEN_HEIGHT;
+						transformed_src_main=&sigle_yuyv[2];
 						break;
 					default:
 						break;
 					}
-					if(chid[MAIN]!=-1) //车长
-					{
-						if(now_pic_format==MVDECT_CN
-								||now_pic_format==MVDECT_ADD_CN)//移动检测
-						{
-						{
-							#if MVDECT
-							if(mv_detect.isRunning())
-							{
-								mv_detect.m_mvDetect(nowGrayidx,(unsigned char *)buffers[buf.index].start, SDI_WIDTH, SDI_HEIGHT);
-							}
-							#endif
-						}
-						}
-						else //４副　６副　　车长１０选一
-						{
-							if(now_pic_format==MAIN_CN)
-							{
-								for(int i=0;i<CAM_COUNT;i++)
-								{
-									if(saveSinglePic[i]==true)
-									{
-										saveSinglePic[i]=false;
-										sprintf(filename,"%.2d.bmp",i%CAM_COUNT);
-										save_single_pic(filename,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
-									}
-								}
-									UYVY2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
-									if(	Render_Agent::IsProducerRGB())
-									{
-										CC_enh_mvd=2;
-										memcpy(*transformed_src_main_touch,(unsigned char *)buffers[buf.index].start,nowpicW*nowpicH*2);
-									}
-									else
-									{
-										CC_enh_mvd=3;
-										memcpy(*transformed_src_main_touch,*transformed_src_main,nowpicW*nowpicH*3);
-									}
-#if MVDECT
-								if(mv_detect.isRunning())
-								{
-									mv_detect.SetoutRect(true);
-									mv_detect.DrawRectOnChosenPic(*transformed_src_main_touch,CC_enh_mvd);
-								}
-#endif
-								if(Render_Agent::IsProducerRGB())
-								{
-									(*transformed_src_main_touch)[0]=SRCUYVY;
-								}
-								else
-								{
-									(*transformed_src_main_touch)[0]=SRCUYVUYV;
-								}
-									if(Data2Queue(*transformed_src_main_touch,nowpicW,nowpicH,chid_touch[MAIN]))
-									{
-										if(getEmpty(&*transformed_src_main_touch, chid_touch[MAIN]))
-										{
-										}
-									}
-							}
-							else
-							{
-								if(	Render_Agent::IsProducerRGB())
-								{
-									CC_enh_mvd=2;
-									memcpy(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW*nowpicH*2);
-								}
-								else
-								{
-									CC_enh_mvd=3;
-									UYVY2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
-									Src=*transformed_src_main;
-								}
-#if MVDECT
-								if(mv_detect.isRunning())
-								{
-									mv_detect.SetoutRect(false);
-									if(nowpicW==1280)
-									{
-										mv_detect.DrawRectOnpic(*transformed_src_main,MAIN_FPGA_FOUR,CC_enh_mvd);
-									}
-									else if (nowpicW==1920)
-									{
-										mv_detect.DrawRectOnpic(*transformed_src_main,MAIN_FPGA_SIX,CC_enh_mvd);
-									}
-								}
-#endif
-								if(Render_Agent::IsProducerRGB())
-								{
-									(*transformed_src_main)[0]=SRCUYVY;
-								}
-								else
-								{
-									(*transformed_src_main)[0]=SRCUYVUYV;
-								}
-							}
+			//					UYVY2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
+						HD_YUYV2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
 
-						}
+
 						if(Data2Queue(*transformed_src_main,nowpicW,nowpicH,chid[MAIN]))
 						{
 							if(getEmpty(&*transformed_src_main, chid[MAIN]))
 							{
 							}
 						}
-					}
-					if(chid[SUB]!=-1)//驾驶员
-					{
-						if(now_pic_format==SUB_CN)//如果等于驾驶员十选一，则要进行rgb转换
-						{
-							UYVY2UYV(*transformed_src_sub,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
-						}
-						else if(now_pic_format==MVDECT_CN)//移动检测
-						{
-						}
-						else//如果不等于驾驶员十选一＆不等于检测的gray数据，则直接将main里的已经转换好的数据进行拷贝
-						{
-
-						}
-						if(Data2Queue(*transformed_src_sub,nowpicW,nowpicH,chid[SUB]))
-						{
-							if(getEmpty(&*transformed_src_sub, chid[SUB]))
-							{
-							}
-						}
-					}
-
 
 			}
 					if (-1 ==xioctl(m_devFd, VIDIOC_QBUF, &buf)){
@@ -812,8 +677,8 @@ int HDv4l_cam::read_frame(int now_pic_format)
 						exit(EXIT_FAILURE);
 					}
 	return 0;
-}
 
+}
 void HDv4l_cam::stop_capturing(void)
 {
 	enum v4l2_buf_type type;
@@ -1050,24 +915,15 @@ void HDv4l_cam::mainloop(int now_pic_format)
 		int l=0;
 		switch(now_pic_format)
 		{
-		case FPGA_FOUR_CN :
+		case 0 :
 			l=THREAD_L_4;
 			break;
-		case	 SUB_CN :
+		case	 1 :
 			l=THREAD_L_S_1;
 						break;
-		case	MAIN_CN :
+		case	2 :
 			l=THREAD_L_M_1;
 						break;
-		case	 MVDECT_CN	:
-			l=THREAD_L_MVDECT;
-						break;
-		case	 FPGA_SIX_CN :
-			l=THREAD_L_6;
-						break;
-		case	 MVDECT_ADD_CN	:
-				l=THREAD_L_MVDECT;
-							break;
 		default:
 			assert(false);
 
@@ -1268,11 +1124,7 @@ bool HDv4l_cam::Data2Queue(unsigned char *pYuvBuf,int width,int height,int chId)
 
 void  HDv4l_cam::start_queue()
 {
-	int j=0;
-	for (int i = MAIN_1; i < MAIN_1+CAM_COUNT; i++) {
-	//	getEmpty(&GRAY_data_main[i-MAIN_1], i);
-		getEmpty(&MVDECT_data_main[i-MAIN_1], i);
-	}
+#if 0
 	getEmpty(&select_bgr_data_main,MAIN_ONE_OF_TEN);
 	getEmpty(&select_bgr_data_sub,SUB_ONE_OF_TEN );
 	getEmpty(&FPGA6_bgr_data_main,MAIN_FPGA_SIX);
@@ -1280,7 +1132,9 @@ void  HDv4l_cam::start_queue()
 	getEmpty(&FPGA4_bgr_data_main,MAIN_FPGA_FOUR);
 	getEmpty(&FPGA4_bgr_data_sub, SUB_FPGA_FOUR);
 	getEmpty(&select_bgr_data_main_touch, MAIN_ONE_OF_TEN_TOUCH);
-
+#endif
+	for(int j = 0;j<3;j++)
+		getEmpty(&(sigle_yuyv[j]),j);
 }
 
 

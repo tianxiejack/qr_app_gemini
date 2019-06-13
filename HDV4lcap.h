@@ -153,7 +153,7 @@ private:
 
 	void YUYV2UYVx(unsigned char *dst,unsigned char *src, int ImgWidth, int ImgHeight);
 	void YUVquar(unsigned char *dst,unsigned char *src, int ImgWidth, int ImgHeight);
-
+	void HD_YUYV2UYV(unsigned char *dst,unsigned char *src, int ImgWidth, int ImgHeight);
 	void YUYV2RGB(unsigned char * src,unsigned char * dst,int w,int h);
 	void YUYV2GRAY(unsigned char * src,unsigned char * dst,int w,int h);
 	void RectFromPixels(unsigned char *src);
