@@ -105,8 +105,8 @@ void RenderMain::initGlut(int argc, char **argv,int startx,int starty)
 	glutReshapeFunc(ReSizeGLScene); /* Register the function called when our window is resized. */
 	glutKeyboardFunc(keyPressed); /* Register the function called when the keyboard is pressed. */
 	glutSpecialFunc(specialkeyPressed); /* Register the special key function */
-	glutMouseFunc(mouseButtonPress); /* Register the function called when the mouse buttons are pressed */
-	glutMotionFunc(mouseMotionPress); /*Register the mouse motion function */
+//	glutMouseFunc(mouseButtonPress); /* Register the function called when the mouse buttons are pressed */
+//	glutMotionFunc(mouseMotionPress); /*Register the mouse motion function */
 }
 void RenderMain::parseArgs(int argc, char** argv)
 {

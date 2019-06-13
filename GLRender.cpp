@@ -2745,8 +2745,8 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 						Point1[index].x / DEFAULT_IMAGE_WIDTH,
 						Point1[index].y / DEFAULT_IMAGE_HEIGHT);
 				pBatch->MultiTexCoord2f(1,
-						Point2[index].x / DEFAULT_IMAGE_WIDTH,
-						Point2[index].y / DEFAULT_IMAGE_HEIGHT);
+						Point1[index].x / DEFAULT_IMAGE_WIDTH,
+						Point1[index].y / DEFAULT_IMAGE_HEIGHT);
 				pBatch->MultiTexCoord2f(2, /*1 -*/
 				set_alpha[alpha_dir * 3 + index].x,
 						set_alpha[alpha_dir * 3 + index].y);
@@ -3341,7 +3341,7 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 
 			shaderManager.UseStockShader(GetShaderIDByState(), m_env.GettransformPipeline()->GetModelViewProjectionMatrix(), 0,i);
 
-			(*m_env.GetPanel_Petal(p_petalNum[i])).Draw();
+		(*m_env.GetPanel_Petal(p_petalNum[i])).Draw();
 			{
 
 				   shaderManager.UseStockShader(GetShaderIDByState(false),
