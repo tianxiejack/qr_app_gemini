@@ -7721,9 +7721,8 @@ case DEBUG_ORDER_LEFT_HANDED_IMAGE: {
 			rotate_angle[new_dir] += pano_rotate_angle;
 			if (rotate_angle[new_dir] > 360.0) {
 				rotate_angle[new_dir] -= 360.0;
-
+			}
 			InitPanel(env, 0, true);
-		}
 	}
 break;
 }
