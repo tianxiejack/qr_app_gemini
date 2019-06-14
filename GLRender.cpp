@@ -7671,188 +7671,168 @@ if (TRIM_MODE == displayMode) {
 if (steps != lasetSteps) {
 	lasetSteps = steps;
 	if (steps == 1)
-		ProcessOitKeys(env, 'Z', 0, 0);
+		SetTuneSteps(1);
 	else if (steps == 5)
-		ProcessOitKeys(env, 'E', 0, 0);
+		SetTuneSteps(5);
 	else if (steps == 10)
-		ProcessOitKeys(env, 'R', 0, 0);
+		SetTuneSteps(10);
 	else if (steps == 50)
-		ProcessOitKeys(env, 'M', 0, 0);
+		SetTuneSteps(50);
 }
 }
 
 DEBUG_ORDER dbo = getDebugModeOrder(TRANSFER_TO_APP_ETHOR);
 switch (dbo) {
-case DEBUG_ORDER_PERISCOPIC_MODE:
-displayMode = ALL_VIEW_MODE;
-break;
-case DEBUG_ORDER_CROSS_MOVEUP:
-if (displayMode == ALL_VIEW_MODE) {
-	ProcessOitKeys(env, '#', 0, 0);
-}
-break;
-case DEBUG_ORDER_CROSS_MOVEDOWN:
-if (displayMode == ALL_VIEW_MODE) {
-	ProcessOitKeys(env, '$', 0, 0);
-}
-break;
-case DEBUG_ORDER_CROSS_MOVELEFT:
-if (displayMode == ALL_VIEW_MODE) {
-	ProcessOitKeys(env, '!', 0, 0);
-}
-break;
-case DEBUG_ORDER_CROSS_MOVERIGHT:
-if (displayMode == ALL_VIEW_MODE) {
-	ProcessOitKeys(env, '@', 0, 0);
-}
-break;
-case DEBUG_ORDER_TARGETDETECTION_ON:
-ProcessOitKeys(env, 'O', 0, 0);
-break;
-case DEBUG_ORDER_TARGETDETECTION_OFF:
-ProcessOitKeys(env, 'o', 0, 0);
-break;
 case DEBUG_ORDER_TRIMMING_ON:
-specialkeyPressed(env, 12, 0, 0);
+	EnablePanoFloat = true;//open trimming
 break;
-case DEBUG_ORDER_CHOOSECAMERA_LEFT:
-if (TRIM_MODE == displayMode) {
-	specialkeyPressed(env, SPECIAL_KEY_LEFT, 0, 0);
-}
-break;
-case DEBUG_ORDER_CHOOSECAMERA_RIGHT:
-if (TRIM_MODE == displayMode) {
-	specialkeyPressed(env, SPECIAL_KEY_RIGHT, 0, 0);
-}
-break;
+
 case DEBUG_ORDER_CHECKEDCAMERA_MOVEUP:
-if (TRIM_MODE == displayMode) {
-	specialkeyPressed(env, SPECIAL_KEY_UP, 0, 0);
+if(EnablePanoFloat){
+	int new_dir = ExchangeChannel(testPanoNumber);
+			PanoFloatData[new_dir] = PanoFloatData[new_dir] + pano_float_step;
+			InitPanel(env, 0, true);
 }
 break;
 case DEBUG_ORDER_CHECKEDCAMERA_MOVEDOWN:
-if (TRIM_MODE == displayMode) {
-	specialkeyPressed(env, SPECIAL_KEY_DOWN, 0, 0);
+	if(EnablePanoFloat){
+	int new_dir = ExchangeChannel(testPanoNumber);
+	PanoFloatData[new_dir] = PanoFloatData[new_dir] - pano_float_step;
+	InitPanel(env, 0, true);
 }
 break;
 case DEBUG_ORDER_CHECKEDCAMERA_MOVELEFT:
-if (TRIM_MODE == displayMode) {
-	ProcessOitKeys(env, 'a', 0, 0);
+	if(EnablePanoFloat){
+	int new_dir = ExchangeChannel(testPanoNumber);
+	move_hor[new_dir] = move_hor[new_dir] + pano_hor_step;
+	InitPanel(env, 0, true);
 }
 break;
 case DEBUG_ORDER_CHECKEDCAMERA_MOVERIGHT:
-if (TRIM_MODE == displayMode) {
-	ProcessOitKeys(env, 'd', 0, 0);
+	if(EnablePanoFloat){
+	int new_dir = ExchangeChannel(testPanoNumber);
+	move_hor[new_dir] = move_hor[new_dir] -  pano_hor_step;
+	InitPanel(env, 0, true);
 }
 break;
 case DEBUG_ORDER_LEFT_HANDED_IMAGE: {
-if (TRIM_MODE == displayMode) {
-	ProcessOitKeys(env, 'q', 0, 0);
-}
+	if(EnablePanoFloat){
+			int new_dir = ExchangeChannel(testPanoNumber);
+			rotate_angle[new_dir] += pano_rotate_angle;
+			if (rotate_angle[new_dir] > 360.0) {
+				rotate_angle[new_dir] -= 360.0;
+
+			InitPanel(env, 0, true);
+		}
+	}
 break;
 }
 case DEBUG_ORDER_RIGH_THANDED_IMAGE: {
-if (TRIM_MODE == displayMode) {
-	ProcessOitKeys(env, 'e', 0, 0);
-}
+	if(EnablePanoFloat){
+				int new_dir = ExchangeChannel(testPanoNumber);
+				rotate_angle[new_dir] -= pano_rotate_angle;
+				if (rotate_angle[new_dir] < 0.0) {
+					rotate_angle[new_dir] += 360.0;
+				}
+				InitPanel(env, 0, true);
+	}
 break;
 }
 case DEBUG_ORDER_LONGITUDINAL_COMPRESSION_IMAGE: {
-if (TRIM_MODE == displayMode) {
-	ProcessOitKeys(env, 'w', 0, 0);
-}
+
+	if(EnablePanoFloat){
+				int new_dir = ExchangeChannel(testPanoNumber);
+				move_ver_scale[new_dir] = move_ver_scale[new_dir] + pano_hor_scale;
+				if (move_ver_scale[new_dir] > 3.0) {
+					move_ver_scale[new_dir] = 3.0;
+				}
+				InitPanel(env, 0, true);
+	}
+
 break;
 }
 case DEBUG_ORDER_LONGITUDINAL_TENSILE_IMAGE: {
-if (TRIM_MODE == displayMode) {
-	ProcessOitKeys(env, 's', 0, 0);					//la
-}
+	if(EnablePanoFloat){
+	int new_dir = ExchangeChannel(testPanoNumber);
+	move_ver_scale[new_dir] = move_ver_scale[new_dir] - pano_hor_scale;
+	if (move_ver_scale[new_dir] < 0.01) {
+		move_ver_scale[new_dir] = 0.01;
+	}
+	InitPanel(env, 0, true);
+	}
 break;
 }
 case DEBUG_ORDER_TRANSVERSE_TENSILE_IMAGE: {
-if (TRIM_MODE == displayMode) {
-	ProcessOitKeys(env, ':', 0, 0);					//la
-}
-break;
+	if(EnablePanoFloat){
+	int new_dir = ExchangeChannel(testPanoNumber);
+	move_hor_scale[new_dir] = move_hor_scale[new_dir] - pano_hor_scale;
+	if (move_hor_scale[new_dir] < 0.01) {
+		move_hor_scale[new_dir] = 0.01;
+	}
+	InitPanel(env, 0, true);
+	}
+	break;
 }
 case DEBUG_ORDER_TRANSVERSE_COMPRESSION_IMAGE: {
-if (TRIM_MODE == displayMode) {
-	ProcessOitKeys(env, '"', 0, 0);
-}
+
+	if(EnablePanoFloat){
+	int new_dir = ExchangeChannel(testPanoNumber);
+	move_hor_scale[new_dir] = move_hor_scale[new_dir] + pano_hor_scale;
+	if (move_hor_scale[new_dir] > 3.0) {
+		move_hor_scale[new_dir] = 3.0;
+	}
+	InitPanel(env, 0, true);
+	}
 break;
 }
 case DEBUG_ORDER_SAVE_TRIMMING_RESULT:
-if (TRIM_MODE == displayMode) {
-	specialkeyPressed(env, 1, 0, 0);
-}
+	WritePanoScaleArrayData(PANO_SCALE_ARRAY_FILE, channel_left_scale,
+			channel_right_scale, move_hor);
+	WritePanoFloatDataFromFile(PANO_FLOAT_DATA_FILENAME, PanoFloatData);
+	WriteRotateAngleDataToFile(PANO_ROTATE_ANGLE_FILENAME, rotate_angle);
+	WritePanoHorVerScaleData(PANO_HOR_VER_SCALE_FILE, move_hor_scale,
+			move_ver_scale);
 break;
 case DEBUG_ORDER_CLEAN_CHECKEDCAMERA_RESULT:
-if (TRIM_MODE == displayMode) {
-	specialkeyPressed(env, 4, 0, 0);
+	if(EnablePanoFloat){
+	int new_dir = ExchangeChannel(testPanoNumber);
+	channel_left_scale[new_dir] = define_channel_left_scale[new_dir];
+	channel_right_scale[new_dir] = define_channel_right_scale[new_dir];
+	move_hor[new_dir] = define_move_hor[new_dir];
+	PanoFloatData[new_dir] = define_PanoFloatData[new_dir];
+	rotate_angle[new_dir] = define_rotate_angle[new_dir];
+	move_hor_scale[new_dir] = define_move_hor_scale[new_dir];
+	move_ver_scale[new_dir] = define_move_ver_scale[new_dir];
+	InitPanel(env, 0, true);
 }
 break;
 case DEBUG_ORDER_CLEAN_ALLCAMERA_RESULT:
-if (TRIM_MODE == displayMode) {
-	specialkeyPressed(env, 6, 0, 0);
+	if(EnablePanoFloat){
+	int test_dir = 0;
+	for (int set_i = 0; set_i < CAM_COUNT; set_i++) {
+		test_dir = set_i;
+		channel_left_scale[test_dir] = define_channel_left_scale[set_i];
+		channel_right_scale[test_dir] = define_channel_right_scale[set_i];
+		move_hor[test_dir] = define_move_hor[set_i];
+		PanoFloatData[test_dir] = define_PanoFloatData[set_i];
+		rotate_angle[test_dir] = define_rotate_angle[set_i];
+		move_hor_scale[test_dir] = define_move_hor_scale[set_i];
+		move_ver_scale[test_dir] = define_move_ver_scale[set_i];
+	}
+	InitPanel(env, 0, true);
 }
 break;
 case DEBUG_ORDER_TRIMMING_OFF:
-if (TRIM_MODE == displayMode) {
-	specialkeyPressed(env, 11, 0, 0);
-}
-break;
-case DEBUG_ORDER_SINGLECAMERA_MODE:
-displayMode = CHOSEN_VIEW_MODE;
-break;
-case DEBUG_ORDER_SINGLECAMERA_0:
-displayMode = CHOSEN_VIEW_MODE;
-chosenCam[MAIN] = 1;
-ChangeMainChosenCamidx(chosenCam[MAIN]);
+	EnablePanoFloat = false;
 break;
 case DEBUG_ORDER_SINGLECAMERA_1:
-displayMode = CHOSEN_VIEW_MODE;
-chosenCam[MAIN] = 2;
-ChangeMainChosenCamidx(chosenCam[MAIN]);
+	testPanoNumber =1;
 break;
 case DEBUG_ORDER_SINGLECAMERA_2:
-displayMode = CHOSEN_VIEW_MODE;
-chosenCam[MAIN] = 3;
-ChangeMainChosenCamidx(chosenCam[MAIN]);
+	testPanoNumber =2;
 break;
 case DEBUG_ORDER_SINGLECAMERA_3:
-displayMode = CHOSEN_VIEW_MODE;
-chosenCam[MAIN] = 4;
-ChangeMainChosenCamidx(chosenCam[MAIN]);
-break;
-case DEBUG_ORDER_SINGLECAMERA_4:
-displayMode = CHOSEN_VIEW_MODE;
-chosenCam[MAIN] = 5;
-ChangeMainChosenCamidx(chosenCam[MAIN]);
-break;
-case DEBUG_ORDER_SINGLECAMERA_5:
-displayMode = CHOSEN_VIEW_MODE;
-chosenCam[MAIN] = 6;
-ChangeMainChosenCamidx(chosenCam[MAIN]);
-break;
-case DEBUG_ORDER_SINGLECAMERA_6:
-displayMode = CHOSEN_VIEW_MODE;
-chosenCam[MAIN] = 7;
-ChangeMainChosenCamidx(chosenCam[MAIN]);
-break;
-case DEBUG_ORDER_SINGLECAMERA_7:
-displayMode = CHOSEN_VIEW_MODE;
-chosenCam[MAIN] = 8;
-ChangeMainChosenCamidx(chosenCam[MAIN]);
-break;
-case DEBUG_ORDER_SINGLECAMERA_8:
-displayMode = CHOSEN_VIEW_MODE;
-chosenCam[MAIN] = 9;
-ChangeMainChosenCamidx(chosenCam[MAIN]);
-break;
-case DEBUG_ORDER_SINGLECAMERA_9:
-displayMode = CHOSEN_VIEW_MODE;
-chosenCam[MAIN] = 10;
-ChangeMainChosenCamidx(chosenCam[MAIN]);
+	testPanoNumber =3;
 break;
 default:
 break;
@@ -7904,6 +7884,7 @@ if (env.Getp_FboPboFacade()->IsFboUsed()) {
 env.Getp_FBOmgr()->SetDrawBehaviour(&render);
 env.Getp_FboPboFacade()->DrawAndGet( Isenhdata,IsTouchenhdata);
 }
+Debuging();
 switch (displayMode) {
 case TRIM_MODE:
 env.Getp_FboPboFacade()->Render2Front(MAIN, g_windowWidth, g_windowHeight);
