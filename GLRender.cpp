@@ -8985,161 +8985,89 @@ case 'r':
 	}
 	break;
 case 't':		//PANO add PTZ view
+	SetTuneSteps(10);
 	break;
 case 'y':		//two half PANO view
-	DISPLAYMODE_SWITCH_TO(TWO_HALF_PANO_VIEW_MODE)
-	;
+	SetTuneSteps(50);
 	break;
 case 'u':		//single high quality view
+	testPanoNumber =1;
 	break;
 case 'i':		//pano view mode
-	DISPLAYMODE_SWITCH_TO(PANO_VIEW_MODE)
-	;
+	testPanoNumber =2;
 	break;
 case 'p':		//high definition pano add pano view
+	testPanoNumber =3;
 	break;
 case 'w':		//up
-	if (getFollowValue()) {
-		memcpy(cross_pos, getCrossCenterPos(), sizeof(cross_pos));
-		if (cross_pos[1] > (PanelLoader.Getextent_pos_z()) * CROSS_VER_UP_SCALE) {
-			;
-		} else {
-			cross_pos[1] = cross_pos[1] + CROSS_VER_STEP;
-			setCrossCenterPos(cross_pos);
-		}
-	}
-	if (EnablePanoFloat == true) {
-		if ((TRIM_MODE == displayMode)) {
+{
+
 			int new_dir = ExchangeChannel(testPanoNumber);
 			move_ver_scale[new_dir] = move_ver_scale[new_dir] + pano_hor_scale;
 			if (move_ver_scale[new_dir] > 3.0) {
 				move_ver_scale[new_dir] = 3.0;
 			}
 			InitPanel(m_env, 0, true);
-		}
+
 	}
 
 	break;
 case 's':		//down
-	if (getFollowValue()) {
-		memcpy(cross_pos, getCrossCenterPos(), sizeof(cross_pos));
-		if (cross_pos[1]
-				< (PanelLoader.Getextent_pos_z()) * CROSS_VER_DOWN_SCALE) {
-			;
-		} else {
-			cross_pos[1] = cross_pos[1] - CROSS_VER_STEP;
-			setCrossCenterPos(cross_pos);
-		}
-	}
+ {
 
-	if ((INIT_VIEW_MODE == displayMode)
-			&& (EnterSinglePictureSaveMode == true)) {
-
-		if (enterNumberofCam >= 0 && enterNumberofCam < CAM_COUNT) {
-			env.GetPanoCaptureGroup()->saveSingleCapImg(enterNumberofCam);
-			picSaveState[enterNumberofCam] = true;
-		}
-		enterNumberofCam = 0;
-	}
-	if (EnablePanoFloat == true) {
-		if ((TRIM_MODE == displayMode)) {
 			int new_dir = ExchangeChannel(testPanoNumber);
 			move_ver_scale[new_dir] = move_ver_scale[new_dir] - pano_hor_scale;
 			if (move_ver_scale[new_dir] < 0.01) {
 				move_ver_scale[new_dir] = 0.01;
 			}
 			InitPanel(m_env, 0, true);
-		}
+
 	}
 	break;
 case 'a':		//left
-	if (getFollowValue()) {
-		memcpy(cross_pos, getCrossCenterPos(), sizeof(cross_pos));
-		cross_pos[0] = cross_pos[0] - CROSS_HOR_STEP;
-		if (cross_pos[0] < (PanelLoader.Getextent_neg_x())) {
-			cross_pos[0] = -cross_pos[0] + PanelLoader.Getextent_pos_x()
-					+ PanelLoader.Getextent_neg_x();
-		} else {
-			;
-		}
-		setCrossCenterPos(cross_pos);
-	}
 
-	if (EnablePanoFloat == true) {
-		if ((TRIM_MODE == displayMode)) {
+ {
+
 			int new_dir = ExchangeChannel(testPanoNumber);
 			move_hor[new_dir] = move_hor[new_dir] + pano_hor_step;
 			InitPanel(m_env, 0, true);
-		}
+
 	}
 
 	break;
 case 'd':		//right
-	if (getFollowValue()) {
-		memcpy(cross_pos, getCrossCenterPos(), sizeof(cross_pos));
-		cross_pos[0] = cross_pos[0] + CROSS_HOR_STEP;
-		if (cross_pos[0] > (PanelLoader.Getextent_pos_x())) {
-			cross_pos[0] = -cross_pos[0] + PanelLoader.Getextent_pos_x()
-					+ PanelLoader.Getextent_neg_x();
-		} else {
-			;
-		}
-		setCrossCenterPos(cross_pos);
-	}
-	if (EnablePanoFloat == true) {
-		if ((TRIM_MODE == displayMode)) {
+{
 			int new_dir = ExchangeChannel(testPanoNumber);
 			move_hor[new_dir] = move_hor[new_dir] - pano_hor_step;
 			InitPanel(m_env, 0, true);
-		}
+
 	}
 
 	break;
 case 'q':		//enter
-	if (getFollowValue()) {
-		panel_pos_hor_start = (PanelLoader.Getextent_pos_x()
-				- PanelLoader.Getextent_neg_x()) / 2;
-		panel_pos_ver_start = (PanelLoader.Getextent_pos_z()
-				- PanelLoader.Getextent_neg_z()) / 2;
-		memcpy(cross_pos, getCrossCenterPos(), sizeof(cross_pos));
-		set_follow_angle[0] =
-				(cross_pos[0] - panel_pos_hor_start) * 360.0
-						/ (PanelLoader.Getextent_pos_x()
-								- PanelLoader.Getextent_neg_x());
-		set_follow_angle[1] = 180.0
-				* atan(
-						(cross_pos[1] - panel_pos_ver_start)
-								/ PanelLoader.Getextent_pos_y()) / PI;
 
-		setFollowAngle(set_follow_angle);
-		setSendFollowAngleEnable(true);
-		printf("\nstart to send\n");
+	 {
 
-	}
-
-	if (EnablePanoFloat == true) {
-		if ((TRIM_MODE == displayMode)) {
 			int new_dir = ExchangeChannel(testPanoNumber);
 			rotate_angle[new_dir] += pano_rotate_angle;
 			if (rotate_angle[new_dir] > 360.0) {
 				rotate_angle[new_dir] -= 360.0;
-			}
+
 			InitPanel(m_env, 0, true);
 		}
 	}
 	break;
 case 'e':
-	if (EnablePanoFloat == true) {
-		if ((TRIM_MODE == displayMode)) {
+{
 			int new_dir = ExchangeChannel(testPanoNumber);
 			rotate_angle[new_dir] -= pano_rotate_angle;
 			if (rotate_angle[new_dir] < 0.0) {
 				rotate_angle[new_dir] += 360.0;
 			}
 			InitPanel(m_env, 0, true);
+}
 
-		}
-	}
+
 	break;
 case 'G':		//PTZ--CCD
 	isUseNewGain = !isUseNewGain;
