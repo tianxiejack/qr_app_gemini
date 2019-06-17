@@ -84,9 +84,6 @@ force_format(1),m_devFd(-1),n_buffers(0),bRun(false),Id(devId),BaseVCap()
 			{
 				init_buffer();
 				Once_buffer=false;
-				for(int i=0;i<CAM_COUNT;i++){
-					target_data[i]=(unsigned char *)malloc(1920*1080*4);
-				}
 			}
 			Src=NULL;
 }
@@ -909,28 +906,6 @@ void HDv4l_cam::close_device(void)
 
 void HDv4l_cam::mainloop(int now_pic_format)
 {
-	static int setpriorityOnce[MAX_CC]={0};
-	if(!setpriorityOnce[now_pic_format])
-	{
-		int l=0;
-		switch(now_pic_format)
-		{
-		case 0 :
-			l=THREAD_L_4;
-			break;
-		case	 1 :
-			l=THREAD_L_S_1;
-						break;
-		case	2 :
-			l=THREAD_L_M_1;
-						break;
-		default:
-			assert(false);
-
-		}
-		setCurrentThreadHighPriority(l);
-		setpriorityOnce[now_pic_format]=1;
-	}
 	fd_set fds;
 	struct timeval tv;
 	int ret;

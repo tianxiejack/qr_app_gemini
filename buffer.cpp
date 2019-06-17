@@ -237,35 +237,9 @@ void get_buffer(unsigned char* ptr, int chId)
 
 //    yuv2UYVx(bufdata, ptr, width, height,chId);
 	int w=SDI_WIDTH;
-	if(chId==MAIN_FPGA_FOUR ||chId==SUB_FPGA_FOUR)
-	{
-		w=FPGA_SCREEN_WIDTH;
-	}
-//	if(Render_Agent:: IsUsePart()&&chId==MAIN_ONE_OF_TEN_TOUCH)
-	if(chId==MAIN_ONE_OF_TEN_TOUCH)
-	{
-		Center_Rect *temprect=Render_Agent::GetCurrentRect();
-		int factor=(int )(Render_Agent::GetTouchForesightPosY()*1080);
-			int y=temprect->y+factor;
-			if(y+temprect->height>1080)
-				y=1080-temprect->height;
 
-
-			if(bufdata[0]==SRCUYVY)
-			{
-				memcpy(ptr,bufdata+y*temprect->width*2,temprect->width*temprect->height*2);
-				ptr[0]=SRCUYVY;
-			}
-			else if(bufdata[0]==SRCUYVUYV)
-			{
-				memcpy(ptr,bufdata+y*temprect->width*3,temprect->width*temprect->height*3);
-				ptr[0]=SRCUYVUYV;
-			}
-	}
-	else
-	{
 		memcpy(ptr,bufdata,w*SDI_HEIGHT*3);
-	}
+
 	OSA_bufPutEmpty(&alg_handle->bufHndl[chId],bufId);
 }
 void get_bufferyuv(unsigned char* ptr, int chId)

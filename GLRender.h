@@ -967,8 +967,8 @@ private:
 #define ALPHA_TEXTURE_IDX	(1)
 //#define ALPHA_TEXTURE_IDX1	(1+2)
 
-	GLuint textures[PETAL_TEXTURE_COUNT];
-	GLuint GL_TextureIDs[PETAL_TEXTURE_COUNT];
+	GLuint textures[3];
+	GLuint GL_TextureIDs[3];
 
 	DynamicTrack *p_DynamicTrack;
 	CornerMarkerGroup *p_CornerMarkerGroup;

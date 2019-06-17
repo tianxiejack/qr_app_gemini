@@ -118,13 +118,7 @@ bool PBOSender::sendDataPBO(GLEnv &env,GLuint textureId, PFN_PBOFILLBUFFER fxn, 
 	// Use offset instead of pointer.
 
 #if WHOLE_PIC
-#if 0
-if(idx==0)//10路拼接中1*6
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height*m_ratio_1, pixel_format, GL_UNSIGNED_BYTE, 0);
-else if(idx==1)//10路拼接中1*4
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, height*m_ratio_1, width, height*m_ratio_2, pixel_format, GL_UNSIGNED_BYTE, 0);
-else
-#endif
+
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, pixel_format, GL_UNSIGNED_BYTE, 0);
 
 #else
@@ -148,6 +142,11 @@ else if(idx==1)
 	// If you do that, the previous data in PBO will be discarded and
 	// glMapBufferARB() returns a new allocated pointer immediately
 	// even if GPU is still working with the previous data.
+			glBufferDataARB(GL_PIXEL_UNPACK_BUFFER_ARB, dataSize, 0, /*GL_DYNAMIC_DRAW_ARB*/GL_STREAM_DRAW_ARB);
+			error =glGetError();
+			if(GL_NO_ERROR != error){
+					cout<<"2 GLError = "<<gluErrorString(error)<<endl;
+				}
 	GLubyte* ptr = (GLubyte*)glMapBufferARB(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB);
 	if(ptr && fxn)
 	{

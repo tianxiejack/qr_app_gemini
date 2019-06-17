@@ -13,7 +13,7 @@ GLEnv::GLEnv(CaptureGroup *p_pano,CaptureGroup *p_chosen,CaptureGroup *p_misc):
 m_panoCaptureGroup(p_pano),
 m_chosenCaptureGroup(p_chosen),
 m_miscCaptureGroup(p_misc),
-PBOMgr(PBOSender(CAM_COUNT,PANO_TEXTURE_WIDTH,PANO_TEXTURE_HEIGHT,iniCC,iniformat,0.6,0.4)),
+PBOMgr(PBOSender(3,PANO_TEXTURE_WIDTH,PANO_TEXTURE_HEIGHT,iniCC,iniformat,0.6,0.4)),
 FBOmgr(FBOManager(CURRENT_SCREEN_WIDTH,CURRENT_SCREEN_HEIGHT,iniformat,internalFormat)),
 PBORcr(PBOReceiver(PBO_ALTERNATE_NUM,CURRENT_SCREEN_WIDTH,CURRENT_SCREEN_HEIGHT,iniCC,iniformat)),
 PBOExtMgr(PBOSender(MAGICAL_NUM+EXT_CAM_COUNT,PAL_WIDTH,PAL_HEIGHT,iniCC,iniformat)),//图片

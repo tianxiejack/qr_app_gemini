@@ -1670,26 +1670,11 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		env.Set_FboPboFacade(*(env.Getp_FBOmgr()), *(env.Getp_PBORcr()));
 		mPresetCamGroup.LoadCameras();
 		// Load up CAM_COUNT textures
-		glGenTextures(PETAL_TEXTURE_COUNT, textures);
+		glGenTextures(3, textures);
 
-#if TEST_GAIN
-		//	memset(GainMask,0x00,sizeof(GainMask));
-		for (int i = 0; i < 1; i++) {
-			glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX + i + 1]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, GAIN_TEX_WIDTH,
-					GAIN_TEX_HEIGHT * CAM_COUNT, 0,
-					GL_RGBA, GL_UNSIGNED_BYTE, GainMask);
-		}
-#endif
 
-#if WHOLE_PIC
-		for (int i = 0; i < 1; i++) {
+#if 1
+		for (int i = 0; i < 3; i++) {
 			glBindTexture(GL_TEXTURE_2D, textures[i]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1732,14 +1717,7 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		//nComponents=GL_RGBA8;
 		// format= GL_RGBA;
 		// Alpha mask: 1/16 size of 1920x1080
-		glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX]);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, ALPHA_MASK_WIDTH,
-				ALPHA_MASK_HEIGHT, 0,
-				GL_RGBA, GL_UNSIGNED_BYTE, alphaMask);
+
 		/*
 		 glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX0]);
 		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -3059,10 +3037,10 @@ void Render::SendData(int i,bool needSendData)
 {
 	GLEnv &m_env=env1;
 	if(needSendData){
-			bool temp=m_env.Getp_PBOMgr()->sendData(m_env,textures[0], (PFN_PBOFILLBUFFER)capturePanoCam,i);
+			bool temp=m_env.Getp_PBOMgr()->sendData(m_env,textures[i], (PFN_PBOFILLBUFFER)capturePanoCam,i);
 		}
 			else{
-		glBindTexture(GL_TEXTURE_2D, textures[0]);
+		glBindTexture(GL_TEXTURE_2D, textures[i]);
 	}
 }
 void Render::DrawChosenVideo(GLEnv &m_env, bool needSendData, int mainorsub) {
@@ -3277,7 +3255,6 @@ GLT_STOCK_SHADER Render::GetShaderIDByState(bool ispano)
 
 void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_petalNum,
 		int mainOrsub) {
-
 #ifdef GET_ALARM_AERA
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pVehicle->msFBO);
 #endif
@@ -3287,27 +3264,11 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 	//#pragma omp parallel sections
 
 	//bind alpha mask to texture6, render the imagei, imagei+1 and alphaMask on petal_overlap[i]
-	glActiveTexture(GL_TextureIDs[ALPHA_TEXTURE_IDX]);
-	glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX]);
-
-#if  GAIN_MASK
-	for(int i = 0; i < 1; i++) {
-		glActiveTexture(GL_TextureIDs[PETAL_TEXTURE_COUNT-1]);
-		glBindTexture(GL_TEXTURE_2D, textures[PETAL_TEXTURE_COUNT-1]);
-		if(GainisNew)
-		{
-			glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,GAIN_TEX_WIDTH, GAIN_TEX_HEIGHT*CAM_COUNT, 0,
-					GL_RGBA, GL_UNSIGNED_BYTE, GainMask);
-			GainisNew=false;
-		}
-	}
-
-#endif
 	if (p_petalNum == NULL) {
 		glActiveTexture(GL_TextureIDs[0]);
 		//glActiveTexture(renderTGATextures[0]);
 
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 1; i++) {
 
 			p_EnhStateMachineGroup->SendData(i,needSendData);
 
@@ -3327,26 +3288,24 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 
 	}
 } else {
+	for(int j =0;j<3;j++){
+			glActiveTexture(GL_TextureIDs[j]);
+			p_EnhStateMachineGroup->SendData(j,needSendData);
+	}
+
 	for (int i = 0; i < CAM_COUNT; i++) {
-		static int k = 0;
-		if(i == CAM_COUNT-1 )
-			k = 0;
+
+
 		if (p_petalNum[i] != -1) {
-			glActiveTexture(GL_TextureIDs[0]);
-			//glActiveTexture(renderTGATextures[0]);
-				//SEND_TEXTURE_TO_PETAL(i, m_env,Isenhdata);
-				p_EnhStateMachineGroup->SendData(k,needSendData);
 
-				k = k+1;
-
-			shaderManager.UseStockShader(GetShaderIDByState(), m_env.GettransformPipeline()->GetModelViewProjectionMatrix(), 0,i);
+			shaderManager.UseStockShader(GetShaderIDByState(), m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),i-1,i);
 
 		(*m_env.GetPanel_Petal(p_petalNum[i])).Draw();
 			{
 
 				   shaderManager.UseStockShader(GetShaderIDByState(false),
 				            m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),0,
-				           0,ALPHA_TEXTURE_IDX,i);
+				           i-1,ALPHA_TEXTURE_IDX,i);
 
 		}
 		m_env.Getp_Panel_Petal_OverLap(p_petalNum[i])->Draw();
