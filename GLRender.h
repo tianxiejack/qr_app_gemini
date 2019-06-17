@@ -964,19 +964,19 @@ private:
 #define CHOSEN_TEXTURE_COUNT (CHOSEN_CAM_COUNT)
 #define PETAL_TEXTURE_COUNT (1+1+1)
 
-#define ALPHA_TEXTURE_IDX	(1)
+#define ALPHA_TEXTURE_IDX	(3)
 //#define ALPHA_TEXTURE_IDX1	(1+2)
 
-	GLuint textures[3];
-	GLuint GL_TextureIDs[3];
+	GLuint textures[6];
+	GLuint GL_TextureIDs[6];
 
 	DynamicTrack *p_DynamicTrack;
 	CornerMarkerGroup *p_CornerMarkerGroup;
 	float* pConerMarkerColors[CORNER_COUNT];
 	float   m_DynamicWheelAngle;
 	GLuint alphaMask[ALPHA_MASK_HEIGHT*ALPHA_MASK_WIDTH];//={0};
-//	GLuint alphaMask0[ALPHA_MASK_HEIGHT*ALPHA_MASK_WIDTH];//={0};
-//	GLuint alphaMask1[ALPHA_MASK_HEIGHT*ALPHA_MASK_WIDTH];//={0};
+	GLuint alphaMask0[ALPHA_MASK_HEIGHT*ALPHA_MASK_WIDTH];//={0};
+	GLuint alphaMask1[ALPHA_MASK_HEIGHT*ALPHA_MASK_WIDTH];//={0};
 
 	STLASCIILoader BowlLoader;
 	STLASCIILoader PanelLoader;

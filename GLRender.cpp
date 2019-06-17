@@ -1216,7 +1216,7 @@ Render::Render() :
 
 Render::~Render() {
 	destroyPixList();
-	glDeleteTextures(PETAL_TEXTURE_COUNT, textures);
+	glDeleteTextures(6, textures);
 	glDeleteTextures(EXTENSION_TEXTURE_COUNT, extensionTextures);
 #if USE_COMPASS_ICON
 	glDeleteTextures(1,iconTextures);
@@ -1670,7 +1670,7 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		env.Set_FboPboFacade(*(env.Getp_FBOmgr()), *(env.Getp_PBORcr()));
 		mPresetCamGroup.LoadCameras();
 		// Load up CAM_COUNT textures
-		glGenTextures(3, textures);
+		glGenTextures(6, textures);
 
 
 #if 1
@@ -1717,16 +1717,29 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		//nComponents=GL_RGBA8;
 		// format= GL_RGBA;
 		// Alpha mask: 1/16 size of 1920x1080
+		glBindTexture(GL_TEXTURE_2D, textures[3]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,ALPHA_MASK_WIDTH, ALPHA_MASK_HEIGHT, 0,
+				GL_RGBA, GL_UNSIGNED_BYTE, alphaMask);
 
-		/*
-		 glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX0]);
-		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		 glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,ALPHA_MASK_WIDTH, ALPHA_MASK_HEIGHT, 0,
-		 GL_RGBA, GL_UNSIGNED_BYTE, alphaMask0);
-		 */
+		glBindTexture(GL_TEXTURE_2D, textures[4]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexImage2D(GL_TEXTURE_2D,0,nComponents,ALPHA_MASK_WIDTH, ALPHA_MASK_HEIGHT, 0,
+				format, GL_UNSIGNED_BYTE, alphaMask0);
+
+		glBindTexture(GL_TEXTURE_2D, textures[5]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexImage2D(GL_TEXTURE_2D,0,nComponents,ALPHA_MASK_WIDTH, ALPHA_MASK_HEIGHT, 0,
+				format, GL_UNSIGNED_BYTE, alphaMask1);
 		/*		glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX1]);
 		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1856,7 +1869,9 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		}
 #endif
 	}
+
 	glMatrixMode(GL_MODELVIEW);
+
 
 }
 
@@ -2723,28 +2738,12 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 						Point1[index].x / DEFAULT_IMAGE_WIDTH,
 						Point1[index].y / DEFAULT_IMAGE_HEIGHT);
 				pBatch->MultiTexCoord2f(1,
-						Point1[index].x / DEFAULT_IMAGE_WIDTH,
-						Point1[index].y / DEFAULT_IMAGE_HEIGHT);
+						Point2[index].x / DEFAULT_IMAGE_WIDTH,
+						Point2[index].y / DEFAULT_IMAGE_HEIGHT);
 				pBatch->MultiTexCoord2f(2, /*1 -*/
 				set_alpha[alpha_dir * 3 + index].x,
 						set_alpha[alpha_dir * 3 + index].y);
-#if GAIN_MASK
-				pBatch->MultiTexCoord2f(3, Point1[index].x/DEFAULT_IMAGE_WIDTH, Point1[index].y/DEFAULT_IMAGE_HEIGHT);
-				pBatch->MultiTexCoord2f(4, Point2[index].x/DEFAULT_IMAGE_WIDTH, Point2[index].y/DEFAULT_IMAGE_HEIGHT);
-#endif
-#if  GAIN_MASK
-#if  !USE_BIG_OVERLAP
-				if(AppOverlap)
-				{
-					int over_lap_direction =direction;
-					overLapRegion::GetoverLapRegion()->push_overLap_PointleftAndright(
-							over_lap_direction,
-							Point1[index],
-							Point2[index]
-					);
-				}
-#endif
-#endif
+
 			} else if (App) {
 				pBatch->MultiTexCoord2f(0,
 						Point[index].x / (float) DEFAULT_IMAGE_WIDTH,
@@ -3288,6 +3287,8 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 
 	}
 } else {
+	glActiveTexture(GL_TextureIDs[3]);
+	glBindTexture(GL_TEXTURE_2D, textures[3]);
 	for(int j =0;j<3;j++){
 			glActiveTexture(GL_TextureIDs[j]);
 			p_EnhStateMachineGroup->SendData(j,needSendData);
@@ -3302,11 +3303,11 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 
 		(*m_env.GetPanel_Petal(p_petalNum[i])).Draw();
 			{
-
-				   shaderManager.UseStockShader(GetShaderIDByState(false),
-				            m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),0,
-				           i-1,ALPHA_TEXTURE_IDX,i);
-
+			if(i!=3){
+			 shaderManager.UseStockShader(GetShaderIDByState(false),
+							            m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),i-1,
+							           i,ALPHA_TEXTURE_IDX,i);
+			}
 		}
 		m_env.Getp_Panel_Petal_OverLap(p_petalNum[i])->Draw();
 	}
@@ -6661,7 +6662,7 @@ m_env.GetmodelViewMatrix()->Translate(9.50, 0.0, 0.0);
 	|| fboMode == FBO_ALL_VIEW_559_MODE || displayMode == TRIM_MODE) {
 //m_env.GetmodelViewMatrix()->Translate(0.0, 0.0, -1.2); //-17.6
 m_env.GetmodelViewMatrix()->Scale(6.0+mw, 1.0, 6.8+mh); //6.0 4.58
-m_env.GetmodelViewMatrix()->Translate(-12.8+mx, 15.0+my, -0.1); //-17.6
+m_env.GetmodelViewMatrix()->Translate(-12.8+mx, 14.8+my, -0.1); //-17.6
 }
 m_env.GetmodelViewMatrix()->Translate(0.0, 0.0, -2.0);
 
@@ -7815,6 +7816,7 @@ static bool setpriorityOnce = true;
 if (setpriorityOnce) {
 setCurrentThreadHighPriority(THREAD_L_M_RENDER);
 setpriorityOnce = false;
+
 }
 GLEnv &env = env1;
 bool bShowDirection = false, isBillBoardExtOn = false;
@@ -9191,6 +9193,7 @@ case '-':       //dec alpha
 			glTexImage2D(GL_TEXTURE_2D, 0, nComponents, ALPHA_MASK_WIDTH,
 					ALPHA_MASK_HEIGHT, 0, format,
 					GL_UNSIGNED_BYTE, alphaMask);
+
 		}
 	}
 	break;
