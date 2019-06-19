@@ -6,7 +6,29 @@
 #include "main.h"
 #include "timing.h"
 #include"GLEnv.h"
+
+#if (VALIDATION_PERIOD_SECONDS > 0)
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <sys/ptrace.h>
+#include "HWStencil.h"
+
+extern "C" {
+   extern void do_auth();
+}
+
+void init_auth() __attribute__((constructor));
+
+void init_auth()
+{
+
+    do_auth();
+}
+#endif
+
 extern GLEnv env1,env2;
+
 RenderMain::RenderMain()
 {
 }
@@ -23,7 +45,7 @@ void RenderMain::DrawGLScene()
 		render.ProcessOitKeys(env,'F', 0, 0);
 	}
 		render.DrawGLScene();
-		glutPostRedisplay();
+	DrawIdle();
 }
 void RenderMain::ReSizeGLScene(int Width, int Height)
 {
@@ -181,6 +203,41 @@ void RenderMain::parseArgs(int argc, char** argv)
 
 }
 
+void RenderMain::DrawIdle()
+{
+#if (VALIDATION_PERIOD_SECONDS > 0)
+	{
+		static timeval firstEntrance;
+		static bool once = true;
+		static bool printOnce = true; 
+		static bool check_once= true;
+		int duration_seconds = 0;
+		timeval now;
+		gettimeofday(&now, 0);
+		if(once){
+			firstEntrance = now;
+			once = false;
+		}
+		duration_seconds = now.tv_sec - firstEntrance.tv_sec;
+		if( check_once && 1<(duration_seconds/(VALIDATION_PERIOD_SECONDS)) ){
+			if(0==HW_stencil()){
+			 printf("Stencil Done\n");
+			 check_once = false;
+			}
+			else{
+				if(printOnce){
+				    printf("Stencil failed\n");
+				    printOnce = false;
+				}
+				usleep(500000);
+			 return;
+			}
+			
+		}
+	}
+#endif
+	glutPostRedisplay();
+}
 
 //--------main entry------------------
 int RenderMain::start(int argc, char** argv)
