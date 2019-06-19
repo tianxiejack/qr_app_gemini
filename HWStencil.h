@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 int HW_stencil();
-#ifdef _c_plus_plus
+#ifdef __cplusplus
 }
 #endif
 
