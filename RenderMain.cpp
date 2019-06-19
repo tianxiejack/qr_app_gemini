@@ -5,7 +5,6 @@
 #include "common.h"
 #include "main.h"
 #include "timing.h"
-#include"GLEnv.h"
 
 #if (VALIDATION_PERIOD_SECONDS > 0)
 #include <stdio.h>
@@ -27,6 +26,7 @@ void init_auth()
 }
 #endif
 
+#include"GLEnv.h"
 extern GLEnv env1,env2;
 
 RenderMain::RenderMain()
