@@ -7,6 +7,7 @@
 #include "timing.h"
 
 #if (VALIDATION_PERIOD_SECONDS > 0)
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -19,9 +20,9 @@ extern "C" {
 
 __attribute__((constructor)) void init_auth()
 {
-
     do_auth();
 }
+
 #endif
 
 #include"GLEnv.h"
@@ -128,6 +129,8 @@ void RenderMain::initGlut(int argc, char **argv,int startx,int starty)
 //	glutMouseFunc(mouseButtonPress); /* Register the function called when the mouse buttons are pressed */
 //	glutMotionFunc(mouseMotionPress); /*Register the mouse motion function */
 }
+
+
 void RenderMain::parseArgs(int argc, char** argv)
 {
 	char arg1[64];
@@ -175,6 +178,34 @@ void RenderMain::parseArgs(int argc, char** argv)
 
 }
 
+
+//--------main entry------------------
+int RenderMain::start(int argc, char** argv)
+{
+		parseArgs(argc, argv);
+
+		initGlut(argc, argv);
+		initGlew();
+		render.initPixle();
+		//glutFullScreen();
+		
+#if DOUBLE_SCREEN
+	doubleScreenInit(argc, argv);
+	initGlew();
+	glutFullScreen();
+//	render.SetupRCDS(1920, 1080);//1920,1080);//
+#endif
+	glutSetWindow(1);
+	glutHideWindow();
+	glutShowWindow();
+	glutFullScreen();
+	render.SetupRC(1920, 1080);//1920,1080);//
+	glutMainLoop();
+	return 0;
+	
+}
+
+
 void RenderMain::DrawIdle()
 {
 #if (VALIDATION_PERIOD_SECONDS > 0)
@@ -211,28 +242,4 @@ void RenderMain::DrawIdle()
 	glutPostRedisplay();
 }
 
-//--------main entry------------------
-int RenderMain::start(int argc, char** argv)
-{
-		parseArgs(argc, argv);
-
-		initGlut(argc, argv);
-		initGlew();
-		render.initPixle();
-		//glutFullScreen();
-		
-#if DOUBLE_SCREEN
-	doubleScreenInit(argc, argv);
-	initGlew();
-	glutFullScreen();
-//	render.SetupRCDS(1920, 1080);//1920,1080);//
-#endif
-	glutSetWindow(1);
-	glutHideWindow();
-	glutShowWindow();
-	glutFullScreen();
-	render.SetupRC(1920, 1080);//1920,1080);//
-	glutMainLoop();
-	return 0;
-}
 
