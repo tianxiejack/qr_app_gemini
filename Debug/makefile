@@ -59,7 +59,7 @@ all: Gemini_d
 Gemini_d: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: NVCC Linker'
-	/usr/local/cuda-8.0/bin/nvcc --cudart static -L/usr/lib -Xlinker -rpath-link="/usr/lib/aarch64-linux-gnu/tegra" --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50 -m64 -ccbin aarch64-linux-gnu-g++ -link -o  "Gemini_d" $(OBJS) $(USER_OBJS) $(LIBS)
+	/usr/local/cuda-8.0/bin/nvcc --cudart static -L/usr/lib -L../lib -Xlinker -rpath-link="/usr/lib/aarch64-linux-gnu/tegra" --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50 -m64 -ccbin aarch64-linux-gnu-g++ -link -o  "Gemini_d" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
