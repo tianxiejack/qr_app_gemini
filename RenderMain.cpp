@@ -17,9 +17,7 @@ extern "C" {
    extern void do_auth();
 }
 
-void init_auth() __attribute__((constructor));
-
-void init_auth()
+__attribute__((constructor)) void init_auth()
 {
 
     do_auth();
