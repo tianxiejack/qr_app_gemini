@@ -164,32 +164,6 @@ void RenderMain::parseArgs(int argc, char** argv)
 	}
 	render.BowlParseSTLAscii(argv[1]);
 	render.VehicleParseObj(argv[2]);
-	/*
-	float distance[4];
-	distance[0]=atof(argv[3])*1.0;
-	distance[1]=atof(argv[4])*1.0;
-	distance[2]=atof(argv[5])*1.0;
-	distance[3]=atof(argv[6])*1.0;
-
-	if(distance[0]<0.0)
-	{
-		distance[0]=20.0;
-	}
-	if(distance[1]<0.0)
-	{
-		distance[1]=20.0;
-	}
-	if(distance[2]<0.0)
-	{
-		distance[2]=20.0;
-	}
-	if(distance[3]<0.0)
-	{
-		distance[3]=3.0;
-	}
-
-		render.setTankDistance(distance);
-*/
 
 	if(argv[3]!=NULL)
 	{
@@ -263,3 +237,4 @@ int RenderMain::start(int argc, char** argv)
 	glutMainLoop();
 	return 0;
 }
+
