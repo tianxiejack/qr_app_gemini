@@ -464,7 +464,7 @@ bool FBOManager::Init()
 void FBOManager::InToFrameBuffer()
 {
 	 glBindFramebuffer(GL_FRAMEBUFFER, fboId);
-	 glClearColor(0.0f, 0/255.0f, 0.0f, 1.0f);
+	 glClearColor(0x87/255.0f, 0/255.0f, 0x87/255.0f, 1.0f);
 	 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 void FBOManager::OutOfFrameBuffer()
