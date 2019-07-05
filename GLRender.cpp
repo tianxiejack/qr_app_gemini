@@ -3287,8 +3287,8 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 
 	}
 } else {
-//	glActiveTexture(GL_TextureIDs[3]);
-//	glBindTexture(GL_TEXTURE_2D, textures[3]);
+	glActiveTexture(GL_TextureIDs[3]);
+	glBindTexture(GL_TEXTURE_2D, textures[3]);
 	for(int j =0;j<3;j++){
 			glActiveTexture(GL_TextureIDs[j]);
 			p_EnhStateMachineGroup->SendData(j,needSendData);
