@@ -1132,7 +1132,7 @@ Render::Render() :
 				10), set_scan_region_angle(SCAN_REGION_ANGLE), send_follow_angle_enable(
 				false), p_CompassBillBoard(NULL), p_LineofRuler(NULL), refresh_ruler(
 				true), EnterSinglePictureSaveMode(false), enterNumberofCam(0), EnablePanoFloat(
-				false), testPanoNumber(0), PanoDirectionLeft(false), TrackSpeed(
+				false), testPanoNumber(1), PanoDirectionLeft(false), TrackSpeed(
 				0.0), RulerAngle(0.0), PanoLen(0), SightWide(0), m_VGAVideoId(
 				VGA_CAM_0), m_SDIVideoId(SDI_CAM_0), p_CornerMarkerGroup(NULL), psy_button_f1(
 				true), psy_button_f2(true), psy_button_f3(true), psy_button_f8(
@@ -3287,14 +3287,14 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 
 	}
 } else {
-	glActiveTexture(GL_TextureIDs[3]);
-	glBindTexture(GL_TEXTURE_2D, textures[3]);
+//	glActiveTexture(GL_TextureIDs[3]);
+//	glBindTexture(GL_TEXTURE_2D, textures[3]);
 	for(int j =0;j<3;j++){
 			glActiveTexture(GL_TextureIDs[j]);
 			p_EnhStateMachineGroup->SendData(j,needSendData);
 	}
 
-	for (int i = 0; i < CAM_COUNT; i++) {
+	for (int i = 1; i < 4; i++) {
 
 
 		if (p_petalNum[i] != -1) {
@@ -8993,9 +8993,8 @@ case 'q':		//enter
 			rotate_angle[new_dir] += pano_rotate_angle;
 			if (rotate_angle[new_dir] > 360.0) {
 				rotate_angle[new_dir] -= 360.0;
-
-			InitPanel(m_env, 0, true);
 		}
+			InitPanel(m_env, 0, true);
 	}
 	break;
 case 'e':
@@ -9983,10 +9982,14 @@ if (isCalibTimeOn) {
 	if (SPECIAL_KEY_RIGHT == key) {
 		shaderManager.ResetTrimColor();
 		testPanoNumber = (testPanoNumber + CAM_COUNT - 1) % CAM_COUNT;
+		if(testPanoNumber<=0)
+			testPanoNumber=3;
 		shaderManager.SetTrimColor(testPanoNumber);
 	} else if (key == SPECIAL_KEY_LEFT) {
 		shaderManager.ResetTrimColor();
 		testPanoNumber = (testPanoNumber + 1) % CAM_COUNT;
+		if(testPanoNumber>=4)
+			testPanoNumber=1;
 		shaderManager.SetTrimColor(testPanoNumber);
 	} else if (SPECIAL_KEY_UP == key) {
 		int new_dir = ExchangeChannel(testPanoNumber);

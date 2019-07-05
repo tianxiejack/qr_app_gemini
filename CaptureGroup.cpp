@@ -170,40 +170,6 @@ bool CaptureGroup::captureCam(GLubyte *ptr, int index)
 	{
 		 Isenhdata=true;
 	}
-	#if USE_BMPCAP
-	Mat src6(FPGA_SINGLE_PIC_H*6,FPGA_SINGLE_PIC_W,CV_8UC3,ptr);
-	int x=0,y=0,w=FPGA_SINGLE_PIC_W,h=FPGA_SINGLE_PIC_H;
-	char buf[24]={0};
-	static bool once[2]={true,true};
-	if(index==0  && once[0])
-	{
-		once[0]=false;
-		for(int i=0;i<6;i++)
-		{
-			y=i*h;
-			Rect roi(x,y,w,h);
-			Mat dst=src6(roi);
-			UYV2Ycrcb(dst.data,dst.data,dst.cols,dst.rows);
-			cvtColor(dst,dst,CV_YCrCb2RGB);
-			sprintf(buf,"./data/gain/%.2d.bmp",i);
-			imwrite(buf,dst);
-		}
-	}
-	else 	if(index==1  && once[1])
-	{
-		once[1]=false;
-		for(int i=0;i<4;i++)
-		{
-			y=i*h;
-			Rect roi(x,y,w,h);
-			Mat dst=src6(roi);
-			UYV2Ycrcb(dst.data,dst.data,dst.cols,dst.rows);
-			cvtColor(dst,dst,CV_YCrCb2RGB);
-			sprintf(buf,"./data/gain/%.2d.bmp",i+6);
-			imwrite(buf,dst);
-		}
-	}
-	#endif
 	return Isenhdata;
 }
 void CaptureGroup::captureCamFish(GLubyte *ptr, int index)
