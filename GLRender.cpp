@@ -240,7 +240,7 @@ float define_move_ver_scale[CAM_COUNT] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 		1.0 }; //{     1.0,      1.0,     1.37,     1.06,     1.02,     0.99,     0.88,     1.00,     1.00,     1.00};
 
 int ExchangeChannel(int direction) {
-	if (direction == 0) {
+/*	if (direction == 0) {
 		direction = 3;
 	} else if (direction == 1) {
 		direction = 2;
@@ -253,13 +253,13 @@ int ExchangeChannel(int direction) {
 	}
 	else if (direction == 5) {
 		direction = 5;
-	}
+	}*/
 	return direction;
 }
 
 int NeighbourChannel(int direction) {
 	int dir = 0;
-	switch (direction) {
+/*	switch (direction) {
 	case 0:
 		dir = 4;
 		break;
@@ -286,7 +286,8 @@ int NeighbourChannel(int direction) {
 		break;
 	default:
 		break;
-	}
+	}*/
+	dir=(direction+1)%CAM_COUNT;
 	return dir;
 }
 
@@ -635,17 +636,28 @@ void Render::SetDeltaGainMask() {
 //	 0x123456,0x220011,0x123456,0x220011};
 /*	 for(int idx=0;idx<CAM_COUNT;idx++)
 	 {
-	 if(idx==3)
-	 {
-	 for(int i=0;i<GAIN_TEX_WIDTH*GAIN_TEX_HEIGHT;i++)
-	 GainMask[idx][i]=0xDD0000;
-	 //continue;
-	 }
-
+		 if(idx==3)
+		 {
+		 for(int i=0;i<GAIN_TEX_WIDTH*GAIN_TEX_HEIGHT;i++)
+		 GainMask[idx][i]=0xDD0000;
+		 //continue;
+		 }
+		 else if(idx==2)
+		 {
+		 for(int i=0;i<GAIN_TEX_WIDTH*GAIN_TEX_HEIGHT;i++)
+		 GainMask[idx][i]=0x005500;
+		 //continue;
+		 }
+		 else if(idx==1)
+		 {
+		 for(int i=0;i<GAIN_TEX_WIDTH*GAIN_TEX_HEIGHT;i++)
+		 GainMask[idx][i]=0x0000EE;
+		 //continue;
+		 }
 	 else{
 	 for(int i=0;i<GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH;i++)
 	 {
-	 GainMask[idx][i]=0x0000EE;
+		 GainMask[idx][i]=0x0000EE;
 	 }
 	 }
 	 }
@@ -2594,6 +2606,7 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 
 						//point1图０左边，point2图１右边
 
+
 						Point1[k].x = (Point1[k].x - scale_hor[direction])
 								* move_hor_scale[direction] + scale_hor[direction]
 								+ move_hor[direction];
@@ -2625,6 +2638,7 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 								rotate_center[(new_dir) % CAM_COUNT],
 								rotate_angle[(new_dir) % CAM_COUNT],
 								max_panel_length, CAM_COUNT);
+
 						overLapRegion::GetoverLapRegion()->push_overLap_PointleftAndright(
 								over_lap_direction,
 								Point1[k],

@@ -69,7 +69,7 @@ int rightExchange(int idx)
 {
 //	return idx;
 	int after=-1;
-	switch(idx)
+/*	switch(idx)
 	{
 	case 0:
 		after=6;
@@ -103,7 +103,8 @@ int rightExchange(int idx)
 		break;
 	default :
 		break;
-	}
+	}*/
+	after=(idx+1)%CAM_COUNT;
 	return after;
 }
 
@@ -186,14 +187,14 @@ bool overLapRegion::van_save_coincidence()
 	for(i=0; i<CAM_COUNT; i++){
 		sprintf(buf,"./data/gain/%02d.bmp",i);
 		van_images[(i+1)%CAM_COUNT] = imread(buf);
-		if (van_images[i+1].empty()){
+		if (van_images[(i+1)%CAM_COUNT].empty()){
 			cout<<"Can't open gain/image " << buf<<"open other one"<<endl;
 			sprintf(buf,"./data/%02d.bmp",i);
 			van_images[(i+1)%CAM_COUNT] = imread(buf);
 		}
 		else{
 			strcpy(buf,"'\0'");
-			van_images[(i+1)%CAM_COUNT].convertTo(van_images_warped_f[i], CV_8U);
+			van_images[(i+1)%CAM_COUNT].convertTo(van_images_warped_f[(i+1)%CAM_COUNT], CV_8U);
 		}
 	}
 #else
@@ -511,16 +512,16 @@ void overLapRegion::brightness_blance()
 			 static int a[4]={0};
 			 if(i==2||i==3)
 			 {
-				 sprintf(buf[0],"./subimg/subimg1_%d.bmp",a[0]);
+				 sprintf(buf[0],"./subimg/subimg1_%d.bmp",i);
 				 imwrite(buf[0],subimg1);
-				 sprintf(buf[1],"./subimg/subimg2_%d.bmp",a[1]);
+				 sprintf(buf[1],"./subimg/subimg2_%d.bmp",i);
 				 imwrite(buf[1],subimg2);
 			 }
 			 if(i==2||i==1)
 			 {
-				 sprintf(buf[2],"./subimg/subimg3_%d.bmp",a[2]);
+				 sprintf(buf[2],"./subimg/subimg3_%d.bmp",i);
 				 imwrite(buf[2],subimg3);
-				 sprintf(buf[3],"./subimg/subimg4_%d.bmp",a[3]);
+				 sprintf(buf[3],"./subimg/subimg4_%d.bmp",i);
 				 imwrite(buf[3],subimg4);
 			 }
 			 for(int innx=0;innx<4;innx++)
@@ -660,7 +661,7 @@ void overLapRegion::brightness_blance()
 							  sliceIdx, gain_2[sliceIdx].x, gain_2[sliceIdx].y, gain_2[sliceIdx].z);
 			  }
 			  float r[2],g[2],b[2];
-			  r[1]= gain_[sliceIdx].x;
+			  r[1]=gain_[sliceIdx].x;
 			  g[1]= gain_[sliceIdx].y;
 			  b[1]= gain_[sliceIdx].z;
 			  r[0]= gain_2[sliceIdx].x;
