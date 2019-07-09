@@ -47,6 +47,7 @@ public:
 	vector<cv::Point2f> m_pointRight[CAM_COUNT];
 	unsigned char *Src4,*temp4;
 	unsigned char *Src6,*temp6;
+	unsigned char *Src1280,*temp1280;
 	float midX[CAM_COUNT][ROI_COUNT];
 
 };

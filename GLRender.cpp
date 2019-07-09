@@ -461,12 +461,12 @@ void Render::SetCharacteristicGainMask(int index, int sliceIdx, float leftr,
 #endif
 	for (int side = 0; side < HEAD_MID_TAIL * RGBNUM; side++) //每张图的gain值计算
 			{
-		tempMask[index * GAIN_TEX_HEIGHT * GAIN_TEX_WIDTH * RGBNUM //each pic
+		tempMask[index][
 		+ GAIN_TEX_WIDTH * RGBNUM * ((GAIN_TEX_HEIGHT) / (slices)) * sliceIdx //each line
 		+ side] = color[side]; //each pic head
 	}
 	int rows_per_slices = GAIN_TEX_HEIGHT / slices;
-	float *src = &tempMask[index * GAIN_TEX_HEIGHT * GAIN_TEX_WIDTH * RGBNUM //each pic
+	float *src = &tempMask[index][
 	+ GAIN_TEX_WIDTH * RGBNUM * ((GAIN_TEX_HEIGHT) / (slices)) * sliceIdx //each line
 	];
 
@@ -511,10 +511,10 @@ void Render::AddrowDeltaGain(GLfloat g0, GLfloat g1, int idx /*CAMERA_IDX*/,
 		//target=25;
 	}
 
-	int camera_offset = HEAD_MID_TAIL * RGBNUM * GAIN_TEX_HEIGHT * idx;
+	int camera_offset =0;// HEAD_MID_TAIL * RGBNUM * GAIN_TEX_HEIGHT * idx;
 	int slice_offset = rows_per_slices * deltaIdx;
 	//计算完后赋值给gain
-	InterPolatedMask[camera_offset + (slice_offset + rows_per_slices / 2 //slices_center_offset
+	InterPolatedMask[idx][(slice_offset + rows_per_slices / 2 //slices_center_offset
 	+ rows) * HEAD_MID_TAIL * RGBNUM + cols] = target;
 }
 
@@ -523,36 +523,36 @@ void Render::Interflow(int idx, int rows, int cols, GLfloat*src, GLint*dst) {
 	GLint look = 0;
 	int destUint4;
 	int movebit = (cols % RGBNUM) * 8;    //由rgb 转成bgr
-	beforeTrans = (int) src[HEAD_MID_TAIL * RGBNUM * GAIN_TEX_HEIGHT * idx
-			+ rows * HEAD_MID_TAIL * RGBNUM + cols];
+	beforeTrans = (int) src[/*HEAD_MID_TAIL * RGBNUM * GAIN_TEX_HEIGHT * idx
+			+ */rows * HEAD_MID_TAIL * RGBNUM + cols];
 	if (movebit == 16)  //B
 			{
 		movebit = 0;
 		afterTrans = 0xff & (beforeTrans << movebit);
 		//clear the bit 0~8in dst int
-		destUint4 = dst[HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx
-				+ rows * HEAD_MID_TAIL + cols / 3];
+		destUint4 = dst[/*HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx
+				+*/ rows * HEAD_MID_TAIL + cols / 3];
 		destUint4 &= 0xffffff00;
 		//replace bit0~8 in dest unit
 		destUint4 |= afterTrans;
 		//replace the element in dst with dest unit;
-		dst[HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx + rows * HEAD_MID_TAIL
+		dst[/*HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx +*/ rows * HEAD_MID_TAIL
 				+ cols / 3] = destUint4;
-		look = dst[HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx + rows * HEAD_MID_TAIL
+		look = dst[/*HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx + */rows * HEAD_MID_TAIL
 				+ cols / 3];
 	} else if (movebit == 8) //G
 			{
 		afterTrans = 0xff00 & (beforeTrans << movebit);
 		//clear the bit 8~16 in dst int
-		destUint4 = dst[HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx
-				+ rows * HEAD_MID_TAIL + cols / 3];
+		destUint4 = dst[/*HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx
+				+ */rows * HEAD_MID_TAIL + cols / 3];
 		destUint4 &= 0xffff00ff;
 		//replace bit8~24 in dest unit
 		destUint4 |= afterTrans;
 		//replace the element in dst with dest unit;
-		dst[HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx + rows * HEAD_MID_TAIL
+		dst[/*HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx + */rows * HEAD_MID_TAIL
 				+ cols / 3] = destUint4;
-		look = dst[HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx + rows * HEAD_MID_TAIL
+		look = dst[/*HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx +*/ rows * HEAD_MID_TAIL
 				+ cols / 3];
 	} else if (movebit == 0) //R
 			{
@@ -560,15 +560,15 @@ void Render::Interflow(int idx, int rows, int cols, GLfloat*src, GLint*dst) {
 
 		afterTrans = 0xff0000 & (beforeTrans << movebit);
 		//clear the bit 16~24 in dst int
-		destUint4 = dst[HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx
-				+ rows * HEAD_MID_TAIL + cols / 3];
+		destUint4 = dst[/*HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx
+				+*/ rows * HEAD_MID_TAIL + cols / 3];
 		destUint4 &= 0xff00ffff;
 		//replace bit 16~24 in dest unit
 		destUint4 |= afterTrans;
 		//replace the element in dst with dest unit;
-		dst[HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx + rows * HEAD_MID_TAIL
+		dst[/*HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx +*/ rows * HEAD_MID_TAIL
 				+ cols / 3] = destUint4;
-		look = dst[HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx + rows * HEAD_MID_TAIL
+		look = dst[/*HEAD_MID_TAIL * GAIN_TEX_HEIGHT * idx +*/ rows * HEAD_MID_TAIL
 				+ cols / 3];
 	}
 
@@ -590,9 +590,9 @@ void Render::SetDeltaGainMask() {
 		for (int cols = 0; cols < HEAD_MID_TAIL * RGBNUM; cols++) {
 			for (int sliceIdx = 0; sliceIdx < (slices - 1); sliceIdx++) //高度上 slices份 只做slices-1个delta
 					{
-				g0 = tempMask[HEAD_MID_TAIL * RGBNUM * GAIN_TEX_HEIGHT * idx +
+				g0 = tempMask[idx][
 				HEAD_MID_TAIL * RGBNUM * silk * sliceIdx + cols];
-				g1 = tempMask[HEAD_MID_TAIL * RGBNUM * GAIN_TEX_HEIGHT * idx +
+				g1 = tempMask[idx][
 				HEAD_MID_TAIL * RGBNUM * silk * (sliceIdx + 1) + cols];
 				//			if(idx==-1)
 				{
@@ -622,7 +622,7 @@ void Render::SetDeltaGainMask() {
 				}
 				//		Interflow(idx,i,j,InterPolatedMask,interflowMask);
 #endif
-				Interflow(idx, i, j, InterPolatedMask, interflowMask);
+				Interflow(idx, i, j, InterPolatedMask[idx], interflowMask[idx]);
 			}
 		}
 	}
@@ -630,26 +630,26 @@ void Render::SetDeltaGainMask() {
 	memcpy(GainMask, interflowMask, sizeof(interflowMask));
 //	memset(GainMask,0x0080,sizeof(transTempMask));
 
-	/*
-	 int colors[CAM_COUNT]={0xDD0000,0x00DD00,0x0000EE,0xFFDD00,0x00FF90,0xFF0023,
-	 0x123456,0x220011,0x123456,0x220011};
-	 for(int idx=0;idx<CAM_COUNT;idx++)
+
+	// int colors[CAM_COUNT]={0xDD0000,0x00DD00,0x0000EE,0xFFDD00,0x00FF90,0xFF0023,
+//	 0x123456,0x220011,0x123456,0x220011};
+/*	 for(int idx=0;idx<CAM_COUNT;idx++)
 	 {
 	 if(idx==3)
 	 {
-	 for(int i=GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*idx;i<GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*idx+GAIN_TEX_WIDTH*GAIN_TEX_HEIGHT/8*5;i++)
-	 GainMask[i]=0xDD0000;
+	 for(int i=0;i<GAIN_TEX_WIDTH*GAIN_TEX_HEIGHT;i++)
+	 GainMask[idx][i]=0xDD0000;
 	 //continue;
 	 }
 
 	 else{
-	 for(int i=GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*idx;i<GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*(idx+1);i++)
+	 for(int i=0;i<GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH;i++)
 	 {
-	 GainMask[i]=0x0000EE;
+	 GainMask[idx][i]=0x0000EE;
 	 }
 	 }
 	 }
-	 */
+*/
 }
 
 void Render::SendtoTrack() {
@@ -1158,11 +1158,15 @@ Render::Render() :
 #else
 	isUseNewGain = false;
 #endif
+
+
 	for (int idx = 0; idx < CAM_COUNT; idx++) {
-		for (int i = GAIN_TEX_HEIGHT * GAIN_TEX_WIDTH * idx;
-				i < GAIN_TEX_HEIGHT * GAIN_TEX_WIDTH * (idx + 1); i++) {
+		for (int i = 0;
+				i < GAIN_TEX_HEIGHT * GAIN_TEX_WIDTH; i++) {
 			{
-				GainMask[i] = 0x191919;
+				tempMask[idx][i]=1.0;
+				GainMask[idx][i] = 0x191919;
+
 			}
 		}
 	}
@@ -1216,7 +1220,7 @@ Render::Render() :
 
 Render::~Render() {
 	destroyPixList();
-	glDeleteTextures(6, textures);
+	glDeleteTextures(7, textures);
 	glDeleteTextures(EXTENSION_TEXTURE_COUNT, extensionTextures);
 #if USE_COMPASS_ICON
 	glDeleteTextures(1,iconTextures);
@@ -1670,7 +1674,7 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		env.Set_FboPboFacade(*(env.Getp_FBOmgr()), *(env.Getp_PBORcr()));
 		mPresetCamGroup.LoadCameras();
 		// Load up CAM_COUNT textures
-		glGenTextures(6, textures);
+		glGenTextures(7, textures);
 
 
 #if 1
@@ -1725,6 +1729,21 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,ALPHA_MASK_WIDTH, ALPHA_MASK_HEIGHT, 0,
 				GL_RGBA, GL_UNSIGNED_BYTE, alphaMask);
 
+#if TEST_GAIN
+		//	memset(GainMask,0x00,sizeof(GainMask));
+		for(int i = 4; i < 7; i++) {
+			glBindTexture(GL_TEXTURE_2D, textures[i]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+			glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,GAIN_TEX_WIDTH, GAIN_TEX_HEIGHT, 0,
+					GL_RGBA, GL_UNSIGNED_BYTE, GainMask[i-3]);
+		}
+#endif
+/*
 		glBindTexture(GL_TEXTURE_2D, textures[4]);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -1739,7 +1758,7 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexImage2D(GL_TEXTURE_2D,0,nComponents,ALPHA_MASK_WIDTH, ALPHA_MASK_HEIGHT, 0,
-				format, GL_UNSIGNED_BYTE, alphaMask1);
+				format, GL_UNSIGNED_BYTE, alphaMask1);*/
 		/*		glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX1]);
 		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -2566,7 +2585,53 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 		direction = INVALID_DIRECTION;
 		//如果有两个true,即表明同时在两个相机上都存在，即为重合区
 		AppOverlap = IsOverlay(AppDirection, &direction);
+		if(AppOverlap)  //gain
+			{
+				getOverLapPointsValue(direction, x, Point1, Point2);
+				int over_lap_direction =ExchangeChannel(direction);
+					direction = ExchangeChannel(direction);
+					for (int k = 0; k < 3; k++) {
 
+						//point1图０左边，point2图１右边
+
+						Point1[k].x = (Point1[k].x - scale_hor[direction])
+								* move_hor_scale[direction] + scale_hor[direction]
+								+ move_hor[direction];
+						Point1[k].y = (Point1[k].y - scale_ver[direction])
+								* move_ver_scale[direction] + scale_ver[direction];
+						Point1[k].y = Point1[k].y + PanoFloatData[direction];
+
+						int new_dir = NeighbourChannel(direction);
+						Point2[k].x = (Point2[k].x
+								- scale_hor[(new_dir) % CAM_COUNT])
+								* move_hor_scale[(new_dir) % CAM_COUNT]
+								+ scale_hor[(new_dir) % CAM_COUNT]
+								+ move_hor[(new_dir) % CAM_COUNT];
+						Point2[k].y = (Point2[k].y
+								- scale_ver[(new_dir) % CAM_COUNT])
+								* move_ver_scale[(new_dir) % CAM_COUNT]
+								+ scale_ver[(new_dir) % CAM_COUNT];
+						Point2[k].y = Point2[k].y
+								+ PanoFloatData[(new_dir) % CAM_COUNT];
+						Point1[k].x = Point1[k].x / 1920*1280;
+						Point1[k].y = Point1[k].y / 1080*720;
+						Point2[k].x = Point2[k].x / 1920*1280;
+						Point2[k].y = Point2[k].y /1080*720;
+
+						Point1[k] = RotatePoint(Point1[k], rotate_center[direction],
+								rotate_angle[direction], max_panel_length,
+								CAM_COUNT);
+						Point2[k] = RotatePoint(Point2[k],
+								rotate_center[(new_dir) % CAM_COUNT],
+								rotate_angle[(new_dir) % CAM_COUNT],
+								max_panel_length, CAM_COUNT);
+						overLapRegion::GetoverLapRegion()->push_overLap_PointleftAndright(
+								over_lap_direction,
+								Point1[k],
+								Point2[k]
+						);
+					}
+			}
 		if (direction == INVALID_DIRECTION) //out of show range ,the point is invalid
 		{
 			continue;
@@ -2612,57 +2677,7 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 					Point1[k].y = Point1[k].y / 1080*720;
 					Point2[k].x = Point2[k].x / 1920*1280;
 					Point2[k].y = Point2[k].y /1080*720;
-#if 0
-					Point1[k].x = Point1[k].x / 1920.0 * 640.0;
-					Point1[k].y = Point1[k].y / 1080.0 * 540.0
-							+ (direction % CAM_COUNT) * 540.0;
 
-					if (direction == 0) {
-						Point2[k].x = Point2[k].x / 1920.0 * 640.0;
-						Point2[k].y = Point2[k].y / 1080.0 * 540.0
-								+ (4 % CAM_COUNT) * 540.0;
-					}
-
-					else if (direction == 1) {
-						Point2[k].x = Point2[k].x / 1920.0 * 640.0;
-						Point2[k].y = Point2[k].y / 1080.0 * 540.0;
-					}
-					else if (direction == 5) {
-						Point2[k].x = Point2[k].x / 1920.0 * 640.0;
-						Point2[k].y = Point2[k].y / 1080.0 * 540.0
-								+ (6 % CAM_COUNT) * 540.0;
-					}
-
-					else if (direction == 4 ) {
-						Point2[k].x = Point2[k].x / 1920.0 * 640.0;
-						Point2[k].y = Point2[k].y / 1080.0 * 540.0
-								+ (5 % CAM_COUNT)
-										* 540.0;
-					}
-					else if (direction ==3) {
-											Point2[k].x = Point2[k].x / 1920.0 * 640.0;
-											Point2[k].y = Point2[k].y / 1080.0 * 540.0
-													+ (2 % CAM_COUNT)
-															* 540.0;
-										}
-					else if (direction ==2) {
-																Point2[k].x = Point2[k].x / 1920.0 * 640.0;
-																Point2[k].y = Point2[k].y / 1080.0 * 540.0
-																		+ (1 % CAM_COUNT)
-																				* 540.0;
-															}
-
-					else if (direction == 6 ) {
-						Point2[k].x = Point2[k].x / 1920.0 * 640.0;
-						Point2[k].y = Point2[k].y / 1080.0 * 540.0
-								+ (7 % CAM_COUNT) * 540.0;
-					}
-					 else if (direction == 7 ) {
-						Point2[k].x = Point2[k].x / 1920.0 * 640.0;
-						Point2[k].y = Point2[k].y / 1080.0 * 540.0
-								+ ((3) % CAM_COUNT) * 540.0;
-					}
-#endif
 					Point1[k] = RotatePoint(Point1[k], rotate_center[direction],
 							rotate_angle[direction], max_panel_length,
 							CAM_COUNT);
@@ -3082,19 +3097,19 @@ int alpha[12] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 #define USE_GAIN_ON_PETAL(i){\
 		shaderManager.UseStockShader(GLT_SHADER_LINE_BRIGHT,\
 			  m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),\
-			  0,\
-			 0+1+1);\
+			  i-1,\
+			 i+3);\
 											}
 
 //相机A内容 	//相机A+1内容 //Gain_mask //Gain_mask+1
 #define USE_TWO_GAIN_TEXTURE_ON_PETAL_OVERLAP(i)	{\
 		shaderManager.UseStockShader(GLT_SHADER_TEXTURE_LINE_BLENDING,\
 							 m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),\
-						   0,\
-						   0, \
+						   i-1,\
+						   i, \
 						   ALPHA_TEXTURE_IDX,\
-						   0+1+1,\
-						   0+1+1);\
+						   i+3,\
+						  i+3+1);\
 						}
 
 #if USE_GAIN
@@ -3291,24 +3306,47 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 	glBindTexture(GL_TEXTURE_2D, textures[3]);
 	for(int j =0;j<3;j++){
 			glActiveTexture(GL_TextureIDs[j]);
+			glBindTexture(GL_TEXTURE_2D, textures[j]);
 			p_EnhStateMachineGroup->SendData(j,needSendData);
 	}
-
 	for (int i = 1; i < 4; i++) {
+
+		if(GainisNew)
+		{
+				glActiveTexture(GL_TextureIDs[ALPHA_TEXTURE_IDX+i]);
+				glBindTexture(GL_TEXTURE_2D, textures[i+3]);
+				glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,GAIN_TEX_WIDTH, GAIN_TEX_HEIGHT, 0,
+						GL_RGBA, GL_UNSIGNED_BYTE, GainMask[i]);
+				char buf[72]={0};
+				sprintf(buf,"./data/test/%d_gainmask.bmp",i);
+				Mat m(GAIN_TEX_HEIGHT,GAIN_TEX_WIDTH,CV_8UC4,GainMask[i]);
+				imwrite(buf,m);
+			//	GainisNew=false;
+		}
 
 
 		if (p_petalNum[i] != -1) {
 
+			if (isUseNewGain) {
+				USE_GAIN_ON_PETAL(p_petalNum[i]);
+		} else {
 			shaderManager.UseStockShader(GetShaderIDByState(), m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),i-1,i);
+		}
 
 		(*m_env.GetPanel_Petal(p_petalNum[i])).Draw();
+			if(i!=3)
 			{
-			if(i!=3){
-			 shaderManager.UseStockShader(GetShaderIDByState(false),
-							            m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),i-1,
-							           i,ALPHA_TEXTURE_IDX,i);
+				if (isUseNewGain)
+				{
+					USE_TWO_GAIN_TEXTURE_ON_PETAL_OVERLAP(p_petalNum[i]);
+				}
+				else
+				{
+					shaderManager.UseStockShader(GetShaderIDByState(false),
+											m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),i-1,
+										   i,ALPHA_TEXTURE_IDX,i);
+				}
 			}
-		}
 		m_env.Getp_Panel_Petal_OverLap(p_petalNum[i])->Draw();
 	}
 }
@@ -7818,6 +7856,7 @@ setCurrentThreadHighPriority(THREAD_L_M_RENDER);
 setpriorityOnce = false;
 
 }
+
 GLEnv &env = env1;
 bool bShowDirection = false, isBillBoardExtOn = false;
 bool needSendData = true;

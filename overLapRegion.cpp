@@ -10,9 +10,10 @@
 #include"overLapRegion.h"
 #include"GLRender.h"
 #include"PanoCaptureGroup.h"
+#include "assert.h"
 using namespace std;
 using namespace cv;
-#define GAIN_SAVE_IMG 0
+#define GAIN_SAVE_IMG 1
 
 #define LEFT_BLACK_LEN   0
 #define RIGHT_BLACK_LEN  0
@@ -111,6 +112,7 @@ overLapRegion::overLapRegion()
 	CHANGE_GAIN=false;
 	HEIGHT_SLICES=2;
 	IsDealingWithSLICES=false;
+	Src1280=(unsigned char *)malloc(SDI_WIDTH*SDI_HEIGHT*3);
 	Src4=(unsigned char *)malloc(FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*4*3);
 	Src6=(unsigned char *)malloc(FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*6*3);
 	temp4=(unsigned char *)malloc(FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*4*3);
@@ -168,7 +170,7 @@ void UYV2RGB(unsigned char *src, int width, int height, unsigned char * dst)
 
 float overLapRegion::getPercentX(int camidx,int leftorright)
 {
-	return midX[camidx][leftorright]/640.0;
+	return midX[camidx][leftorright]/SDI_WIDTH;
 }
 bool overLapRegion::van_save_coincidence()
 {
@@ -183,15 +185,15 @@ bool overLapRegion::van_save_coincidence()
 #if USE_BMPCAP
 	for(i=0; i<CAM_COUNT; i++){
 		sprintf(buf,"./data/gain/%02d.bmp",i);
-		van_images[i] = imread(buf);
-		if (van_images[i].empty()){
+		van_images[(i+1)%CAM_COUNT] = imread(buf);
+		if (van_images[i+1].empty()){
 			cout<<"Can't open gain/image " << buf<<"open other one"<<endl;
 			sprintf(buf,"./data/%02d.bmp",i);
-			van_images[i] = imread(buf);
+			van_images[(i+1)%CAM_COUNT] = imread(buf);
 		}
 		else{
 			strcpy(buf,"'\0'");
-			van_images[i].convertTo(van_images_warped_f[i], CV_8U);
+			van_images[(i+1)%CAM_COUNT].convertTo(van_images_warped_f[i], CV_8U);
 		}
 	}
 #else
@@ -256,7 +258,7 @@ bool overLapRegion::van_save_coincidence()
 int a=0,b=0,c=0,d=0;
 
 float max_panel_length=render.GetPanoLen();
-	for(direction=0;direction<CAM_COUNT;direction++)
+	for(direction=1;direction<CAM_LIMIT;direction++)
 	{
 		float cmp_x_min=30000, cmp_y_min=30000,cmp_x_max=-1,cmp_y_max=-1;
 		float cmp_x2_min=30000, cmp_y2_min=30000,cmp_x2_max=-1,cmp_y2_max=-1;
@@ -286,14 +288,14 @@ float max_panel_length=render.GetPanoLen();
 
 
 		x_min[direction]= cmp_x_min;
-		y_min[direction]= Modula(cmp_y_min,FPGA_SINGLE_PIC_H);
+		y_min[direction]= Modula(cmp_y_min,SDI_HEIGHT);
 		x_max[direction]= cmp_x_max;
-		y_max[direction]= Modula(cmp_y_max,FPGA_SINGLE_PIC_H);
+		y_max[direction]= Modula(cmp_y_max,SDI_HEIGHT);
 
 		x2_min[direction]= cmp_x2_min;
-		y2_min[direction]= Modula(cmp_y2_min,FPGA_SINGLE_PIC_H);
+		y2_min[direction]= Modula(cmp_y2_min,SDI_HEIGHT);
 		x2_max[direction]= cmp_x2_max;
-		y2_max[direction]= Modula(cmp_y2_max,FPGA_SINGLE_PIC_H);
+		y2_max[direction]= Modula(cmp_y2_max,SDI_HEIGHT);
 
 	strcpy(buf_1,"'\0'");
 	strcpy(buf_2,"'\0'");
@@ -308,8 +310,8 @@ float max_panel_length=render.GetPanoLen();
 		cur_x_min=cur_x_min < 0? 0 : cur_x_min;
 		cur_y_min = cur_y_min<0?0:cur_y_min;
 
-		cur_x_max=cur_x_max>FPGA_SINGLE_PIC_W? FPGA_SINGLE_PIC_W:cur_x_max;
-		cur_y_max=cur_y_max>FPGA_SINGLE_PIC_H? FPGA_SINGLE_PIC_H:cur_y_max;
+		cur_x_max=cur_x_max>SDI_WIDTH? SDI_WIDTH:cur_x_max;
+		cur_y_max=cur_y_max>SDI_HEIGHT? SDI_HEIGHT:cur_y_max;
 	sprintf(buf_1,"./data/save/%d_left.bmp",direction);
 	roi_image[direction][LEFT_ROI]=van_images[direction](
 			Range(cur_y_min,cur_y_max),
@@ -332,8 +334,8 @@ float max_panel_length=render.GetPanoLen();
 	cur_x_min=cur_x_min < 0? 0 : cur_x_min;
 	cur_y_min = cur_y_min<0?0:cur_y_min;
 
-	cur_x_max=cur_x_max>FPGA_SINGLE_PIC_W?FPGA_SINGLE_PIC_W:cur_x_max;
-	cur_y_max=cur_y_max>FPGA_SINGLE_PIC_H? FPGA_SINGLE_PIC_H:cur_y_max;
+	cur_x_max=cur_x_max>SDI_WIDTH?SDI_WIDTH:cur_x_max;
+	cur_y_max=cur_y_max>SDI_HEIGHT? SDI_HEIGHT:cur_y_max;
 	sprintf(buf_2,"./data/save/%d_right.bmp",direction);
 	roi_image[direction][RIGHT_ROI]=van_images[direction](
 			Range(cur_y_min,cur_y_max),
@@ -351,7 +353,7 @@ float max_panel_length=render.GetPanoLen();
 #endif
 	}
 #if GAIN_SAVE_IMG
-for(int i=0;i<CAM_COUNT;i++)
+for(int i=1;i<CAM_LIMIT;i++)
 {
 	char buf_draw[48];
 	sprintf(buf_draw,"./data/draw/%d_draw.bmp",i);
@@ -406,8 +408,9 @@ void overLapRegion::brightness_blance()
 			alpha2[i][CAM_COUNT-1].x  = alpha2[i][CAM_COUNT-1].y = alpha2[i][CAM_COUNT-1].z = 1.0;
 		}
 
-		for(int i=0;i<CAM_COUNT;i++)
+		for(int i=1;i<CAM_LIMIT;i++)
 		{
+#if 0
 #if 0
 			{
 				 subimg2=roi_image[i][RIGHT_ROI];//HEAD i号相机//右边
@@ -428,31 +431,60 @@ void overLapRegion::brightness_blance()
 					 }
 					 subimg3=roi_image[rightExchange(j)][RIGHT_ROI]; //j+1号相机//右边
 #endif
-			 int minclos[2],minrows[2];
-			 if(subimg1.cols<subimg2.cols)  //使重合区大小相等
-			 {
-				 minclos[0]=subimg1.cols;
-			 }
-			 else
-			 {
-				 minclos[0]=subimg2.cols;
-			 }
-			 if(subimg3.cols<subimg4.cols)
-			 {
-				 minclos[1]=subimg3.cols;
-			 }
-			 else
-			 {
-				 minclos[1]=subimg4.cols;
-			 }
+#else
+					 int j=-1;
+					 if(i==1)
+					 {
+							 subimg4=roi_image[1][LEFT_ROI];  //TAIL J号相机 //左边
+							 subimg3=roi_image[2][RIGHT_ROI]; //j+1号相机//右边
+							 j=1;
+					 }
+					 else if(i==2)
+					 {
+							subimg2=roi_image[2][RIGHT_ROI];//HEAD i号相机//右边
+							subimg1=roi_image[1][LEFT_ROI];  //HEAD i-1号相机//左边
+							 subimg4=roi_image[2][LEFT_ROI];  //TAIL J号相机 //左边
+							 subimg3=roi_image[3][RIGHT_ROI]; //j+1号相机//右边
+							 j=2;
+					 }
+					 else if(i==3)
+					 {
+						 subimg2=roi_image[3][RIGHT_ROI];//HEAD i号相机//右边
+						 subimg1=roi_image[2][LEFT_ROI];  //HEAD i-1号相机//左边
+					 }
+					 else
+						 assert(false);
 
-			 if(subimg1.rows<subimg2.rows)
+#endif
+			 int minclos[2],minrows[2];
+			 if(i==2||i==3)
+			 {
+				 if(subimg1.cols<subimg2.cols)  //使重合区大小相等
 				 {
-				 	 minrows[0]=subimg1.rows;
+					 minclos[0]=subimg1.cols;
+				 }
+				 else
+				 {
+					 minclos[0]=subimg2.cols;
+				 }
+				 if(subimg1.rows<subimg2.rows)
+				 {
+					 minrows[0]=subimg1.rows;
 				 }
 				 else
 				 {
 					 minrows[0]=subimg2.rows;
+				 }
+			 }
+			 if(i==2||i==1)
+			 {
+				 if(subimg3.cols<subimg4.cols)
+				 {
+					 minclos[1]=subimg3.cols;
+				 }
+				 else
+				 {
+					 minclos[1]=subimg4.cols;
 				 }
 				 if(subimg3.rows<subimg4.rows)
 				 {
@@ -462,22 +494,35 @@ void overLapRegion::brightness_blance()
 				 {
 					 minrows[1]=subimg4.rows;
 				 }
+			 }
 
-			 resize(subimg1,subimg1,Size( minclos[0], minrows[0]),0,0,INTER_LINEAR);
-			 resize(subimg2,subimg2,Size( minclos[0], minrows[0]),0,0,INTER_LINEAR);
-			 resize(subimg3,subimg3,Size( minclos[1], minrows[1]),0,0,INTER_LINEAR);
-			 resize(subimg4,subimg4,Size( minclos[1], minrows[1]),0,0,INTER_LINEAR);
+			 if(i==2||i==3)
+			 {
+				 resize(subimg1,subimg1,Size( minclos[0], minrows[0]),0,0,INTER_LINEAR);
+				 resize(subimg2,subimg2,Size( minclos[0], minrows[0]),0,0,INTER_LINEAR);
+			 }
+			 if(i==2||i==1)
+			 {
+				 resize(subimg3,subimg3,Size( minclos[1], minrows[1]),0,0,INTER_LINEAR);
+				 resize(subimg4,subimg4,Size( minclos[1], minrows[1]),0,0,INTER_LINEAR);
+			 }
 #if GAIN_SAVE_IMG
 			 char buf[4][48];
 			 static int a[4]={0};
-			 sprintf(buf[0],"./subimg/subimg1_%d.bmp",a[0]);
-			 imwrite(buf[0],subimg1);
-			 sprintf(buf[1],"./subimg/subimg2_%d.bmp",a[1]);
-			 imwrite(buf[1],subimg2);
-			 sprintf(buf[2],"./subimg/subimg3_%d.bmp",a[2]);
-			 imwrite(buf[2],subimg3);
-			 sprintf(buf[3],"./subimg/subimg4_%d.bmp",a[3]);
-			 imwrite(buf[3],subimg4);
+			 if(i==2||i==3)
+			 {
+				 sprintf(buf[0],"./subimg/subimg1_%d.bmp",a[0]);
+				 imwrite(buf[0],subimg1);
+				 sprintf(buf[1],"./subimg/subimg2_%d.bmp",a[1]);
+				 imwrite(buf[1],subimg2);
+			 }
+			 if(i==2||i==1)
+			 {
+				 sprintf(buf[2],"./subimg/subimg3_%d.bmp",a[2]);
+				 imwrite(buf[2],subimg3);
+				 sprintf(buf[3],"./subimg/subimg4_%d.bmp",a[3]);
+				 imwrite(buf[3],subimg4);
+			 }
 			 for(int innx=0;innx<4;innx++)
 			 {
 				 a[innx]++;
@@ -497,38 +542,45 @@ void overLapRegion::brightness_blance()
 			 int countHead=0,countTail=0;
 			 int rows_per_slice = subimg1.rows/HEIGHT_SLICES;
 			//head重合区每个像素累加归一化
-				for(int y=subimg1.rows/HEIGHT_SLICES*idx;
-						y< subimg1.rows/HEIGHT_SLICES*(idx+1)  ;
-						y++){
-				const Point3_<uchar>* r1 = subimg1.ptr<Point3_<uchar> >(y);
-				const Point3_<uchar>* r2 = subimg2.ptr<Point3_<uchar> >(y);
-				for(int x=0;x< subimg1.cols;x++){
-					countHead++;
-					Isum1[idx].x += std::pow(static_cast<double>(r1[x].x/255.0),gamma)*255.0;
-					Isum1[idx].y += std::pow(static_cast<double>(r1[x].y/255.0),gamma)*255.0;
-					Isum1[idx].z += std::pow(static_cast<double>(r1[x].z/255.0),gamma)*255.0;
-					Isum2[idx].x += std::pow(static_cast<double>(r2[x].x/255.0),gamma)*255.0;
-					Isum2[idx].y += std::pow(static_cast<double>(r2[x].y/255.0),gamma)*255.0;
-					Isum2[idx].z += std::pow(static_cast<double>(r2[x].z/255.0),gamma)*255.0;
+			 if(i==2||i==3)
+			 {
+					for(int y=subimg1.rows/HEIGHT_SLICES*idx;
+							y< subimg1.rows/HEIGHT_SLICES*(idx+1)  ;
+							y++){
+					const Point3_<uchar>* r1 = subimg1.ptr<Point3_<uchar> >(y);
+					const Point3_<uchar>* r2 = subimg2.ptr<Point3_<uchar> >(y);
+					for(int x=0;x< subimg1.cols;x++){
+						countHead++;
+						Isum1[idx].x += std::pow(static_cast<double>(r1[x].x/255.0),gamma)*255.0;
+						Isum1[idx].y += std::pow(static_cast<double>(r1[x].y/255.0),gamma)*255.0;
+						Isum1[idx].z += std::pow(static_cast<double>(r1[x].z/255.0),gamma)*255.0;
+						Isum2[idx].x += std::pow(static_cast<double>(r2[x].x/255.0),gamma)*255.0;
+						Isum2[idx].y += std::pow(static_cast<double>(r2[x].y/255.0),gamma)*255.0;
+						Isum2[idx].z += std::pow(static_cast<double>(r2[x].z/255.0),gamma)*255.0;
+					}
 				}
-			}
-			//tail重合区每个像素累加归一化
-			for(int y=subimg3.rows/HEIGHT_SLICES*idx;y< subimg3.rows/HEIGHT_SLICES*(idx+1);y++){
-				const Point3_<uchar>* r3 = subimg3.ptr<Point3_<uchar> >(y);
-				const Point3_<uchar>* r4 = subimg4.ptr<Point3_<uchar> >(y);
-				for(int x=0;x< subimg3.cols;x++){
-					countTail++;
-					Isum3[idx].x += std::pow(static_cast<double>(r3[x].x/255.0),gamma)*255.0;
-					Isum3[idx].y += std::pow(static_cast<double>(r3[x].y/255.0),gamma)*255.0;
-					Isum3[idx].z += std::pow(static_cast<double>(r3[x].z/255.0),gamma)*255.0;
-					Isum4[idx].x += std::pow(static_cast<double>(r4[x].x/255.0),gamma)*255.0;
-					Isum4[idx].y += std::pow(static_cast<double>(r4[x].y/255.0),gamma)*255.0;
-					Isum4[idx].z += std::pow(static_cast<double>(r4[x].z/255.0),gamma)*255.0;
+			 }
+
+				//tail重合区每个像素累加归一化
+			 if(i==2||i==1)
+			 {
+				for(int y=subimg3.rows/HEIGHT_SLICES*idx;y< subimg3.rows/HEIGHT_SLICES*(idx+1);y++){
+					const Point3_<uchar>* r3 = subimg3.ptr<Point3_<uchar> >(y);
+					const Point3_<uchar>* r4 = subimg4.ptr<Point3_<uchar> >(y);
+					for(int x=0;x< subimg3.cols;x++){
+						countTail++;
+						Isum3[idx].x += std::pow(static_cast<double>(r3[x].x/255.0),gamma)*255.0;
+						Isum3[idx].y += std::pow(static_cast<double>(r3[x].y/255.0),gamma)*255.0;
+						Isum3[idx].z += std::pow(static_cast<double>(r3[x].z/255.0),gamma)*255.0;
+						Isum4[idx].x += std::pow(static_cast<double>(r4[x].x/255.0),gamma)*255.0;
+						Isum4[idx].y += std::pow(static_cast<double>(r4[x].y/255.0),gamma)*255.0;
+						Isum4[idx].z += std::pow(static_cast<double>(r4[x].z/255.0),gamma)*255.0;
+					}
 				}
-			}
+			 }
 #define COMPARE_ASSIGN_ZERO(f)  if((f)<0.0001){(f)=0.0001;}
 //head :拿图i-1 /图i
-			{
+			 if(i==2||i==3){
 				float denominator=(Isum2[idx].x+Isum1[idx].x)/2;
 		//		denominator=Isum1[idx].x;
 
@@ -548,9 +600,15 @@ void overLapRegion::brightness_blance()
 				COMPARE_ASSIGN_ZERO(Isum1[idx].z);
 					alpha[idx][i].z  = denominator/Isum2[idx].z;
 
+					if(i==3)
+					{
+					alpha2[idx][i].x  =1;
+					alpha2[idx][i].y  =1;
+					alpha2[idx][i].z  =1;
+					}
 			}
 //tail 拿图j/j-1
-			{
+			 if(j==2||j==1){
 				float denominator=(Isum3[idx].x+Isum4[idx].x)/2.0f;
 			//	denominator=Isum3[idx].x;
 				COMPARE_ASSIGN_ZERO(Isum4[idx].x);
@@ -565,16 +623,23 @@ void overLapRegion::brightness_blance()
 				//	 denominator=Isum3[idx].z;
 				COMPARE_ASSIGN_ZERO(Isum4[idx].z);
 					alpha2[idx][j].z  =denominator/Isum4[idx].z;
+
+					if(j==1)
+					{
+						alpha[idx][j].x  =1;
+						alpha[idx][j].y  =1;
+						alpha[idx][j].z  =1;
+					}
 			}
 		}
 	}
 
-		for(int index=0;index<CAM_COUNT;index++)
+		for(int index=1;index<CAM_LIMIT;index++)
 		{
 			for(int sliceIdx=0;sliceIdx<HEIGHT_SLICES;sliceIdx++)
 			{
-			 CV_Assert(roi_image[index][LEFT_ROI].type() == CV_8UC3);
-			 CV_Assert(roi_image[index][RIGHT_ROI].type() == CV_8UC3);
+				CV_Assert(roi_image[index][LEFT_ROI].type() == CV_8UC3);
+				CV_Assert(roi_image[index][RIGHT_ROI].type() == CV_8UC3);
 
 			  Point3d gain_[HEIGHT_SLICES]  ,gain_2[HEIGHT_SLICES];
 //应用到每张图上
@@ -599,8 +664,9 @@ void overLapRegion::brightness_blance()
 			  g[1]= gain_[sliceIdx].y;
 			  b[1]= gain_[sliceIdx].z;
 			  r[0]= gain_2[sliceIdx].x;
-			  g[0]= gain_2[sliceIdx].y;
-			  b[0]= gain_2[sliceIdx].z;
+			  g[0]=gain_2[sliceIdx].y;
+			  b[0]=gain_2[sliceIdx].z;
+
 #if TEST_GAIN
 		render.SetCharacteristicGainMask(index,sliceIdx,(r[0]*FACTOR),(g[0]*FACTOR),(b[0]*FACTOR),
 				(r[1]*FACTOR),(g[1]*FACTOR),(b[1]*FACTOR));
@@ -610,7 +676,7 @@ void overLapRegion::brightness_blance()
 #if TEST_GAIN
 		render.BlanceNeighbours2InterPolate();
 		render.SetDeltaGainMask();
-	//	render.En_DisableUseNewGain(true);
+		render.En_DisableUseNewGain(true);
 		//printf("using New Gain\n");
 #endif
 		IsDealingWithSLICES=false;
