@@ -417,11 +417,6 @@ void overLapRegion::brightness_blance()
 	float gamma[CAM_COUNT]={0};
 	for(int i=0;i<CAM_COUNT;i++)
 		gamma[i]=0.25;
-
-	gamma[1]=0.5;
-	gamma[2]=0.23;
-	gamma[3]=0.33;
-	gamma[4]=0.23;
 	alpha.resize(CAM_COUNT);
 	alpha[1].x  = alpha[1].y = alpha[1].z = 1.0;
 	for(int i=1;i<4;i++)
