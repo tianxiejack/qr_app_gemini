@@ -924,11 +924,14 @@ GLint GLShaderManager::UseStockShader(GLT_STOCK_SHADER nShaderID, ...)
 	else
 	{
 		for(int i=0;i<m_cam_count;i++)
-			{
-				for(int j=0;j<3;j++){
-					vanColor[i][j]=ptrimColor[j*m_cam_count+i];
-				}
-			}
+				{
+					for(int j=0;j<1;j++){
+						vanColor[i][j]=ptrimColor[3*i];
+						vanColor[i][1]=1.0;
+						vanColor[i][2]=1.0;
+						vanColor[i][3]=1.0;
+					}
+	}
 	}
 #endif
 

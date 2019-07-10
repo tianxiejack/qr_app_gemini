@@ -659,7 +659,7 @@ int HDv4l_cam::read_frame(int now_pic_format)
 					}
 			//					UYVY2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
 						HD_YUYV2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
-
+						Src=*transformed_src_main;
 
 						if(Data2Queue(*transformed_src_main,nowpicW,nowpicH,chid[MAIN]))
 						{

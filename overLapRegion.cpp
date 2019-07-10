@@ -116,6 +116,12 @@ overLapRegion::overLapRegion()
 	Src6=(unsigned char *)malloc(FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*6*3);
 	temp4=(unsigned char *)malloc(FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*4*3);
 	temp6=(unsigned char *)malloc(FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*6*3);
+
+	for(int i=0;i<3;i++)
+	{
+		pSrc[i]=(unsigned char *)malloc(SDI_WIDTH*SDI_HEIGHT*3);
+		ptemp[i]=(unsigned char *)malloc(SDI_WIDTH*SDI_HEIGHT*3);
+	}
 }
 
 
@@ -174,7 +180,6 @@ float overLapRegion::getPercentX(int camidx,int leftorright)
 bool overLapRegion::van_save_coincidence()
 {
 	Point3d Isum1 = Point3d(0.0,0.0,0.0), Isum2 = Point3d(0.0,0.0,0.0);
-	double gamma=0.25;
 	vector<Point3d>	van_alpha(CAM_COUNT);
 	vector<Mat> van_images(CAM_COUNT);
 	vector<Mat> van_images_warped_f(CAM_COUNT);
@@ -196,41 +201,29 @@ bool overLapRegion::van_save_coincidence()
 		}
 	}
 #else
-	unsigned char *p6=PanoCaptureGroup::GetMainInstance()->GetSrc(FPGA_SIX_CN);
-	if(p6)
+	for(int i=0;i<3;i++)
 	{
-		memcpy(temp6,p6,
-		FPGA_SINGLE_PIC_H*FPGA_SINGLE_PIC_W*6*3);
-		UYV2RGB(temp6,FPGA_SINGLE_PIC_W,FPGA_SINGLE_PIC_H*6,Src6);
-	}
-	else
-		return false;
-	unsigned char *p4=PanoCaptureGroup::GetMainInstance()->GetSrc(FPGA_FOUR_CN);
-	char buf_save[64]={0};
-	if(p4)
-	{
-		memcpy(temp4,p4,
-		FPGA_SINGLE_PIC_H*FPGA_SINGLE_PIC_W*4*3);
-		UYV2RGB(temp4,FPGA_SINGLE_PIC_W,FPGA_SINGLE_PIC_H*4,Src4);
+		unsigned char *pcam=PanoCaptureGroup::GetMainInstance()->GetSrc(i);
+		if(pcam!=NULL)
+		{
+			memcpy(ptemp[i],pcam,
+			SDI_WIDTH*SDI_HEIGHT*3);
+			UYV2RGB(ptemp[i],SDI_WIDTH,SDI_HEIGHT,pSrc[i]);
+
 #if GAIN_SAVE_IMG
-		Mat s4(FPGA_SINGLE_PIC_H*4,FPGA_SINGLE_PIC_W,CV_8UC3,Src4);
+		Mat s4(SDI_HEIGHT,SDI_WIDTH,CV_8UC3,pSrc[i]);
 		imwrite("./data/save/p4.bmp",s4);
 #endif
+		}
+		else
+				return false;
+		for(int i=0;i<3;i++)
+		{
+			van_images[i+1].create(SDI_HEIGHT,SDI_WIDTH,CV_8UC3);
+			van_images[i+1].data=pSrc[i];
+		}
 	}
-	else
-		return false;
-	for(int i=0; i<6; i++){
-	van_images[i].create(FPGA_SINGLE_PIC_H,FPGA_SINGLE_PIC_W,CV_8UC3);
-	van_images[i].data=Src6+i*FPGA_SINGLE_PIC_H*FPGA_SINGLE_PIC_W*3;
-	}
-	for(int i=6; i<CAM_COUNT; i++){
-	van_images[i].create(FPGA_SINGLE_PIC_H,FPGA_SINGLE_PIC_W,CV_8UC3);
-	van_images[i].data=Src4+(i-6)*FPGA_SINGLE_PIC_H*FPGA_SINGLE_PIC_W*3;
-#if GAIN_SAVE_IMG
-	Mat s6(FPGA_SINGLE_PIC_H*6,FPGA_SINGLE_PIC_W,CV_8UC3,Src6);
-	imwrite("./data/save/p6.bmp",s6);
-#endif
-	}
+
 #endif
 	static bool Once=true;
 	if(0)
@@ -393,7 +386,11 @@ void overLapRegion::brightness_blance()
 	Mat subimg1, subimg2;
 	 std::vector<Point3d>	alpha;
 
-	float gamma=0.15;
+	float gamma[CAM_COUNT]={0};
+	for(int i=0;i<CAM_COUNT;i++)
+		gamma[i]=0.25;
+		gamma[2]=0.22;
+		gamma[1]=0.6;
 	alpha.resize(CAM_COUNT);
 	alpha[1].x  = alpha[1].y = alpha[1].z = 1.0;
 	for(int i=1;i<4;i++)
@@ -417,14 +414,14 @@ void overLapRegion::brightness_blance()
 			const Point3_<uchar>* r1 = subimg1.ptr<Point3_<uchar> >(y);
 			const Point3_<uchar>* r2 = subimg2.ptr<Point3_<uchar> >(y);
 			for(int x=0;x< subimg1.cols;x++){
-				Isum1.x += std::pow(static_cast<double>(r1[x].x/255.0),gamma)*255.0;
-				Isum1.y += std::pow(static_cast<double>(r1[x].y/255.0),gamma)*255.0;
-				Isum1.z += std::pow(static_cast<double>(r1[x].z/255.0),gamma)*255.0;
+				Isum1.x += std::pow(static_cast<double>(r1[x].x/255.0),gamma[i])*255.0;
+				Isum1.y += std::pow(static_cast<double>(r1[x].y/255.0),gamma[i])*255.0;
+				Isum1.z += std::pow(static_cast<double>(r1[x].z/255.0),gamma[i])*255.0;
 		//		printf("x=%d  y=%d\n",x,y);
 
-				Isum2.x += std::pow(static_cast<double>(r2[x].x/255.0),gamma)*255.0;
-				Isum2.y += std::pow(static_cast<double>(r2[x].y/255.0),gamma)*255.0;
-				Isum2.z += std::pow(static_cast<double>(r2[x].z/255.0),gamma)*255.0;
+				Isum2.x += std::pow(static_cast<double>(r2[x].x/255.0),gamma[i+1])*255.0;
+				Isum2.y += std::pow(static_cast<double>(r2[x].y/255.0),gamma[i+1])*255.0;
+				Isum2.z += std::pow(static_cast<double>(r2[x].z/255.0),gamma[i+1])*255.0;
 			}
 		}
 		 if(i==3)
@@ -463,7 +460,7 @@ void overLapRegion::brightness_blance()
 		gain_c.y = sum_alph.y/sum_alph2.y;
 		gain_c.z = sum_alph.z/sum_alph2.z;   //求出增益值
 
-		printf("gain_c.x=%f  gain_c.y=%f gain_c.z=%f \n",gain_c.x,gain_c.y,gain_c.z);
+	//	printf("gain_c.x=%f  gain_c.y=%f gain_c.z=%f \n",gain_c.x,gain_c.y,gain_c.z);
 		float x,y,z;
 
 		my_shaderm=(GLShaderManager *)getDefaultShaderMgr();
@@ -472,10 +469,10 @@ void overLapRegion::brightness_blance()
 		{
 			for(int index=1;index<3;index++)
 			{
-				x=(std::pow(alpha[index].x*gain_c.x, 1/gamma));
-				y=(std::pow(alpha[index].y*gain_c.y, 1/gamma));
-				z=(std::pow(alpha[index].z*gain_c.z, 1/gamma));
-				printf("index=%d x=%f  y=%f  z=%f \n",index,x,y,z);
+				x=(std::pow(alpha[index].x*gain_c.x, 1/gamma[index]));
+				y=(std::pow(alpha[index].y*gain_c.y, 1/gamma[index]));
+				z=(std::pow(alpha[index].z*gain_c.z, 1/gamma[index]));
+	//			printf("index=%d x=%f  y=%f  z=%f \n",index,x,y,z);
 				my_shaderm=(GLShaderManager *)getDefaultShaderMgr();
 				my_shaderm->set_gain_(index,x,y,z);
 			}

@@ -9965,6 +9965,7 @@ isUseNewGain=false;
 #endif
 if ((TRIM_MODE == displayMode)) {
 	EnablePanoFloat = true;
+	overLapRegion::GetoverLapRegion()->set_change_gain(true);
 }
 
 if (INIT_VIEW_MODE == displayMode) {
