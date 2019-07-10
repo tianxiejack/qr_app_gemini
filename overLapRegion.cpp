@@ -21,6 +21,31 @@ extern Render render;
 extern int ExchangeChannel(int direction);
 GLShaderManager *my_shaderm;
 overLapRegion *overLapRegion::overlapregion;
+int resetExchange(int idx)
+{
+	int ret=idx;
+	switch(idx)
+	{
+	case 0:
+		ret=3;
+		break;
+	case 1:
+		ret=2;
+		break;
+	case 2:
+		ret=1;
+		break;
+	case 3:
+		ret=0;
+		break;
+	default:
+		break;
+	}
+	return ret;
+}
+
+
+
 
 int leftExchange(int idx)
 {
@@ -108,10 +133,11 @@ int rightExchange(int idx)
 
 overLapRegion::overLapRegion()
 {
-	CHANGE_GAIN=false;
+	CHANGE_GAIN=true;
 	HEIGHT_SLICES=2;
 	IsDealingWithSLICES=false;
 	EnableSingleHightLight=false;
+	isdealingwithVector=false;
 	Src4=(unsigned char *)malloc(FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*4*3);
 	Src6=(unsigned char *)malloc(FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*6*3);
 	temp4=(unsigned char *)malloc(FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*4*3);
@@ -373,8 +399,9 @@ void overLapRegion::push_overLap_PointleftAndright(
 		cv::Point2f pointright
 		)
 {
-	m_pointLeft[direction_leftcam].push_back(pointleft);
-	 int right_dir=rightExchange(direction_leftcam);
+	int resetL=resetExchange(direction_leftcam);
+	m_pointLeft[resetL].push_back(pointleft);
+	 int right_dir=(resetL+1)%CAM_COUNT;
 	 m_pointRight[right_dir].push_back(pointright);
 }
 
@@ -391,11 +418,10 @@ void overLapRegion::brightness_blance()
 	for(int i=0;i<CAM_COUNT;i++)
 		gamma[i]=0.25;
 
-	gamma[1]=0.3;
-	gamma[2]=0.24;
-	gamma[3]=0.28;
-	gamma[4]=0.22;
-
+	gamma[1]=0.5;
+	gamma[2]=0.23;
+	gamma[3]=0.31;
+	gamma[4]=0.23;
 	alpha.resize(CAM_COUNT);
 	alpha[1].x  = alpha[1].y = alpha[1].z = 1.0;
 	for(int i=1;i<4;i++)

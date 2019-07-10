@@ -31,14 +31,26 @@ public:
 	bool get_change_gain();
 	void SetSingleHightLightState(bool state){EnableSingleHightLight=state;};
 	bool GetSingleHightLightState(){return EnableSingleHightLight;};
+	void ClearLeftRightPointV(int idx)
+	{
+	//	printf("m_pointRight=%d   L=%d\n",m_pointRight[idx].size(),m_pointLeft[idx].size());
+		m_pointLeft[idx].clear();
+		m_pointRight[idx].clear();
+	};
 	int GetHeightSlices(){return HEIGHT_SLICES;};
 	float getPercentX(int camidx,int leftorright);
+	bool IsDealingVector(){return isdealingwithVector;};
+	void SetIsDealingVector(bool tof)
+	{
+		isdealingwithVector=tof;
+	};
 	private:
 	overLapRegion();
 	static  overLapRegion *overlapregion;
 	std::vector<int> vectors[CAM_COUNT];
 	std::vector<int> max_min[CAM_COUNT];
 	Mat roi_image[CAM_COUNT][ROI_COUNT];
+	bool isdealingwithVector;
 	int HEIGHT_SLICES;
 	bool IsDealingWithSLICES;
 	bool CHANGE_GAIN;

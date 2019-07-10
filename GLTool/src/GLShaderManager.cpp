@@ -901,7 +901,6 @@ GLint GLShaderManager::UseStockShader(GLT_STOCK_SHADER nShaderID, ...)
 #if USE_GAIN
 	if(!overLapRegion::GetoverLapRegion()->get_change_gain())
 	{
-
 		for(int i=1;i<4;i++)
 		{
 			vanColor[i][0]=gain_[i][0];

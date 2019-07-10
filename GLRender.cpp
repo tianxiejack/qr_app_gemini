@@ -1154,11 +1154,6 @@ Render::Render() :
 	PANx = 0, PANy = 0;
 	scale = 0;
 	oScale = 1.0f;
-#if GAIN_MASK
-	isUseNewGain=true;
-#else
-	isUseNewGain = false;
-#endif
 	for (int idx = 0; idx < CAM_COUNT; idx++) {
 		for (int i = GAIN_TEX_HEIGHT * GAIN_TEX_WIDTH * idx;
 				i < GAIN_TEX_HEIGHT * GAIN_TEX_WIDTH * (idx + 1); i++) {
@@ -2456,6 +2451,10 @@ cv::Point2f RotatePoint(cv::Point2f Point, cv::Point2f rotate_center,
 }
 
 void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
+	for(int i=0;i<CAM_COUNT;i++)
+	{
+		overLapRegion::GetoverLapRegion()->ClearLeftRightPointV(i);
+	}
 //	printf("%d\n",idx);
 //	sleep(3);
 	if ((!common.isUpdate()) && (!common.isIdleDraw()))
@@ -7692,7 +7691,16 @@ if (steps != lasetSteps) {
 DEBUG_ORDER dbo = getDebugModeOrder(TRANSFER_TO_APP_ETHOR);
 switch (dbo) {
 case DEBUG_ORDER_TRIMMING_ON:
-	EnablePanoFloat = true;//open trimming
+	//EnablePanoFloat = true;//open trimming
+	displayMode = TRIM_MODE;
+	if ((TRIM_MODE == displayMode)) {
+		EnablePanoFloat = true;
+		overLapRegion::GetoverLapRegion()->set_change_gain(true);
+		while(overLapRegion::GetoverLapRegion()->IsDealingVector()==true)
+		{
+			usleep(1000);
+		}
+	}
 break;
 
 case DEBUG_ORDER_CHECKEDCAMERA_MOVEUP:
@@ -7831,6 +7839,7 @@ case DEBUG_ORDER_CLEAN_ALLCAMERA_RESULT:
 break;
 case DEBUG_ORDER_TRIMMING_OFF:
 	EnablePanoFloat = false;
+	shaderManager.ResetTrimColor();
 break;
 case DEBUG_ORDER_SINGLECAMERA_1:
 	testPanoNumber =1;
@@ -8667,9 +8676,6 @@ GLenum format = GL_BGRA;
 #if MVDECT
 	mv_detect.mvClose();
 #endif
-#if GAIN_MASK
-	isUseNewGain=true;
-#endif
 
 #if MVDECT
 	mv_detect.ClearAllVector(false);
@@ -8684,9 +8690,6 @@ case 'O':
 #if MVDECT
 	mv_detect.ClearAllVector(true);
 #endif
-#endif
-#if GAIN_MASK
-	isUseNewGain=false;
 #endif
 	//	mode = OitVehicle::USER_OIT;
 	break;
@@ -9058,19 +9061,16 @@ case 'e':
 
 	break;
 case 'G':		//PTZ--CCD
-	isUseNewGain = !isUseNewGain;
 	break;
 case 'V':
 #if GAIN_MASK
-	if(isUseNewGain)
-	{
+	overLapRegion::GetoverLapRegion()->set_change_gain(false);
 		static bool Once=true;
 		if(Once)
 		{
 			Once=false;
 			start_exposure_thread();
 		}
-	}
 #endif
 	break;
 case 'g':		//PTZ--FIR
@@ -9647,16 +9647,6 @@ case ')':
 	break;
 case '?': {
 	isEnhanceOn = !isEnhanceOn;
-#if GAIN_MASK
-	if(isEnhanceOn)
-	{
-		isUseNewGain=false;
-	}
-	else
-	{
-		isUseNewGain=true;
-	}
-#endif
 }
 	break;
 
@@ -9979,11 +9969,8 @@ break;
 case 11:
 if ((TRIM_MODE == displayMode)) {
 	EnablePanoFloat = false;
-#if GAIN_MASK
-	isUseNewGain=true;
-#endif
 	shaderManager.ResetTrimColor();
-	displayMode = ALL_VIEW_MODE;
+//	displayMode = ALL_VIEW_MODE;
 }
 if (INIT_VIEW_MODE == displayMode) {
 	EnterSinglePictureSaveMode = false;
@@ -10001,11 +9988,15 @@ break;
 case 12:
 displayMode = TRIM_MODE;
 #if GAIN_MASK
-isUseNewGain=false;
+overLapRegion::GetoverLapRegion()->set_change_gain(true);
 #endif
 if ((TRIM_MODE == displayMode)) {
 	EnablePanoFloat = true;
-	overLapRegion::GetoverLapRegion()->set_change_gain(true);
+//	overLapRegion::GetoverLapRegion()->set_change_gain(true);
+	while(overLapRegion::GetoverLapRegion()->IsDealingVector()==true)
+	{
+		usleep(1000);
+	}
 }
 
 if (INIT_VIEW_MODE == displayMode) {

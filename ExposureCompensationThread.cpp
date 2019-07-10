@@ -28,9 +28,11 @@ void *exposure_thread(void *arg)
 	{
 	//	gettimeofday(&startT[4],0);
 
-		if(render.isUsingNewGain())
+
+		if(!overLapRegion::GetoverLapRegion()->get_change_gain())
 		{
 		//if(!overLapRegion::GetoverLapRegion()->GetSingleHightLightState())
+			overLapRegion::GetoverLapRegion()->SetIsDealingVector(true);
 		{
 		//	 sleep(2);
 			 if(overLapRegion::GetoverLapRegion()->van_save_coincidence())
@@ -38,6 +40,7 @@ void *exposure_thread(void *arg)
 				 overLapRegion::GetoverLapRegion()->brightness_blance();
 			 }
 		}
+		overLapRegion::GetoverLapRegion()->SetIsDealingVector(false);
 		render.SetGainisNew(true);
 		 sleep(10);
 		}

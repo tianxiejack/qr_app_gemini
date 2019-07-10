@@ -701,7 +701,6 @@ public:
 	 GLTriangleBatch     sphereBatch2;
 	 GLFrame             cameraFrame2;
 	 	 bool GainisNew;
-		bool isUseNewGain;
 		GLfloat tempMask[GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*CAM_COUNT*RGBNUM];
 		GLfloat InterPolatedMask[GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*CAM_COUNT*RGBNUM];
 		GLint interflowMask[GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*CAM_COUNT];
@@ -716,14 +715,6 @@ public:
 
 		void Interflow(int idx,int rows,int cols,GLfloat*src,GLint*dst );
 		void     BlanceNeighbours2InterPolate();
-		bool isUsingNewGain()
-		{
-			return isUseNewGain;
-		};
-		void En_DisableUseNewGain(bool tof)
-		{
-			isUseNewGain=tof;
-		};
 		void SetGainisNew(bool tof){
 			GainisNew=tof;
 		};
