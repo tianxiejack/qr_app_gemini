@@ -237,8 +237,8 @@ bool overLapRegion::van_save_coincidence()
 		}
 	}
 
-	vector<cv::Point2f>::iterator it2;
-	vector<int>::iterator it;
+	vector<cv::Point2f>::iterator it2,it;
+
 	Vec3b van_pix_1, van_pix_2;
 
 	cv::Point2f vPoint1[3], vPoint2[3];
@@ -255,94 +255,95 @@ float max_panel_length=render.GetPanoLen();
 	{
 		float cmp_x_min=30000, cmp_y_min=30000,cmp_x_max=-1,cmp_y_max=-1;
 		float cmp_x2_min=30000, cmp_y2_min=30000,cmp_x2_max=-1,cmp_y2_max=-1;
-		for(it=vectors[direction].begin();it!= vectors[direction].end();it++)
+		for(it=m_pointLeft[direction].begin();it!= m_pointLeft[direction].end();it++)
 		{
-			for(int van_index=0; van_index<3; van_index++)
-			{
-				render.getPointsValue(direction, *it,vPoint1);     //van_get
-				render.getPointsValue((direction+1)%(CAM_COUNT),*it, vPoint2);//van_get
-
-				if(vPoint1[van_index].x>cmp_x_max)
-					cmp_x_max=vPoint1[van_index].x;
-				if(vPoint1[van_index].y>cmp_y_max)
-					cmp_y_max=vPoint1[van_index].y;
-				if(vPoint1[van_index].x<cmp_x_min)
-					cmp_x_min=vPoint1[van_index].x;
-				if(vPoint1[van_index].y<cmp_y_min)
-					cmp_y_min=vPoint1[van_index].y;
-
-				if(vPoint2[van_index].x>cmp_x2_max)
-					cmp_x2_max=vPoint2[van_index].x;
-				if(vPoint2[van_index].y>cmp_y2_max)
-					cmp_y2_max=vPoint2[van_index].y;
-				if(vPoint2[van_index].x<cmp_x2_min)
-					cmp_x2_min=vPoint2[van_index].x;
-				if(vPoint2[van_index].y<cmp_y2_min)
-					cmp_y2_min=vPoint2[van_index].y;
-			}
+				if((*it).x>cmp_x_max)
+					cmp_x_max=(*it).x;
+				if((*it).y>cmp_y_max)
+					cmp_y_max=(*it).y;
+				if((*it).x<cmp_x_min)
+					cmp_x_min=(*it).x;
+				if((*it).y<cmp_y_min)
+					cmp_y_min=(*it).y;
 		}
+
+		for(it2=m_pointRight[direction].begin();it2!= m_pointRight[direction].end();it2++)
+		{
+				if((*it2).x>cmp_x2_max)
+					cmp_x2_max=(*it2).x;
+				if((*it2).y>cmp_y2_max)
+					cmp_y2_max=(*it2).y;
+				if((*it2).x<cmp_x2_min)
+					cmp_x2_min=(*it2).x;
+				if((*it2).y<cmp_y2_min)
+					cmp_y2_min=(*it2).y;
+		}
+
 
 		x_min[direction]= cmp_x_min;
-		y_min[direction]= cmp_y_min;
+		y_min[direction]= Modula(cmp_y_min,SDI_HEIGHT);
 		x_max[direction]= cmp_x_max;
-		y_max[direction]= cmp_y_max;
-		if(direction==CAM_COUNT-1)
-		{
-			x2_min[0]= cmp_x2_min;
-			y2_min[0]= cmp_y2_min;
-			x2_max[0]= cmp_x2_max;
-			y2_max[0]= cmp_y2_max;
-		}
-		else if(direction==3)
-		{
-			x2_min[1]= cmp_x2_min;
-			y2_min[1]= cmp_y2_min;
-			x2_max[1]= cmp_x2_max;
-			y2_max[1]= cmp_y2_max;
-		}
-		else{
-		x2_min[direction+1]= cmp_x2_min;
-		y2_min[direction+1]= cmp_y2_min;
-		x2_max[direction+1]= cmp_x2_max;
-		y2_max[direction+1]= cmp_y2_max;
-		}
-//	strcpy(buf_1,"'\0'");
-//	strcpy(buf_2,"'\0'");
-//	sprintf(buf_1,"./van_2/%d_left.bmp",direction);
-		if(y_min[direction]<0)
-			y_min[direction]=0;
-		if(y_max[direction]>=SDI_HEIGHT)
-			y_max[direction]=SDI_HEIGHT-1;
+		y_max[direction]= Modula(cmp_y_max,SDI_HEIGHT);
 
-		if(x_min[direction]<0)
-			x_min[direction]=0;
-		if(x_max[direction]>=SDI_WIDTH)
-			x_max[direction]=SDI_WIDTH-1;
+		x2_min[direction]= cmp_x2_min;
+		y2_min[direction]= Modula(cmp_y2_min,SDI_HEIGHT);
+		x2_max[direction]= cmp_x2_max;
+		y2_max[direction]= Modula(cmp_y2_max,SDI_HEIGHT);
 
+	strcpy(buf_1,"'\0'");
+	strcpy(buf_2,"'\0'");
+	char buf_1[48];
+	char buf_2[48];
 
-		int tmpidx=-1;
-		if(direction+1==4)
-			tmpidx=1;
-		else
-			tmpidx=(direction+1)%CAM_COUNT;
-		if(y2_min[tmpidx]<0)
-			y2_min[tmpidx]=0;
-		if(y2_max[tmpidx]>=SDI_HEIGHT)
-			y2_max[tmpidx]=SDI_HEIGHT-1;
+	int cur_x_min=x_min[direction]+LEFT_BLACK_LEN,
+			cur_y_min = y_min[direction],
+			cur_x_max=x_max[direction],
+			cur_y_max=y_max[direction]
+			;
+		cur_x_min=cur_x_min < 0? 0 : cur_x_min;
+		cur_y_min = cur_y_min<0?0:cur_y_min;
 
-		if(x2_min[tmpidx]<0)
-			x2_min[tmpidx]=0;
-		if(x2_max[tmpidx]>=SDI_WIDTH)
-			x2_max[tmpidx]=SDI_WIDTH-1;
+		cur_x_max=cur_x_max>SDI_WIDTH? SDI_WIDTH:cur_x_max;
+		cur_y_max=cur_y_max>SDI_HEIGHT? SDI_HEIGHT:cur_y_max;
+	sprintf(buf_1,"./data/save/%d_left.bmp",direction);
+	roi_image[direction][LEFT_ROI]=van_images[direction](
+			Range(cur_y_min,cur_y_max),
+			Range(cur_x_min,cur_x_max)////leftmid
+			);
+	midX[direction][LEFT_ROI]=(cur_x_max-cur_x_min)/2.0+cur_x_min;
+#if GAIN_SAVE_IMG
+	imwrite(buf_1,roi_image[direction][LEFT_ROI]);
 
-	roi_image[direction][LEFT_ROI]=van_images[direction](Range(y_min[direction],y_max[direction]),Range(x_min[direction],	x_max[direction]));
-//		imwrite(buf_1,roi_image[direction][LEFT_ROI]);
-//		strcpy(buf_2,"./van_2/0_right.bmp");
-	if(tmpidx==4)
-		roi_image[(1)%CAM_COUNT][RIGHT_ROI]=van_images[1](Range(y2_min[1],y2_max[1]),Range(x2_min[1],	x2_max[1]));
-	else
-		roi_image[(tmpidx)%CAM_COUNT][RIGHT_ROI]=van_images[tmpidx](Range(y2_min[tmpidx],y2_max[tmpidx]),Range(x2_min[tmpidx],	x2_max[tmpidx]));
-//		imwrite(buf_2,roi_image[0][RIGHT_ROI]);
+	cv::Rect Roi_rect = cv::Rect(cur_x_min+50,cur_y_min,roi_image[direction][LEFT_ROI].cols,roi_image[direction][LEFT_ROI].rows);
+//	roi_image[direction][LEFT_ROI].copyTo(van_images[direction](Roi_rect));
+	cv::rectangle(van_images[direction],cvPoint(cur_x_min,cur_y_min),cvPoint(cur_x_max,cur_y_max),cvScalar(255,0,0),1);
+#endif
+	cur_x_min=x2_min[direction];
+	cur_y_min = y2_min[direction];
+
+	cur_x_max=x2_max[direction]-RIGHT_BLACK_LEN;
+	cur_y_max=y2_max[direction];
+
+	cur_x_min=cur_x_min < 0? 0 : cur_x_min;
+	cur_y_min = cur_y_min<0?0:cur_y_min;
+
+	cur_x_max=cur_x_max>SDI_WIDTH?SDI_WIDTH:cur_x_max;
+	cur_y_max=cur_y_max>SDI_HEIGHT? SDI_HEIGHT:cur_y_max;
+	sprintf(buf_2,"./data/save/%d_right.bmp",direction);
+	roi_image[direction][RIGHT_ROI]=van_images[direction](
+			Range(cur_y_min,cur_y_max),
+			Range(cur_x_min,	cur_x_max)   //rightmid
+			);
+	midX[direction][RIGHT_ROI]=(cur_x_max-cur_x_min)/2.0+cur_x_min;
+#if GAIN_SAVE_IMG
+	imwrite(buf_2,roi_image[direction][RIGHT_ROI]);
+
+		cv::Rect Roi_rect2 = cv::Rect(cur_x_min-50,cur_y_min,
+			roi_image[direction][RIGHT_ROI].cols,
+			roi_image[direction][RIGHT_ROI].rows);
+//	roi_image[direction][RIGHT_ROI].copyTo(van_images[direction](Roi_rect2));
+	cv::rectangle(van_images[direction],cvPoint(cur_x_min,cur_y_min),cvPoint(cur_x_max,cur_y_max),cvScalar(0,255,0),1);
+#endif
 	}
 #if GAIN_SAVE_IMG
 for(int i=0;i<CAM_COUNT;i++)
@@ -358,10 +359,10 @@ for(int i=0;i<CAM_COUNT;i++)
 
 bool overLapRegion::beExist()
 {
-	for(int direction=0;direction<CAM_COUNT;direction++)
+//	for(int direction=0;direction<CAM_COUNT;direction++)
 	{
-		if(vectors[direction].empty())
-			return false;
+	//	if(vectors[direction].empty())
+//			return false;
 	}
 	return true;
 }
@@ -389,8 +390,12 @@ void overLapRegion::brightness_blance()
 	float gamma[CAM_COUNT]={0};
 	for(int i=0;i<CAM_COUNT;i++)
 		gamma[i]=0.25;
-		gamma[2]=0.22;
-		gamma[1]=0.6;
+
+	gamma[1]=0.3;
+	gamma[2]=0.24;
+	gamma[3]=0.28;
+	gamma[4]=0.22;
+
 	alpha.resize(CAM_COUNT);
 	alpha[1].x  = alpha[1].y = alpha[1].z = 1.0;
 	for(int i=1;i<4;i++)
@@ -456,9 +461,9 @@ void overLapRegion::brightness_blance()
 			sum_alph2.y += alpha[img_idx].y*alpha[img_idx].y;
 			sum_alph2.z += alpha[img_idx].z*alpha[img_idx].z;
 		}
-		gain_c.x = sum_alph.x/sum_alph2.x;
-		gain_c.y = sum_alph.y/sum_alph2.y;
-		gain_c.z = sum_alph.z/sum_alph2.z;   //求出增益值
+		gain_c.x = (sum_alph.x/sum_alph2.x);
+		gain_c.y = (sum_alph.y/sum_alph2.y);
+		gain_c.z = (sum_alph.z/sum_alph2.z);   //求出增益值
 
 	//	printf("gain_c.x=%f  gain_c.y=%f gain_c.z=%f \n",gain_c.x,gain_c.y,gain_c.z);
 		float x,y,z;
@@ -467,7 +472,7 @@ void overLapRegion::brightness_blance()
 		 Point3d gain_2[CAM_COUNT];
 		if(EnableSingleHightLight==false)
 		{
-			for(int index=1;index<3;index++)
+			for(int index=1;index<4;index++)
 			{
 				x=(std::pow(alpha[index].x*gain_c.x, 1/gamma[index]));
 				y=(std::pow(alpha[index].y*gain_c.y, 1/gamma[index]));

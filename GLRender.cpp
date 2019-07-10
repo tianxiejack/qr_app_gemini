@@ -240,7 +240,7 @@ float define_move_ver_scale[CAM_COUNT] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 		1.0 }; //{     1.0,      1.0,     1.37,     1.06,     1.02,     0.99,     0.88,     1.00,     1.00,     1.00};
 
 int ExchangeChannel(int direction) {
-/*	if (direction == 0) {
+	if (direction == 0) {
 		direction = 3;
 	} else if (direction == 1) {
 		direction = 2;
@@ -253,13 +253,13 @@ int ExchangeChannel(int direction) {
 	}
 	else if (direction == 5) {
 		direction = 5;
-	}*/
+	}
 	return direction;
 }
 
 int NeighbourChannel(int direction) {
 	int dir = 0;
-/*	switch (direction) {
+	switch (direction) {
 	case 0:
 		dir = 4;
 		break;
@@ -286,8 +286,8 @@ int NeighbourChannel(int direction) {
 		break;
 	default:
 		break;
-	}*/
-	dir=(dir+1)%CAM_COUNT;
+	}
+//	dir=(dir+1)%CAM_COUNT;
 	return dir;
 }
 
@@ -2572,13 +2572,53 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 		{
 			continue;
 		}
-#if  USE_GAIN
-               if(AppOverlap)
-               {
-                       getPointsValue(direction, x, Point1);
-                       overLapRegion::GetoverLapRegion()->push_overLap_triangle(direction,x);
-               }
-#endif
+		if(AppOverlap)  //gain
+					{
+						getOverLapPointsValue(direction, x, Point1, Point2);
+						int over_lap_direction =ExchangeChannel(direction);
+							for (int k = 0; k < 3; k++) {
+
+								//point1图０左边，point2图１右边
+
+								Point1[k].x = (Point1[k].x - scale_hor[over_lap_direction])
+										* move_hor_scale[over_lap_direction] + scale_hor[over_lap_direction]
+										+ move_hor[over_lap_direction];
+								Point1[k].y = (Point1[k].y - scale_ver[over_lap_direction])
+										* move_ver_scale[over_lap_direction] + scale_ver[over_lap_direction];
+								Point1[k].y = Point1[k].y + PanoFloatData[over_lap_direction];
+
+								int new_dir = NeighbourChannel(over_lap_direction);
+								Point2[k].x = (Point2[k].x
+										- scale_hor[(new_dir) % CAM_COUNT])
+										* move_hor_scale[(new_dir) % CAM_COUNT]
+										+ scale_hor[(new_dir) % CAM_COUNT]
+										+ move_hor[(new_dir) % CAM_COUNT];
+								Point2[k].y = (Point2[k].y
+										- scale_ver[(new_dir) % CAM_COUNT])
+										* move_ver_scale[(new_dir) % CAM_COUNT]
+										+ scale_ver[(new_dir) % CAM_COUNT];
+								Point2[k].y = Point2[k].y
+										+ PanoFloatData[(new_dir) % CAM_COUNT];
+								Point1[k].x = Point1[k].x / 1920*1280;
+								Point1[k].y = Point1[k].y / 1080*720;
+								Point2[k].x = Point2[k].x / 1920*1280;
+								Point2[k].y = Point2[k].y /1080*720;
+
+								Point1[k] = RotatePoint(Point1[k], rotate_center[over_lap_direction],
+										rotate_angle[over_lap_direction], max_panel_length,
+										CAM_COUNT);
+								Point2[k] = RotatePoint(Point2[k],
+										rotate_center[(new_dir) % CAM_COUNT],
+										rotate_angle[(new_dir) % CAM_COUNT],
+										max_panel_length, CAM_COUNT);
+								overLapRegion::GetoverLapRegion()->push_overLap_PointleftAndright(
+										over_lap_direction,
+										Point1[k],
+										Point2[k]
+								);
+							}
+					}
+
 
 		AppOverlap = false;
 		setcamsOverlapArea(x, direction, AppOverlap);
@@ -8937,7 +8977,7 @@ case 't':		//PANO add PTZ view
 	SetTuneSteps(10);
 	break;
 case 'y':		//two half PANO view
-	SetTuneSteps(50);
+	SetTuneSteps(5);
 	break;
 case 'u':		//single high quality view
 	testPanoNumber =1;
