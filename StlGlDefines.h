@@ -58,7 +58,7 @@ enum{
        ROI_COUNT
 };
 #endif
-#define CAM_LIMIT	4
+
 #define CENTER_X 0
 #define CENTER_Y 215
 #define CENTER_WIDTH 1920

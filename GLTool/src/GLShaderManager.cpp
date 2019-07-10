@@ -902,19 +902,24 @@ GLint GLShaderManager::UseStockShader(GLT_STOCK_SHADER nShaderID, ...)
 	if(!overLapRegion::GetoverLapRegion()->get_change_gain())
 	{
 
-		for(int i=0;i<m_cam_count;i++)
+		for(int i=1;i<4;i++)
 		{
 			vanColor[i][0]=gain_[i][0];
 			vanColor[i][1]=gain_[i][1];
 			vanColor[i][2]=gain_[i][2];
 			vanColor[i][3]=1.0f;
+	/*		printf("i=%d  vanColor[0]=%f vanColor[1]=%f  vanColor[2]=%f\n",
+					i,
+					vanColor[i][0],
+					vanColor[i][1],
+					vanColor[i][2]);*/
 		}
-		for(int i=0;i<m_cam_count;i++)
-						{
-							for(int j=0;j<1;j++){
-								vanColor[i][j]=ptrimColor[3*i];
-							}
-						}
+	/*	for(int i=0;i<m_cam_count;i++)
+		{
+			for(int j=0;j<1;j++){
+				vanColor[i][j]=ptrimColor[3*i];
+			}
+		}*/
 	}
 	else
 	{
