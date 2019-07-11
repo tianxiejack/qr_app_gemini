@@ -364,8 +364,17 @@ float max_panel_length=render.GetPanoLen();
 	cur_x_min=cur_x_min < 0? 0 : cur_x_min;
 	cur_y_min = cur_y_min<0?0:cur_y_min;
 
-	cur_x_max=cur_x_max>SDI_WIDTH?SDI_WIDTH:cur_x_max;
-	cur_y_max=cur_y_max>SDI_HEIGHT? SDI_HEIGHT:cur_y_max;
+	cur_x_min=cur_x_min>SDI_WIDTH? SDI_WIDTH-10:cur_x_min;
+	cur_y_min=cur_y_min>SDI_HEIGHT? SDI_HEIGHT-10:cur_y_min;
+
+	cur_x_max=cur_x_max>SDI_WIDTH? SDI_WIDTH-10:cur_x_max;
+	cur_y_max=cur_y_max>SDI_HEIGHT? SDI_HEIGHT-10:cur_y_max;
+
+	cur_x_max=cur_x_max < 0? 10 : cur_x_max;
+	cur_y_max = cur_y_max<0? 10:cur_y_max;
+
+	cur_x_max=cur_x_max>cur_x_min? cur_x_max:cur_x_min+8;
+	cur_y_max=cur_y_max>cur_y_min? cur_y_max:cur_y_min+8;
 	sprintf(buf_2,"./data/save/%d_right.bmp",direction);
 	roi_image[direction][RIGHT_ROI]=van_images[direction](
 			Range(cur_y_min,cur_y_max),
