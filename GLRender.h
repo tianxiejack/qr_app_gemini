@@ -63,8 +63,8 @@ static const int ALPHA_MASK_WIDTH = (DEFAULT_IMAGE_WIDTH/16);
 /*set up render scene*/
 static const M3DVector3f DEFAULT_ORIGIN = {0.0f, 0.0f, 50.0f};
 static const int GAIN_TEX_HEIGHT=4;
-static const int GAIN_TEX_WIDTH=192;//3
-#define HEAD_MID_TAIL 192 //3
+static const int GAIN_TEX_WIDTH=128;//3
+#define HEAD_MID_TAIL 128 //3
 #define RGBNUM 3
 #define MAX_SLICES (GAIN_TEX_HEIGHT)
 

@@ -42,7 +42,7 @@ void *exposure_thread(void *arg)
 		}
 		overLapRegion::GetoverLapRegion()->SetIsDealingVector(false);
 		render.SetGainisNew(true);
-		 sleep(10);
+	//	 sleep(10);
 		}
 		else
 			sleep(3);

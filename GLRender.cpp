@@ -3313,23 +3313,23 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 	}
 
 	for (int i = 1; i < 4; i++) {
-
-		if(GainisNew)
+		if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
 		{
+			if(GainisNew)
+			{
+					glActiveTexture(GL_TextureIDs[ALPHA_TEXTURE_IDX+i]);
+					glBindTexture(GL_TEXTURE_2D, textures[i+3]);
+					glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,GAIN_TEX_WIDTH, GAIN_TEX_HEIGHT, 0,
+							GL_RGBA, GL_UNSIGNED_BYTE, GainMask[i]);
+					GainisNew=false;
+			}
+			else
 				glActiveTexture(GL_TextureIDs[ALPHA_TEXTURE_IDX+i]);
 				glBindTexture(GL_TEXTURE_2D, textures[i+3]);
-				glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,GAIN_TEX_WIDTH, GAIN_TEX_HEIGHT, 0,
-						GL_RGBA, GL_UNSIGNED_BYTE, GainMask[i]);
-				char buf[72]={0};
-				sprintf(buf,"./data/test/%d_gainmask.bmp",i);
-				Mat m(GAIN_TEX_HEIGHT,GAIN_TEX_WIDTH,CV_8UC4,GainMask[i]);
-				imwrite(buf,m);
-			//	GainisNew=false;
 		}
-
 		if (p_petalNum[i] != -1) {
 
-			if (isUseNewGain) {
+			if (overLapRegion::GetoverLapRegion()->get_change_gain() == false) {
 				USE_GAIN_ON_PETAL(p_petalNum[i]);
 		} else {
 			shaderManager.UseStockShader(GetShaderIDByState(), m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),i-1,i);
@@ -3338,7 +3338,7 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 		(*m_env.GetPanel_Petal(p_petalNum[i])).Draw();
 			if(i!=3)
 			{
-				if (isUseNewGain)
+				if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
 				{
 					USE_TWO_GAIN_TEXTURE_ON_PETAL_OVERLAP(p_petalNum[i]);
 				}
@@ -7832,7 +7832,6 @@ case DEBUG_ORDER_CLEAN_ALLCAMERA_RESULT:
 break;
 case DEBUG_ORDER_TRIMMING_OFF:
 	EnablePanoFloat = false;
-	En_DisableUseNewGain(false);
 	shaderManager.ResetTrimColor();
 break;
 case DEBUG_ORDER_SINGLECAMERA_1:
@@ -7850,12 +7849,10 @@ case DEBUG_ORDER_SINGLECAMERA_MODE:
 		if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
 		{
 			overLapRegion::GetoverLapRegion()->set_change_gain(true);
-			En_DisableUseNewGain(true);
 		}
 		else
 		{
 			overLapRegion::GetoverLapRegion()->set_change_gain(false);
-			En_DisableUseNewGain(false);
 		}
 #endif
 }
@@ -9086,12 +9083,11 @@ case 'V':
 		if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
 		{
 			overLapRegion::GetoverLapRegion()->set_change_gain(true);
-			isUseNewGain=false;
 		}
 		else
 		{
 		overLapRegion::GetoverLapRegion()->set_change_gain(false);
-		isUseNewGain=true;
+
 		}
 	}
 

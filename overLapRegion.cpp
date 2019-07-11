@@ -706,7 +706,7 @@ void overLapRegion::brightness_blance()
 #if TEST_GAIN
 		render.BlanceNeighbours2InterPolate();
 		render.SetDeltaGainMask();
-		render.En_DisableUseNewGain(true);
+	//	render.En_DisableUseNewGain(true);
 		//printf("using New Gain\n");
 #endif
 		IsDealingWithSLICES=false;
