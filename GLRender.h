@@ -701,11 +701,12 @@ public:
 	 GLTriangleBatch     sphereBatch2;
 	 GLFrame             cameraFrame2;
 	 	 bool GainisNew;
-		GLfloat tempMask[GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*CAM_COUNT*RGBNUM];
-		GLfloat InterPolatedMask[GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*CAM_COUNT*RGBNUM];
-		GLint interflowMask[GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*CAM_COUNT];
-		GLint transTempMask[GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*CAM_COUNT];
-		GLint GainMask[GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*CAM_COUNT];
+		bool isUseNewGain;
+		GLfloat tempMask[CAM_COUNT][GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*RGBNUM];
+		GLfloat InterPolatedMask[CAM_COUNT][GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*RGBNUM];
+		GLint interflowMask[CAM_COUNT][GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH];
+		GLint transTempMask[CAM_COUNT][GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH];
+		GLint GainMask[CAM_COUNT][GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH];
 
 		void SetCharacteristicGainMask(int index,int sliceIdx,
 				float leftr,float leftg,float leftb,
@@ -850,6 +851,7 @@ public:
 		return rotate_angle[idx];
 	};
 	bool IsProducerRGB();
+	void En_DisableUseNewGain(bool tof){isUseNewGain=tof;};
 private:
 	char chosenCamidx;
 	float pano_hor_step;  //a d
@@ -958,16 +960,16 @@ private:
 #define ALPHA_TEXTURE_IDX	(3)
 //#define ALPHA_TEXTURE_IDX1	(1+2)
 
-	GLuint textures[6];
-	GLuint GL_TextureIDs[6];
+	GLuint textures[7];
+	GLuint GL_TextureIDs[7];
 
 	DynamicTrack *p_DynamicTrack;
 	CornerMarkerGroup *p_CornerMarkerGroup;
 	float* pConerMarkerColors[CORNER_COUNT];
 	float   m_DynamicWheelAngle;
 	GLuint alphaMask[ALPHA_MASK_HEIGHT*ALPHA_MASK_WIDTH];//={0};
-	GLuint alphaMask0[ALPHA_MASK_HEIGHT*ALPHA_MASK_WIDTH];//={0};
-	GLuint alphaMask1[ALPHA_MASK_HEIGHT*ALPHA_MASK_WIDTH];//={0};
+//	GLuint alphaMask0[ALPHA_MASK_HEIGHT*ALPHA_MASK_WIDTH];//={0};
+//	GLuint alphaMask1[ALPHA_MASK_HEIGHT*ALPHA_MASK_WIDTH];//={0};
 
 	STLASCIILoader BowlLoader;
 	STLASCIILoader PanelLoader;
