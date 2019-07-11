@@ -666,14 +666,14 @@ void overLapRegion::brightness_blance()
 
 			  Point3d gain_[HEIGHT_SLICES]  ,gain_2[HEIGHT_SLICES];
 //应用到每张图上
+			  float da=1.1;
+			  gain_[sliceIdx].x = CEILING(std::pow(alpha[sliceIdx][index].x*da, 1/gamma), 10.0);
+			  gain_[sliceIdx].y =CEILING( std::pow(alpha[sliceIdx][index].y*da, 1/gamma),10.0);//RIGHT
+			  gain_[sliceIdx].z = CEILING(std::pow(alpha[sliceIdx][index].z*da, 1/gamma),10.0);
 
-			  gain_[sliceIdx].x = CEILING(std::pow(alpha[sliceIdx][index].x, 1/gamma), 10.0);
-			  gain_[sliceIdx].y =CEILING( std::pow(alpha[sliceIdx][index].y, 1/gamma),10.0);//RIGHT
-			  gain_[sliceIdx].z = CEILING(std::pow(alpha[sliceIdx][index].z, 1/gamma),10.0);
-
-			  gain_2[sliceIdx].x = CEILING(std::pow(alpha2[sliceIdx][index].x, 1/gamma),10.0);
-			  gain_2[sliceIdx].y = CEILING(std::pow(alpha2[sliceIdx][index].y, 1/gamma),10.0);//LEFT
-			  gain_2[sliceIdx].z = CEILING(std::pow(alpha2[sliceIdx][index].z, 1/gamma),10.0);
+			  gain_2[sliceIdx].x = CEILING(std::pow(alpha2[sliceIdx][index].x*da, 1/gamma),10.0);
+			  gain_2[sliceIdx].y = CEILING(std::pow(alpha2[sliceIdx][index].y*da, 1/gamma),10.0);//LEFT
+			  gain_2[sliceIdx].z = CEILING(std::pow(alpha2[sliceIdx][index].z*da, 1/gamma),10.0);
 
 	//		  printf("  alpha[sliceIdx][index].x=%f~~~~~~~~~\n",  alpha[sliceIdx][index].x);
 
