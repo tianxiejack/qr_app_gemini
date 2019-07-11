@@ -7850,6 +7850,26 @@ break;
 case DEBUG_ORDER_SINGLECAMERA_3:
 	testPanoNumber =3;
 break;
+case DEBUG_ORDER_SINGLECAMERA_MODE:
+{
+#if GAIN_MASK
+	static bool Once=true;
+	if(Once==true)
+	{
+		Once=false;
+		overLapRegion::GetoverLapRegion()->set_change_gain(false);
+		start_exposure_thread();
+	}
+	else
+	{
+		if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
+			overLapRegion::GetoverLapRegion()->set_change_gain(true);
+		else
+		overLapRegion::GetoverLapRegion()->set_change_gain(false);
+	}
+#endif
+}
+	break;
 default:
 break;
 
@@ -9064,13 +9084,20 @@ case 'G':		//PTZ--CCD
 	break;
 case 'V':
 #if GAIN_MASK
-	overLapRegion::GetoverLapRegion()->set_change_gain(false);
-		static bool Once=true;
-		if(Once)
-		{
-			Once=false;
-			start_exposure_thread();
-		}
+	static bool Once=true;
+	if(Once==true)
+	{
+		Once=false;
+		overLapRegion::GetoverLapRegion()->set_change_gain(false);
+		start_exposure_thread();
+	}
+	else
+	{
+		if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
+			overLapRegion::GetoverLapRegion()->set_change_gain(true);
+		else
+		overLapRegion::GetoverLapRegion()->set_change_gain(false);
+	}
 #endif
 	break;
 case 'g':		//PTZ--FIR
