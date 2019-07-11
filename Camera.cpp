@@ -23,9 +23,10 @@
 #include <cuda_runtime_api.h>
 #include <omp.h>
 #include"assert.h"
+#include "CheckMyself.h"
 #define MEMCPY memcpy
 
-
+extern SelfCheck selfcheck;
 using namespace std;
 using namespace cv;
 unsigned char * temp_data_main[MAX_CC];
@@ -455,7 +456,15 @@ void HDVCap::CaptureTouchSrc(char* ptr,bool istouchsrc)
 	}
 }
 void HDVCap::Capture(char* ptr){
-	get_buffer((unsigned char *)ptr,m_qid);
+	int *pbroken=selfcheck.GetBrokenCam();
+	if(pbroken[m_qid]==0)
+	{
+		memset(ptr,0x80,SDI_WIDTH*SDI_HEIGHT*3);
+	}
+	else
+	{
+		get_buffer((unsigned char *)ptr,m_qid);
+	}
 #if ENABLE_ENHANCE_FUNCTION
 		if(ptr[0]==SRCUYVY)
 		{

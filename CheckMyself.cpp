@@ -44,7 +44,24 @@ for(int i=0;i<CAM_COUNT;i++)
 	BrokenCam[i]=1;
 #endif
 }
-
+void SelfCheck::JudgeByPixels(unsigned char *ptr,int camidx)
+{
+		if(ptr!=NULL)
+		{
+			int count =0;
+			for(int i=0;i<50;i++)
+			{
+				if(ptr[i+SDI_WIDTH*i*2]==0)
+				{
+					count++;
+				}
+			}
+			if(count>=30)
+				BrokenCam[camidx]=0;
+			else
+				BrokenCam[camidx]=1;
+		}
+}
 self_check_state  SelfCheck::IsIDLE()
 {
 	for(int i=0;i<CAM_COUNT;i++)

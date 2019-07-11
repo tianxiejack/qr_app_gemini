@@ -12,13 +12,13 @@ extern SelfCheck selfcheck;
 
 void *SelfCheck_thread(void *arg)
 {
-	 gpio_init();
+	// gpio_init();
 	//sleep(5);
 	selfcheck.initState();
 	while(1)
 	{
 
-		selfcheck.CheckBrokenCam();
+		//selfcheck.CheckBrokenCam();
 		//selfcheck.Check12CAM();
 		//selfcheck.CheckExtra2CAM();
 	//	selfcheck.Check2HD();

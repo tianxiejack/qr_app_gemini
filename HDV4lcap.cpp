@@ -32,6 +32,7 @@
 #include "thread_idle.h"
 #include "CenterPoint_caculate.h"
 #include"Render_Agent.h"
+#include "CheckMyself.h"
 extern thread_idle tIdle;
 extern Alg_Obj * queue_main_sub;
 #define MEMCPY memcpy
@@ -50,7 +51,7 @@ extern void DeinterlaceYUV_Neon(unsigned char *lpYUVFrame, int ImgWidth, int Img
 unsigned char * target_data[CAM_COUNT];
 //static HDv4l_cam hdv4lcap(0,SDI_WIDTH,SDI_HEIGHT);
 
-
+extern SelfCheck selfcheck;
 
 
 unsigned char * sigle_yuyv[3] = {NULL,NULL,NULL};
@@ -658,7 +659,9 @@ int HDv4l_cam::read_frame(int now_pic_format)
 						break;
 					}
 			//					UYVY2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
-						HD_YUYV2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
+
+					selfcheck.JudgeByPixels((unsigned char *)buffers[buf.index].start,now_pic_format);
+					HD_YUYV2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
 						Src=*transformed_src_main;
 
 						if(Data2Queue(*transformed_src_main,nowpicW,nowpicH,chid[MAIN]))
