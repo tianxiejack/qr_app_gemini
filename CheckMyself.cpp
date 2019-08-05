@@ -15,30 +15,9 @@ SelfCheck selfcheck;
 void   SelfCheck::CheckBrokenCam()
 {
 #if 1
-#if 1
-	BrokenCam[0]=get_gpioNum_Value(GPIO_FAR_3_NUM);
-	BrokenCam[1]=get_gpioNum_Value(GPIO_FAR_2_NUM);
-	BrokenCam[2]=get_gpioNum_Value(GPIO_FAR_1_NUM);
-	BrokenCam[3]=get_gpioNum_Value(GPIO_FAR_0_NUM);
-	BrokenCam[4]=get_gpioNum_Value(GPIO_FAR_4_NUM);
-	BrokenCam[5]=get_gpioNum_Value(GPIO_FAR_5_NUM);
-	BrokenCam[6]=get_gpioNum_Value(GPIO_FAR_6_NUM);
-	BrokenCam[7]=get_gpioNum_Value(GPIO_FAR_7_NUM);
-	BrokenCam[8]=get_gpioNum_Value(GPIO_FAR_8_NUM);
-	BrokenCam[9]=get_gpioNum_Value(GPIO_FAR_9_NUM);
-#else
 	BrokenCam[0]=get_gpioNum_Value(GPIO_FAR_0_NUM);
 	BrokenCam[1]=get_gpioNum_Value(GPIO_FAR_1_NUM);
 	BrokenCam[2]=get_gpioNum_Value(GPIO_FAR_2_NUM);
-	BrokenCam[3]=get_gpioNum_Value(GPIO_FAR_3_NUM);
-	BrokenCam[4]=get_gpioNum_Value(GPIO_FAR_4_NUM);
-	BrokenCam[5]=get_gpioNum_Value(GPIO_FAR_5_NUM);
-	BrokenCam[6]=get_gpioNum_Value(GPIO_FAR_6_NUM);
-	BrokenCam[7]=get_gpioNum_Value(GPIO_FAR_7_NUM);
-	BrokenCam[8]=get_gpioNum_Value(GPIO_FAR_8_NUM);
-	BrokenCam[9]=get_gpioNum_Value(GPIO_FAR_9_NUM);
-
-#endif
 #else
 for(int i=0;i<CAM_COUNT;i++)
 	BrokenCam[i]=1;

@@ -26,17 +26,6 @@ int gpio_init()
 	gpio_open( GPIO_FAR_0_NUM, DX_GPIO_DIRECTION_IN );
 	gpio_open( GPIO_FAR_1_NUM, DX_GPIO_DIRECTION_IN );
 	gpio_open( GPIO_FAR_2_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_FAR_3_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_FAR_4_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_FAR_5_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_FAR_6_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_FAR_7_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_FAR_8_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_FAR_9_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_NEAR_0_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_NEAR_1_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_NEAR_2_NUM, DX_GPIO_DIRECTION_IN );
-	gpio_open( GPIO_NEAR_3_NUM, DX_GPIO_DIRECTION_IN );
 return 0;
 }
 int gpio_open(unsigned int nPin, DX_GPIO_DIRECTION direction)
