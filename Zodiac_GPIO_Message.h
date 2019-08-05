@@ -1,9 +1,9 @@
 #ifndef ZODIAC_GPIO_MESSAGE_H
 #define ZODIAC_GPIO_MESSAGE_H
 
-#define GPIO_FAR_0_NUM	65
-#define GPIO_FAR_1_NUM	187
-#define GPIO_FAR_2_NUM	186
+#define GPIO_FAR_0_NUM	187
+#define GPIO_FAR_1_NUM	186
+#define GPIO_FAR_2_NUM	65
 
 
 typedef enum
