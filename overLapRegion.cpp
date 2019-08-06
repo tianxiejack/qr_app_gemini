@@ -10,6 +10,7 @@
 #include"overLapRegion.h"
 #include"GLRender.h"
 #include"PanoCaptureGroup.h"
+#include "CheckMyself.h"
 using namespace std;
 using namespace cv;
 #define GAIN_SAVE_IMG 0
@@ -21,6 +22,7 @@ extern Render render;
 extern int ExchangeChannel(int direction);
 GLShaderManager *my_shaderm;
 overLapRegion *overLapRegion::overlapregion;
+extern SelfCheck selfcheck;
 int resetExchange(int idx)
 {
 	int ret=idx;
@@ -232,10 +234,16 @@ bool overLapRegion::van_save_coincidence()
 		unsigned char *pcam=PanoCaptureGroup::GetMainInstance()->GetSrc(i);
 		if(pcam!=NULL)
 		{
-			memcpy(ptemp[i],pcam,
-			SDI_WIDTH*SDI_HEIGHT*3);
-			UYV2RGB(ptemp[i],SDI_WIDTH,SDI_HEIGHT,pSrc[i]);
-
+			if(selfcheck.GetBrokenCam()[i]==0)
+			{
+				memset(ptemp[i],0x80,SDI_WIDTH*SDI_HEIGHT*3);
+			}
+			else
+			{
+				memcpy(ptemp[i],pcam,
+				SDI_WIDTH*SDI_HEIGHT*3);
+				UYV2RGB(ptemp[i],SDI_WIDTH,SDI_HEIGHT,pSrc[i]);
+			}
 #if GAIN_SAVE_IMG
 		Mat s4(SDI_HEIGHT,SDI_WIDTH,CV_8UC3,pSrc[i]);
 		imwrite("./data/save/p4.bmp",s4);
