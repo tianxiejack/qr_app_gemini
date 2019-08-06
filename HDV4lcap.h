@@ -121,6 +121,7 @@ class HDv4l_cam:public BaseVCap {
 public:
 	HDv4l_cam(int devId,int width,int height);
 	virtual ~HDv4l_cam();
+	void ReStart();
 	bool Open();// open device   init deivce  start capturing
 	void Close(){};
 	void Capture(char*p){};
@@ -145,6 +146,7 @@ public:
 	bool bRun;
 //	char *get_split_buffer_ch(){return split_buffer_ch;};
 private:
+	bool mallocOnce;
 	void UYVY2UYVx(unsigned char *dst,unsigned char *src, int ImgWidth, int ImgHeight);
 	void UYVquar(unsigned char *dst,unsigned char *src, int ImgWidth, int ImgHeight);
 

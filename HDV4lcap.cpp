@@ -71,7 +71,7 @@ CMvDectInterface   *pMvIF=NULL;
  MvDetect mv_detect(pMvIF);
 #endif
 HDv4l_cam::HDv4l_cam(int devId,int width,int height):io(IO_METHOD_USERPTR),imgwidth(width),
-imgheight(height),buffers(NULL),memType(MEMORY_NORMAL),cur_CHANnum(0),
+imgheight(height),buffers(NULL),memType(MEMORY_NORMAL),cur_CHANnum(0),mallocOnce(true),
 force_format(1),m_devFd(-1),n_buffers(0),bRun(false),Id(devId),BaseVCap()
 {
 		imgformat 	= V4L2_PIX_FMT_YUYV;//当成YUYV来采
@@ -89,6 +89,14 @@ force_format(1),m_devFd(-1),n_buffers(0),bRun(false),Id(devId),BaseVCap()
 			Src=NULL;
 }
 
+void HDv4l_cam::ReStart()
+{
+//	uninit_device();
+	mallocOnce=false;
+	stop();
+	close_device();
+	Open();
+}
 HDv4l_cam::~HDv4l_cam()
 {
 	stop_capturing();
@@ -598,7 +606,7 @@ int HDv4l_cam::read_frame(int now_pic_format)
 {
 	int t[10]={0};
  timeval startT[20]={0};
-
+ int checkRet=-1;
 
 	struct v4l2_buffer buf;
 	int i=0;
@@ -660,7 +668,7 @@ int HDv4l_cam::read_frame(int now_pic_format)
 					}
 			//					UYVY2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
 
-				//	selfcheck.JudgeByPixels((unsigned char *)buffers[buf.index].start,now_pic_format);
+					checkRet=selfcheck.JudgeByPixels((unsigned char *)buffers[buf.index].start,now_pic_format);
 					HD_YUYV2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
 						Src=*transformed_src_main;
 
@@ -676,6 +684,15 @@ int HDv4l_cam::read_frame(int now_pic_format)
 						fprintf(stderr, "VIDIOC_QBUF error %d, %s\n", errno, strerror(errno));
 						exit(EXIT_FAILURE);
 					}
+					if((checkRet==0) && (selfcheck.GetBrokenCam()[now_pic_format]==1))
+				//	if(Render_Agent::GetReset(now_pic_format))
+					{
+					//	Render_Agent::SetReset(false,now_pic_format);
+					//	printf("reset %d ~~~\n",now_pic_format);
+						ReStart();
+					}
+
+
 	return 0;
 
 }
@@ -774,7 +791,8 @@ void HDv4l_cam::uninit_device(void)
 
 void HDv4l_cam::init_read(unsigned int buffer_size)
 {
-	buffers = (struct buffer *)calloc(1, sizeof(*buffers));
+	if(mallocOnce)
+		buffers = (struct buffer *)calloc(1, sizeof(*buffers));
 
 	if (!buffers) {
 		fprintf(stderr, "Out of memory\n");
@@ -782,7 +800,8 @@ void HDv4l_cam::init_read(unsigned int buffer_size)
 	}
 
 	buffers[0].length = buffer_size;
-	buffers[0].start = (struct buffer *) malloc(buffer_size);
+	if(mallocOnce)
+		buffers[0].start = (struct buffer *) malloc(buffer_size);
 
 	if (!buffers[0].start) {
 		fprintf(stderr, "Out of memory\n");
@@ -815,8 +834,8 @@ void HDv4l_cam::init_mmap(void)
 	}
 
 //	printf("%s qbuf cnt = %d\n", dev_name, req.count);
-
-	buffers = (struct buffer *)calloc(req.count, sizeof(*buffers));
+	if(mallocOnce)
+		buffers = (struct buffer *)calloc(req.count, sizeof(*buffers));
 
 	if (!buffers) {
 		fprintf(stderr, "Out of memory\n");
@@ -875,7 +894,8 @@ void HDv4l_cam::init_userp(unsigned int buffer_size)
 			exit(EXIT_FAILURE);
 		}
 //	printf("%s qbuf cnt = %d\n", dev_name, req.count);
-	buffers = (struct buffer  *)calloc(req.count, sizeof(*buffers));
+	if(mallocOnce)
+		buffers = (struct buffer  *)calloc(req.count, sizeof(*buffers));
 
 	if (!buffers) {
 		fprintf(stderr, "Out of memory\n");
@@ -885,10 +905,16 @@ void HDv4l_cam::init_userp(unsigned int buffer_size)
 	for (n_buffers = 0; n_buffers < req.count; ++n_buffers) {
 		buffers[n_buffers].length = buffer_size;
 		if(memType == MEMORY_NORMAL)
-			buffers[n_buffers].start = memalign(page_size,buffer_size);
+		{
+			if(mallocOnce)
+				buffers[n_buffers].start = memalign(page_size,buffer_size);
+		}
 	else // MEMORY_LOCKED
-			 ret = cudaHostAlloc(&buffers[n_buffers].start, buffer_size, cudaHostAllocDefault);
-			assert(ret == cudaSuccess);
+	{
+			if(mallocOnce)
+			ret = cudaHostAlloc(&buffers[n_buffers].start, buffer_size, cudaHostAllocDefault);
+				assert(ret == cudaSuccess);
+	}
 		//cudaFreeHost();
 
 		if (!buffers[n_buffers].start) {

@@ -18,6 +18,8 @@ public:
 	static char GetCurrentChosenCam();
 	static bool ISenhance();
 	static 	bool IsProducerRGB();
+	static bool GetReset(int idx);
+	static void SetReset(bool tof,int idx);
 };
 
 

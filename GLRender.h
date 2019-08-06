@@ -852,7 +852,10 @@ public:
 	};
 	bool IsProducerRGB();
 	void En_DisableUseNewGain(bool tof){isUseNewGain=tof;};
+	bool GetVideoReset(int idx){return videoReset[idx];};
+	void SetVideoReset(bool tof,int idx){ videoReset[idx]=tof;};
 private:
+	bool videoReset[3];
 	char chosenCamidx;
 	float pano_hor_step;  //a d
 	float pano_float_step;  //up down

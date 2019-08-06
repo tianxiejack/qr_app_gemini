@@ -1154,6 +1154,8 @@ Render::Render() :
 	PANx = 0, PANy = 0;
 	scale = 0;
 	oScale = 1.0f;
+	for(int i=0;i<3;i++)
+		videoReset[i]=false;
 	for (int idx = 0; idx < CAM_COUNT; idx++) {
 		for (int i = 0;
 				i < GAIN_TEX_HEIGHT * GAIN_TEX_WIDTH; i++) {
@@ -8961,7 +8963,15 @@ case 'J':
 		rotateangle_per_second = rotateangle_per_second + 2;
 	}
 	break;
-	//case 'k':
+case 'j':
+	videoReset[0]=true;
+	break;
+case 'k':
+	videoReset[1]=true;
+	break;
+case 'l':
+	videoReset[2]=true;
+	break;
 case 'K':
 	if (rotateangle_per_second > 4) {
 		rotateangle_per_second = rotateangle_per_second - 2;

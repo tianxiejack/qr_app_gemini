@@ -41,7 +41,7 @@ public:
 
 	void SetBrokenCam(int idx,int ok){BrokenCam[idx]=ok;};
 
-	void JudgeByPixels(unsigned char *ptr,int camidx);
+	int JudgeByPixels(unsigned char *ptr,int camidx);
 
 	void CheckCaptureState(GLubyte *ptr,int index,int imgWidth,int ingHeight);
 	void CaptureCheckAll();

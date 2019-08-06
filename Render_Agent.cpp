@@ -49,3 +49,11 @@ return 	render.Get_p_cpg()->GetTouchForesightPosY();
 		{
 		 		return render.IsProducerRGB();
 		}
+			 bool Render_Agent::GetReset(int idx)
+			 {
+				 return render.GetVideoReset(idx);
+			 }
+			 void Render_Agent::SetReset(bool tof,int idx)
+			 {
+				 render.SetVideoReset(tof,idx);
+			 }
