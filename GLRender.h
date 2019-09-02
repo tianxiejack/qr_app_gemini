@@ -56,7 +56,7 @@
 using namespace std;
 class InterfaceTouch_Center_Cross;
 class RenderMain;
-static const int ALPHA_MASK_HEIGHT= 720;//DEFAULT_IMAGE_HEIGHT;
+static const int ALPHA_MASK_HEIGHT= 1080;//DEFAULT_IMAGE_HEIGHT;
 static const int ALPHA_MASK_WIDTH = (DEFAULT_IMAGE_WIDTH/16);
 /* A general OpenGL initialization function. */
 /* Called once from main() */
@@ -111,6 +111,7 @@ public:
 	void mouseMotionPress(int x, int y);
 	inline GLShaderManager* getShaderManager(){return &shaderManager;}
 	void SendData(int i,bool needSendData);
+//	void SendData(int i,bool needSendData);
 	void UseShaderManager(GLT_STOCK_SHADER nShaderID);
 //	inline GLGeometryTransform* getTransformPipeline(){return &transformPipeline;}
 	void keyPressed(GLEnv &m_env,unsigned char key, int x, int y);

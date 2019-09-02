@@ -4,8 +4,6 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../EnhStateGLRenderBridge.cpp\
-../EnhStateMachine.cpp\
 ../AlarmTarget.cpp \
 ../BMPCaptureGroup.cpp \
 ../Camera.cpp \
@@ -18,6 +16,8 @@ CPP_SRCS += \
 ../CornerMarker.cpp \
 ../DataofAlarmarea.cpp \
 ../DynamicTrack.cpp \
+../EnhStateGLRenderBridge.cpp \
+../EnhStateMachine.cpp \
 ../ExposureCompensationThread.cpp \
 ../FBOManager.cpp \
 ../FishCalib.cpp \
@@ -37,6 +37,8 @@ CPP_SRCS += \
 ../Parayml.cpp \
 ../PresetCameraGroup.cpp \
 ../ProcessIPCMsg.cpp \
+../RSTCam.cpp \
+../RTSCaptureGroup.cpp \
 ../RenderDrawBehvrImpl.cpp \
 ../RenderMain.cpp \
 ../Render_Agent.cpp \
@@ -71,12 +73,7 @@ CPP_SRCS += \
 ../v4l2camera.cpp \
 ../yuv2rgb_neon.cpp 
 
-OBJ_SRCS += \
-../tank1215_b_m1.obj 
-
 OBJS += \
-./EnhStateGLRenderBridge.o\
-./EnhStateMachine.o\
 ./AlarmTarget.o \
 ./BMPCaptureGroup.o \
 ./Camera.o \
@@ -89,6 +86,8 @@ OBJS += \
 ./CornerMarker.o \
 ./DataofAlarmarea.o \
 ./DynamicTrack.o \
+./EnhStateGLRenderBridge.o \
+./EnhStateMachine.o \
 ./ExposureCompensationThread.o \
 ./FBOManager.o \
 ./FishCalib.o \
@@ -108,6 +107,8 @@ OBJS += \
 ./Parayml.o \
 ./PresetCameraGroup.o \
 ./ProcessIPCMsg.o \
+./RSTCam.o \
+./RTSCaptureGroup.o \
 ./RenderDrawBehvrImpl.o \
 ./RenderMain.o \
 ./Render_Agent.o \
@@ -143,8 +144,6 @@ OBJS += \
 ./yuv2rgb_neon.o 
 
 CPP_DEPS += \
-./EnhStateGLRenderBridge.d\
-./EnhStateMachine.d\
 ./AlarmTarget.d \
 ./BMPCaptureGroup.d \
 ./Camera.d \
@@ -157,6 +156,8 @@ CPP_DEPS += \
 ./CornerMarker.d \
 ./DataofAlarmarea.d \
 ./DynamicTrack.d \
+./EnhStateGLRenderBridge.d \
+./EnhStateMachine.d \
 ./ExposureCompensationThread.d \
 ./FBOManager.d \
 ./FishCalib.d \
@@ -176,6 +177,8 @@ CPP_DEPS += \
 ./Parayml.d \
 ./PresetCameraGroup.d \
 ./ProcessIPCMsg.d \
+./RSTCam.d \
+./RTSCaptureGroup.d \
 ./RenderDrawBehvrImpl.d \
 ./RenderMain.d \
 ./Render_Agent.d \
@@ -209,7 +212,6 @@ CPP_DEPS += \
 ./updatebuffer.d \
 ./v4l2camera.d \
 ./yuv2rgb_neon.d 
-
 
 # Each subdirectory must supply rules for building sources it contributes
 %.o: ../%.cpp
