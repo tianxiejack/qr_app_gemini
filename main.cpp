@@ -94,7 +94,8 @@ int main(int argc, char** argv)
 			NULL,
 			NULL,
 			BMPMiscGroup::GetInstance());
-#else
+#endif
+#if RTSP_CAP
 	m_rtscam = new RTSCam();
 	env1.init(RTSPanoGroup::GetInstance(),
 			NULL,
@@ -107,7 +108,7 @@ int main(int argc, char** argv)
 			NULL,
 			NULL);
 #endif
-#if 0
+#if HD_CAP
 	env1.init(PanoCaptureGroup::GetMainInstance(),
 			NULL,//ChosenCaptureGroup::GetSubInstance(),
 					NULL,
