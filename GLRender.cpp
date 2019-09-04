@@ -7917,8 +7917,8 @@ if(Once==true)
 {
 	Once=false;
 	overLapRegion::GetoverLapRegion()->set_change_gain(false);
-	start_exposure_thread();
 #if HD_CAP
+	start_exposure_thread();
 	start_SelfCheck_thread();
 #endif
 }
