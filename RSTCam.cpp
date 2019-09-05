@@ -51,7 +51,7 @@ int RTSCam::ReadOnvifConfigFile()
 			fscanf(fp, "%s\n", dev_password);
 			sprintf(devname,"rtsp://%s:%s@%s:554/h264/ch0/main/av_stream",dev_name,dev_password,dev_ip);
 			Rstcam[i]= RTSPCapture_Create();
-			Rstcam[i]->init(devname,0,1920,1080,processFrame);
+			Rstcam[i]->init(devname,i,1920,1080,processFrame);
 		}
 	}
 	else
