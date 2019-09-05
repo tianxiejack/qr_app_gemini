@@ -45,9 +45,6 @@ public:
 	bool getEmpty(unsigned char** pYuvBuf, int chId);
 	void  start_queue();
 private:
-	char dev_ip[64];
-	char dev_name[64];
-	char dev_password[64];
 	char devname[128];
 	Capture *Rstcam[3];
 };
