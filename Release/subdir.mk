@@ -4,6 +4,8 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../EnhStateGLRenderBridge.cpp\
+../EnhStateMachine.cpp\
 ../AlarmTarget.cpp \
 ../BMPCaptureGroup.cpp \
 ../Camera.cpp \
@@ -16,8 +18,6 @@ CPP_SRCS += \
 ../CornerMarker.cpp \
 ../DataofAlarmarea.cpp \
 ../DynamicTrack.cpp \
-../EnhStateGLRenderBridge.cpp \
-../EnhStateMachine.cpp \
 ../ExposureCompensationThread.cpp \
 ../FBOManager.cpp \
 ../FishCalib.cpp \
@@ -37,8 +37,6 @@ CPP_SRCS += \
 ../Parayml.cpp \
 ../PresetCameraGroup.cpp \
 ../ProcessIPCMsg.cpp \
-../RSTCam.cpp \
-../RTSCaptureGroup.cpp \
 ../RenderDrawBehvrImpl.cpp \
 ../RenderMain.cpp \
 ../Render_Agent.cpp \
@@ -73,7 +71,12 @@ CPP_SRCS += \
 ../v4l2camera.cpp \
 ../yuv2rgb_neon.cpp 
 
+OBJ_SRCS += \
+../tank1215_b_m1.obj 
+
 OBJS += \
+./EnhStateGLRenderBridge.o\
+./EnhStateMachine.o\
 ./AlarmTarget.o \
 ./BMPCaptureGroup.o \
 ./Camera.o \
@@ -86,8 +89,6 @@ OBJS += \
 ./CornerMarker.o \
 ./DataofAlarmarea.o \
 ./DynamicTrack.o \
-./EnhStateGLRenderBridge.o \
-./EnhStateMachine.o \
 ./ExposureCompensationThread.o \
 ./FBOManager.o \
 ./FishCalib.o \
@@ -107,8 +108,6 @@ OBJS += \
 ./Parayml.o \
 ./PresetCameraGroup.o \
 ./ProcessIPCMsg.o \
-./RSTCam.o \
-./RTSCaptureGroup.o \
 ./RenderDrawBehvrImpl.o \
 ./RenderMain.o \
 ./Render_Agent.o \
@@ -144,6 +143,8 @@ OBJS += \
 ./yuv2rgb_neon.o 
 
 CPP_DEPS += \
+./EnhStateGLRenderBridge.d\
+./EnhStateMachine.d\
 ./AlarmTarget.d \
 ./BMPCaptureGroup.d \
 ./Camera.d \
@@ -156,8 +157,6 @@ CPP_DEPS += \
 ./CornerMarker.d \
 ./DataofAlarmarea.d \
 ./DynamicTrack.d \
-./EnhStateGLRenderBridge.d \
-./EnhStateMachine.d \
 ./ExposureCompensationThread.d \
 ./FBOManager.d \
 ./FishCalib.d \
@@ -177,8 +176,6 @@ CPP_DEPS += \
 ./Parayml.d \
 ./PresetCameraGroup.d \
 ./ProcessIPCMsg.d \
-./RSTCam.d \
-./RTSCaptureGroup.d \
 ./RenderDrawBehvrImpl.d \
 ./RenderMain.d \
 ./Render_Agent.d \
@@ -218,8 +215,8 @@ CPP_DEPS += \
 %.o: ../%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
-	/usr/local/cuda-8.0/bin/nvcc -DGAIN_MASK=1 -DVALIDATION_PERIOD_SECONDS=0 -DDISABLE_NEON_DEI=1 -DNO_ARM_NEON=1 -DENABLE_ENHANCE_FUNCTION=0 -DMVDECT=0 -DUSE_BMPCAP=0 -DWHOLE_PIC=1 -DUSE_GAIN=1 -DCAM_COUNT=8 -DUSE_CAP_SPI=0 -DTRACK_MODE=0 -DDOUBLE_SCREEN=0 -DTEST_GAIN=1 -DGSTREAM_CAP=1 -DUSE_UART=0 -DUSE_12=1 -DRTSP_CAP=0 -DHD_CAP=1 -I../OSA_CAP/inc -I../GLTool/include -I/usr/include/opencv -I/usr/include/gstreamer-1.0 -I/usr/include/GL -I/usr/include/glib-2.0 -I/usr/lib/aarch64-linux-gnu/glib-2.0/include -I/usr/lib/aarch64-linux-gnu/include -I/usr/include -I/usr/lib/aarch64-linux-gnu/gstreamer-1.0/include -O3 -ccbin aarch64-linux-gnu-g++ -gencode arch=compute_50,code=sm_50 -m64 -odir "." -M -o "$(@:%.o=%.d)" "$<"
-	/usr/local/cuda-8.0/bin/nvcc -DGAIN_MASK=1 -DVALIDATION_PERIOD_SECONDS=0 -DDISABLE_NEON_DEI=1 -DNO_ARM_NEON=1 -DMVDECT=0 -DENABLE_ENHANCE_FUNCTION=0 -DUSE_BMPCAP=0 -DDOUBLE_SCREEN=0 -DWHOLE_PIC=1 -DUSE_GAIN=1 -DUSE_CAP_SPI=0 -DCAM_COUNT=8 -DTRACK_MODE=0 -DTEST_GAIN=1 -DGSTREAM_CAP=1 -DUSE_UART=0 -DUSE_12=1 -DRTSP_CAP=0 -DHD_CAP=1 -I../OSA_CAP/inc -I/usr/include/opencv -I/usr/include/GL -I../GLTool/include -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/aarch64-linux-gnu/glib-2.0/include -I/usr/lib/aarch64-linux-gnu/include -I/usr/include -I/usr/lib/aarch64-linux-gnu/gstreamer-1.0/include -O3 --compile -m64 -ccbin aarch64-linux-gnu-g++  -x c++ -o  "$@" "$<"
+	/usr/local/cuda-8.0/bin/nvcc -DGAIN_MASK=1 -DVALIDATION_PERIOD_SECONDS=0 -DDISABLE_NEON_DEI=1 -DNO_ARM_NEON=1 -DENABLE_ENHANCE_FUNCTION=0 -DMVDECT=0 -DUSE_BMPCAP=0 -DWHOLE_PIC=1 -DUSE_GAIN=1 -DCAM_COUNT=8 -DUSE_CAP_SPI=0 -DTRACK_MODE=0 -DDOUBLE_SCREEN=0 -DTEST_GAIN=1 -DGSTREAM_CAP=1 -DUSE_UART=0 -DUSE_12=1 -I../OSA_CAP/inc -I../GLTool/include -I/usr/include/opencv -I/usr/include/gstreamer-1.0 -I/usr/include/GL -I/usr/include/glib-2.0 -I/usr/lib/aarch64-linux-gnu/glib-2.0/include -I/usr/lib/aarch64-linux-gnu/include -I/usr/include -I/usr/lib/aarch64-linux-gnu/gstreamer-1.0/include -O3 -ccbin aarch64-linux-gnu-g++ -gencode arch=compute_50,code=sm_50 -m64 -odir "." -M -o "$(@:%.o=%.d)" "$<"
+	/usr/local/cuda-8.0/bin/nvcc -DGAIN_MASK=1 -DVALIDATION_PERIOD_SECONDS=0 -DDISABLE_NEON_DEI=1 -DNO_ARM_NEON=1 -DMVDECT=0 -DENABLE_ENHANCE_FUNCTION=0 -DUSE_BMPCAP=0 -DDOUBLE_SCREEN=0 -DWHOLE_PIC=1 -DUSE_GAIN=1 -DUSE_CAP_SPI=0 -DCAM_COUNT=8 -DTRACK_MODE=0 -DTEST_GAIN=1 -DGSTREAM_CAP=1 -DUSE_UART=0 -DUSE_12=1 -I../OSA_CAP/inc -I/usr/include/opencv -I/usr/include/GL -I../GLTool/include -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/aarch64-linux-gnu/glib-2.0/include -I/usr/lib/aarch64-linux-gnu/include -I/usr/include -I/usr/lib/aarch64-linux-gnu/gstreamer-1.0/include -O3 --compile -m64 -ccbin aarch64-linux-gnu-g++  -x c++ -o  "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

@@ -24,16 +24,15 @@
 #include "BMPCaptureGroup.h"
 #include"PanoCaptureGroup.h"
 #include"ChosenCaptureGroup.h"
-#include "RSTCaptureGroup.h"
-#include "CaptureRtsCam.h"
+
 #include"GLEnv.h"
-#include "CaptureRtsCam.h"
+
 RenderMain mainWin;
 Common common;
 AlarmTarget mainAlarmTarget;
 GLEnv env1;
 GLEnv env2;
-RTSCam* m_rtscam = NULL;
+
 #if MVDECT
 extern MvDetect mv_detect;
 #endif
@@ -94,21 +93,8 @@ int main(int argc, char** argv)
 			NULL,
 			NULL,
 			BMPMiscGroup::GetInstance());
-#endif
-#if RTSP_CAP
-	m_rtscam = new RTSCam();
-	env1.init(RTSPanoGroup::GetInstance(),
-			NULL,
-			NULL,
-			NULL,
-			NULL);
-	env2.init(RTSPanoGroup::GetInstance(),
-			NULL,
-			NULL,
-			NULL,
-			NULL);
-#endif
-#if HD_CAP
+#else
+
 	env1.init(PanoCaptureGroup::GetMainInstance(),
 			NULL,//ChosenCaptureGroup::GetSubInstance(),
 					NULL,

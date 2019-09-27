@@ -1706,7 +1706,7 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 			if (i == 1) {
-				glTexImage2D(GL_TEXTURE_2D, 0, nComponents, 1920, 1080, 0,
+				glTexImage2D(GL_TEXTURE_2D, 0, nComponents, 1280, 1080, 0,
 						format, GL_UNSIGNED_BYTE, 0);
 			} else
 				glTexImage2D(GL_TEXTURE_2D, 0, nComponents, PANO_TEXTURE_WIDTH,
@@ -2616,10 +2616,10 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 										+ scale_ver[(new_dir) % CAM_COUNT];
 								Point2[k].y = Point2[k].y
 										+ PanoFloatData[(new_dir) % CAM_COUNT];
-								Point1[k].x = Point1[k].x / 1920.0*DEFAULT_IMAGE_WIDTH;
-								Point1[k].y = Point1[k].y / 1080.0*DEFAULT_IMAGE_HEIGHT;
-								Point2[k].x = Point2[k].x / 1920.0*DEFAULT_IMAGE_WIDTH;
-								Point2[k].y = Point2[k].y /1080.0*DEFAULT_IMAGE_HEIGHT;
+								Point1[k].x = Point1[k].x / 1920.0*1280.0;
+								Point1[k].y = Point1[k].y / 1080.0*720.0;
+								Point2[k].x = Point2[k].x / 1920.0*1280.0;
+								Point2[k].y = Point2[k].y /1080.0*720.0;
 
 								Point1[k] = RotatePoint(Point1[k], rotate_center[over_lap_direction],
 										rotate_angle[over_lap_direction], max_panel_length,
@@ -2673,10 +2673,10 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 							+ scale_ver[(new_dir) % CAM_COUNT];
 					Point2[k].y = Point2[k].y
 							+ PanoFloatData[(new_dir) % CAM_COUNT];
-					Point1[k].x = Point1[k].x / 1920.0*DEFAULT_IMAGE_WIDTH;
-					Point1[k].y = Point1[k].y / 1080.0*DEFAULT_IMAGE_HEIGHT;
-					Point2[k].x = Point2[k].x / 1920.0*DEFAULT_IMAGE_WIDTH;
-					Point2[k].y = Point2[k].y /1080.0*DEFAULT_IMAGE_HEIGHT;
+					Point1[k].x = Point1[k].x / 1920.0*1280.0;
+					Point1[k].y = Point1[k].y / 1080.0*720.0;
+					Point2[k].x = Point2[k].x / 1920.0*1280.0;
+					Point2[k].y = Point2[k].y /1080.0*720.0;
 
 					Point1[k] = RotatePoint(Point1[k], rotate_center[direction],
 							rotate_angle[direction], max_panel_length,
@@ -2710,8 +2710,8 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 							* move_ver_scale[direction] + scale_ver[direction];
 					Point[k].y = Point[k].y + PanoFloatData[direction];
 
-					Point[k].x = Point[k].x /1920* DEFAULT_IMAGE_WIDTH;
-					Point[k].y = Point[k].y /1080* DEFAULT_IMAGE_HEIGHT;
+					Point[k].x = Point[k].x /1920* 1280;
+					Point[k].y = Point[k].y /1080* 720;
 #if 0
 					Point[k].x = Point[k].x / 1920.0 * 640.0;
 					Point[k].y = Point[k].y / 1080.0 * 540.0
@@ -7917,10 +7917,8 @@ if(Once==true)
 {
 	Once=false;
 	overLapRegion::GetoverLapRegion()->set_change_gain(false);
-#if HD_CAP
 	start_exposure_thread();
 	start_SelfCheck_thread();
-#endif
 }
 switch (displayMode) {
 case TRIM_MODE:

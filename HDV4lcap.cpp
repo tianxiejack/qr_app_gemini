@@ -689,7 +689,7 @@ int HDv4l_cam::read_frame(int now_pic_format)
 					{
 					//	Render_Agent::SetReset(false,now_pic_format);
 					//	printf("reset %d ~~~\n",now_pic_format);
-						//ReStart();
+					//	ReStart();
 					}
 
 

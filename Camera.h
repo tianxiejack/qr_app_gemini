@@ -170,19 +170,8 @@ class BMPVcap : public BaseVCap{
 		IplImage * pic;
 		Mat yuv_alpha;
 };
-class RTSVcap : public BaseVCap{
-	public:
-		RTSVcap(int qid,int wide,int height):m_qid(qid){};
-		virtual ~RTSVcap();
-		virtual bool Open(){return true;};
-		virtual void Close(){};
-		virtual void Capture(char* ptr);
-		void CaptureFish(char* ptr){};
-		void SavePic(const char* name){};
-		void saveOverLap(){};
-	private:
-		int m_qid;
-};
+
+
 
 class NVcamVcap : public BaseVCap{
 	public:

@@ -712,13 +712,6 @@ void BMPVcap::Capture(char* ptr)
 		memcpy(ptr,yuv_alpha.data,W_EXPAND_TIMES*H_EXPAND_TIMES*yuv_alpha.rows*yuv_alpha.cols*yuv_alpha.channels());
 	}
 }
-RTSVcap::~RTSVcap()
-{
-
-}
-void RTSVcap::Capture(char* ptr){
-		get_buffer((unsigned char *)ptr,m_qid);
-}
 
 //-----------------NVcamVcap implementation--------
 NVcamVcap::~NVcamVcap()
