@@ -668,7 +668,7 @@ int HDv4l_cam::read_frame(int now_pic_format)
 					}
 			//					UYVY2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
 
-					checkRet=selfcheck.JudgeByPixels((unsigned char *)buffers[buf.index].start,now_pic_format);
+					//checkRet=selfcheck.JudgeByPixels((unsigned char *)buffers[buf.index].start,now_pic_format);
 					HD_YUYV2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
 						Src=*transformed_src_main;
 
@@ -684,12 +684,12 @@ int HDv4l_cam::read_frame(int now_pic_format)
 						fprintf(stderr, "VIDIOC_QBUF error %d, %s\n", errno, strerror(errno));
 						exit(EXIT_FAILURE);
 					}
-					if((checkRet==0) && (selfcheck.GetBrokenCam()[now_pic_format]==1))
+					//if((checkRet==0) && (selfcheck.GetBrokenCam()[now_pic_format]==1))
 				//	if(Render_Agent::GetReset(now_pic_format))
 					{
 					//	Render_Agent::SetReset(false,now_pic_format);
 					//	printf("reset %d ~~~\n",now_pic_format);
-						ReStart();
+						//ReStart();
 					}
 
 
