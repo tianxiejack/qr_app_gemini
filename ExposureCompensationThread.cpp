@@ -41,7 +41,10 @@ void *exposure_thread(void *arg)
 			 }
 		}
 		overLapRegion::GetoverLapRegion()->SetIsDealingVector(false);
-		render.SetGainisNew(true);
+		for(int i=0;i<CAM_COUNT;i++)
+		{
+			render.SetGainisNew(true,i);
+		}	
 	//	 sleep(10);
 		}
 		else

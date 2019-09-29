@@ -1146,7 +1146,7 @@ Render::Render() :
 		DELTA_OF_PANO_HOR), pano_float_step(DELTA_OF_PANOFLOAT), pano_hor_scale(
 		DELTA_OF_PANO_HOR_SCALE), pano_rotate_angle(
 		DELTA_OF_ROTATE_ANGLE), base_x_scale(0), base_y_scale(0), scale_count(
-				0), thechannel_max_count(0), GainisNew(true), chosenCamidx(0)
+				0), thechannel_max_count(0), chosenCamidx(0)
 
 {
 	MOUSEx = 0, MOUSEy = 0, BUTTON = 0;
@@ -1175,6 +1175,7 @@ Render::Render() :
 	track_control_params[3] = 60;
 
 	for (int i = 0; i < CAM_COUNT; i++) {
+		GainisNew[i]=true;
 		OverLap[i] = new GLBatch;
 		Petal_OverLap[i] = OverLap[i];
 		env1.Setp_Panel_OverLap(i, new GLBatch);
@@ -3317,13 +3318,13 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 	for (int i = 1; i < 4; i++) {
 		if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
 		{
-			if(GainisNew)
+			if(GainisNew[i])
 			{
 					glActiveTexture(GL_TextureIDs[ALPHA_TEXTURE_IDX+i]);
 					glBindTexture(GL_TEXTURE_2D, textures[i+3]);
 					glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,GAIN_TEX_WIDTH, GAIN_TEX_HEIGHT, 0,
 							GL_RGBA, GL_UNSIGNED_BYTE, GainMask[i]);
-					GainisNew=false;
+					GainisNew[i]=false;
 			}
 			else
 				glActiveTexture(GL_TextureIDs[ALPHA_TEXTURE_IDX+i]);

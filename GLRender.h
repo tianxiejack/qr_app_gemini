@@ -700,7 +700,7 @@ public:
 	 GLBatch				floorBatch2;
 	 GLTriangleBatch     sphereBatch2;
 	 GLFrame             cameraFrame2;
-	 	 bool GainisNew;
+	 	 bool GainisNew[CAM_COUNT];
 		bool isUseNewGain;
 		GLfloat tempMask[CAM_COUNT][GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*RGBNUM];
 		GLfloat InterPolatedMask[CAM_COUNT][GAIN_TEX_HEIGHT*GAIN_TEX_WIDTH*RGBNUM];
@@ -716,8 +716,8 @@ public:
 
 		void Interflow(int idx,int rows,int cols,GLfloat*src,GLint*dst );
 		void     BlanceNeighbours2InterPolate();
-		void SetGainisNew(bool tof){
-			GainisNew=tof;
+		void SetGainisNew(bool tof,int idx){
+			GainisNew[idx]=tof;
 		};
 		bool isStitchingMode(){return displayMode == INIT_VIEW_MODE; };
 		 float * getTankDistance(){return distance_of_tank;};
