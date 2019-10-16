@@ -24,7 +24,7 @@ void *SelfCheck_thread(void *arg)
 	//	selfcheck.Check2HD();
 	//	selfcheck.CaptureCheckAll();
 	//	selfcheck.SendBrokenCAM();
-	 sleep(10);
+     sleep(5);
 	}
 	return 0;
 }
