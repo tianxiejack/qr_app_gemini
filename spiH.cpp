@@ -240,29 +240,7 @@ int transfer_init(uint8_t comNum, uint8_t interuptThreshold, int Baudrate) {
 /***初始化全部串口****/
 int transfer_init_all(uint8_t interuptThreshold, int Baudrate) {
 	int ret;
-#if 0
-	ret=transfer_init(0,interuptThreshold,Baudrate);
-	if(ret)
-	return 1;
-	ret=transfer_init(1,interuptThreshold,Baudrate);
-	if(ret)
-	return 1;
-	ret=transfer_init(2,interuptThreshold,Baudrate);
-	if(ret)
-	return 1;
-#endif
-//	ret = transfer_init(3, interuptThreshold, Baudrate);
-//	if (ret)
-//		return 1;
 
-	/*
-	 ret=transfer_init(4,interuptThreshold,Baudrate);
-	 if(ret)
-	 return 1;
-	 ret=transfer_init(5,interuptThreshold,Baudrate);
-	 if(ret)
-	 return 1;
-	 */
 	ret = transfer_init(6, interuptThreshold, Baudrate);
 	if (ret)
 		return 1;

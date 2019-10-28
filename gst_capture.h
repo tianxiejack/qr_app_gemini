@@ -67,16 +67,7 @@ int gstCaptureEnable(RecordHandle *handle, unsigned short bEnable);
 
 
 
-/*
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
-#ifdef __cplusplus
-}
-#endif
-*/
 
 
 #endif

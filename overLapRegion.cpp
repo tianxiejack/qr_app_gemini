@@ -461,28 +461,7 @@ void overLapRegion::brightness_blance()
 		
 		for(int i=1;i<CAM_LIMIT;i++)
 		{
-#if 0
-#if 0
-			{
-				 subimg2=roi_image[i][RIGHT_ROI];//HEAD i号相机//右边
-			 }
-			 subimg1=roi_image[(i+CAM_COUNT-1)%CAM_COUNT][LEFT_ROI];  //HEAD i-1号相机//左边
 
-			 int j=CAM_COUNT-i-1;
-			 {
-				 subimg4=roi_image[j][LEFT_ROI];  //TAIL J号相机 //左边
-			 }
-			 subimg3=roi_image[(j+1)%CAM_COUNT][RIGHT_ROI]; //j+1号相机//右边
-#else
-					subimg2=roi_image[i][RIGHT_ROI];//HEAD i号相机//右边
-					subimg1=roi_image[leftExchange(i)][LEFT_ROI];  //HEAD i-1号相机//左边
-					 int j=CAM_COUNT-i-1;
-					 {
-						 subimg4=roi_image[j][LEFT_ROI];  //TAIL J号相机 //左边
-					 }
-					 subimg3=roi_image[rightExchange(j)][RIGHT_ROI]; //j+1号相机//右边
-#endif
-#else
 					 int j=-1;
 					 if(i==1)
 					 {
@@ -506,7 +485,6 @@ void overLapRegion::brightness_blance()
 					 else
 						 assert(false);
 
-#endif
 			 int minclos[2],minrows[2];
 			 if(i==2||i==3)
 			 {

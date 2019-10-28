@@ -160,25 +160,7 @@ void HDv4l_cam::UYVnoXquar(unsigned char *dst,unsigned char *src, int ImgWidth, 
 
 void HDv4l_cam::UYVY2UYV(unsigned char *dst,unsigned char *src, int ImgWidth, int ImgHeight)
 {
-#if 0
-	if (ImgWidth==FPGA_SCREEN_WIDTH) //4副先进行切割
-		{
-//#pragma omp parallel for
-		for(int i=0;i<4;i++)
-		{
-			UYVnoXquar(dst+i*FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*3,src+i*FPGA_SINGLE_PIC_W*FPGA_SINGLE_PIC_H*2,FPGA_SINGLE_PIC_W,FPGA_SINGLE_PIC_H);
-		}
-		}
-	else
-	{
-		ImgHeight/=4;
-//#pragma omp parallel for
-		for(int i=0;i<4;i++)
-		{
-		UYVnoXquar(dst+i*ImgWidth*ImgHeight*3,src+i*ImgWidth*ImgHeight*2,ImgWidth,ImgHeight);
-		}
-	}
-#endif
+
 	UYVnoXquar(dst,src,1280,720);
 
 }
@@ -247,105 +229,13 @@ void HDv4l_cam::YUYV2UYVx(unsigned char *dst,unsigned char *src, int ImgWidth, i
 	{
 		YUVquar(dst,src,ImgWidth,ImgHeight);
 	}
-#if 0
-	if(ImgWidth==FPGA_SCREEN_WIDTH)
-		{
-		static int a=0;
-			if(a++==50)
-			{
-				save_SDIyuyv_pic(src,ImgWidth,ImgHeight);
-			}
-		}
-#endif
-#endif
-	//YUVquar(dst,src,ImgWidth,ImgHeight);
-#if 0
-	unsigned char pp[1280*1080*4];
-	if(ImgWidth==FPGA_SCREEN_WIDTH)
-	{
-		for(int i=0;i<1280*1080*4;i++)
-			pp[i]=i;
-		memcpy(dst,pp,1280*1080*4);
-	}
 
 #endif
-#if 0
-	int t[10]={0};
- timeval startT[20]={0};
-	gettimeofday(&startT[4],0);
-	ImgHeight/=4;
-#pragma omp parallel for
-for(int i=0;i<4;i++)
-{
-	YUVquar(dst+4*i*ImgWidth*ImgHeight,src+2*i*ImgWidth*ImgHeight,ImgWidth,ImgHeight);
-}
-	gettimeofday(&startT[5],0);
-			t[2]=((startT[5].tv_sec-startT[4].tv_sec)*1000000+(startT[5].tv_usec-startT[4].tv_usec))/1000.0;
-			printf("YUYV->UYVX=%d ms    \n",t[2]);
-#endif
+
 }
 void HDv4l_cam::YUYV2RGB(unsigned char * src,unsigned char * dst,int w,int h)
 {
-#if 0
-	int t[10]={0};
-	timeval startT[20]={0};
-	bool enhance=false;
-#if 1
-	if (w==FPGA_SCREEN_WIDTH) //4副先进行切割
-	{
-		RectFromPixels(src);
-		//如果w=1280 h=1080,则进行截取
-		//否则直接转换
-	}
-	gettimeofday(&startT[4],0);
 
-	nv21_to_rgb(dst, w,h,src);
-	gettimeofday(&startT[5],0);
-			t[2]=((startT[5].tv_sec-startT[4].tv_sec)*1000000+(startT[5].tv_usec-startT[4].tv_usec))/1000.0;
-			printf("deltatimet[5]-t[4] =%d ms    width=%d\n",t[2],w);
-#else
-	if(w==MAX_SCREEN_WIDTH)//６副图
-		{
-
-			Mat Src(h,w,CV_8UC2,src);
-			Mat Dst(h,w,CV_8UC3,dst);
-			gettimeofday(&startT[4],0);
-			cvtColor(Src,Dst,CV_YUV2BGR_YUYV);
-			gettimeofday(&startT[5],0);
-			t[2]=((startT[5].tv_sec-startT[4].tv_sec)*1000000+(startT[5].tv_usec-startT[4].tv_usec))/1000.0;
-			printf("deltatimet[5]-t[4] =%d ms    1920\n",t[2]);
-
-		}
-		else if (w==FPGA_SCREEN_WIDTH) //4副先进行切割
-		{
-#if 0
-	//		gettimeofday(&startT[6],0);
-			Mat Src(SDI_HEIGHT,SDI_WIDTH,CV_8UC2,src);
-			Rect rect(0,0,w,h);
-			Mat Roi=Src(rect);
-			Mat Dst(h,w,CV_8UC3,dst);
-			cvtColor(Roi,Dst,CV_YUV2BGR_YUYV);
-#else
-			RectFromPixels(src);
-			Mat Src(h,w,CV_8UC2,src);
-			Mat Dst(h,w,CV_8UC3,dst);
-			gettimeofday(&startT[6],0);
-			cvtColor(Src,Dst,CV_YUV2BGR_YUYV);
-			gettimeofday(&startT[7],0);
-			t[3]=((startT[7].tv_sec-startT[6].tv_sec)*1000000+(startT[7].tv_usec-startT[6].tv_usec))/1000.0;
-			printf("deltatimet[7]-t[6] =%d ms    1280\n",t[3]);
-
-#endif
-
-			//如果w=1280 h=1080,则进行截取
-			//否则直接转换
-		}
-#endif
-	if(enhance)
-	{
-//todo
-	}
-#endif
 }
 
 void HDv4l_cam::YUYV2GRAY(unsigned char * src,unsigned char * dst,int w,int h)
@@ -361,10 +251,7 @@ void HDv4l_cam::YUYV2GRAY(unsigned char * src,unsigned char * dst,int w,int h)
 bool HDv4l_cam::Open()
 {
 	int ret;
-/*	setCurChannum();
-	if(ret < 0)
-			return false;
-*/
+
 	static bool Once=true;
 	if(Once)
 	{
@@ -562,8 +449,7 @@ int HDv4l_cam::GetNowPicIdx(unsigned char *src)
 }
 int HDv4l_cam::ChangeIdx2chid(int idx)
 {//0~9
-	//int picidx=(GetNowPicIdx()+2);
-	//return picidx;
+
 	return 0;
 }
 
@@ -666,9 +552,7 @@ int HDv4l_cam::read_frame(int now_pic_format)
 					default:
 						break;
 					}
-			//					UYVY2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
 
-					//checkRet=selfcheck.JudgeByPixels((unsigned char *)buffers[buf.index].start,now_pic_format);
 					HD_YUYV2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
 						Src=*transformed_src_main;
 
@@ -684,13 +568,7 @@ int HDv4l_cam::read_frame(int now_pic_format)
 						fprintf(stderr, "VIDIOC_QBUF error %d, %s\n", errno, strerror(errno));
 						exit(EXIT_FAILURE);
 					}
-					//if((checkRet==0) && (selfcheck.GetBrokenCam()[now_pic_format]==1))
-				//	if(Render_Agent::GetReset(now_pic_format))
-					{
-					//	Render_Agent::SetReset(false,now_pic_format);
-					//	printf("reset %d ~~~\n",now_pic_format);
-					//	ReStart();
-					}
+
 
 
 	return 0;
@@ -1128,15 +1006,7 @@ bool HDv4l_cam::Data2Queue(unsigned char *pYuvBuf,int width,int height,int chId)
 
 void  HDv4l_cam::start_queue()
 {
-#if 0
-	getEmpty(&select_bgr_data_main,MAIN_ONE_OF_TEN);
-	getEmpty(&select_bgr_data_sub,SUB_ONE_OF_TEN );
-	getEmpty(&FPGA6_bgr_data_main,MAIN_FPGA_SIX);
-	getEmpty(&FPGA6_bgr_data_sub, SUB_FPGA_SIX);
-	getEmpty(&FPGA4_bgr_data_main,MAIN_FPGA_FOUR);
-	getEmpty(&FPGA4_bgr_data_sub, SUB_FPGA_FOUR);
-	getEmpty(&select_bgr_data_main_touch, MAIN_ONE_OF_TEN_TOUCH);
-#endif
+
 	for(int j = 0;j<3;j++)
 		getEmpty(&(sigle_yuyv[j]),j);
 }

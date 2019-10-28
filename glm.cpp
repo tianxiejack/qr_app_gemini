@@ -767,14 +767,7 @@ glmSecondPass(GLMmodel* model, FILE* file)
     }
   }
   
-#if 0
-  /* announce the memory requirements */
-  printf(" Memory: %d bytes\n",
-      numvertices  * 3*sizeof(GLfloat) +
-      numnormals   * 3*sizeof(GLfloat) * (numnormals ? 1 : 0) +
-      numtexcoords * 3*sizeof(GLfloat) * (numtexcoords ? 1 : 0) +
-      numtriangles * sizeof(GLMtriangle));
-#endif
+
 }
 
 
@@ -821,11 +814,7 @@ glmUnitize(GLMmodel* model)
     
     /* calculate model width, height, and depth */
     /* modified by neo6 */
-#if 0
-  w = glmAbs(maxx) + glmAbs(minx);
-    h = glmAbs(maxy) + glmAbs(miny);
-    d = glmAbs(maxz) + glmAbs(minz);
-#endif  
+
   w = maxx - minx;
   h = maxy - miny;
   d = maxz - minz;
@@ -837,9 +826,7 @@ glmUnitize(GLMmodel* model)
     
     /* calculate unitizing scale factor */
   /* modified by neo6 */
-#if 0
-    scale = 2.0 / glmMax(glmMax(w, h), d);
-#endif
+
     scale = 1.0 / glmMax(glmMax(w, h), d);
     
     /* translate around center then scale */
@@ -1221,11 +1208,7 @@ glmLinearTexture(GLMmodel* model)
         }    
         group = group->next;
     }
-    
-#if 0
-    printf("glmLinearTexture(): generated %d linear texture coordinates\n",
-        model->numtexcoords);
-#endif
+
 }
 
 /* glmSpheremapTexture: Generates texture coordinates according to a
@@ -1760,10 +1743,7 @@ glmWeld(GLMmodel* model, GLfloat epsilon)
     vectors  = model->vertices;
     copies = glmWeldVectors(vectors, &numvectors, epsilon);
     
-#if 0
-    printf("glmWeld(): %d redundant vertices.\n", 
-        model->numvertices - numvectors - 1);
-#endif
+
     
     for (i = 0; i < model->numtriangles; i++) {
         T(i).vindices[0] = (GLuint)vectors[3 * T(i).vindices[0] + 0];
@@ -1863,83 +1843,3 @@ glmReadPPM(const char* filename, int* width, int* height)
     return image;
 }
 
-#if 0
-/* normals */
-if (model->numnormals) {
-    numvectors = model->numnormals;
-    vectors  = model->normals;
-    copies = glmOptimizeVectors(vectors, &numvectors);
-    
-    printf("glmOptimize(): %d redundant normals.\n", 
-        model->numnormals - numvectors);
-    
-    for (i = 0; i < model->numtriangles; i++) {
-        T(i).nindices[0] = (GLuint)vectors[3 * T(i).nindices[0] + 0];
-        T(i).nindices[1] = (GLuint)vectors[3 * T(i).nindices[1] + 0];
-        T(i).nindices[2] = (GLuint)vectors[3 * T(i).nindices[2] + 0];
-    }
-    
-    /* free space for old normals */
-    free(vectors);
-    
-    /* allocate space for the new normals */
-    model->numnormals = numvectors;
-    model->normals = (GLfloat*)malloc(sizeof(GLfloat) * 
-        3 * (model->numnormals + 1));
-    
-    /* copy the optimized vertices into the actual vertex list */
-    for (i = 1; i <= model->numnormals; i++) {
-        model->normals[3 * i + 0] = copies[3 * i + 0];
-        model->normals[3 * i + 1] = copies[3 * i + 1];
-        model->normals[3 * i + 2] = copies[3 * i + 2];
-    }
-    
-    free(copies);
-}
-
-/* texcoords */
-if (model->numtexcoords) {
-    numvectors = model->numtexcoords;
-    vectors  = model->texcoords;
-    copies = glmOptimizeVectors(vectors, &numvectors);
-    
-    printf("glmOptimize(): %d redundant texcoords.\n", 
-        model->numtexcoords - numvectors);
-    
-    for (i = 0; i < model->numtriangles; i++) {
-        for (j = 0; j < 3; j++) {
-            T(i).tindices[j] = (GLuint)vectors[3 * T(i).tindices[j] + 0];
-        }
-    }
-    
-    /* free space for old texcoords */
-    free(vectors);
-    
-    /* allocate space for the new texcoords */
-    model->numtexcoords = numvectors;
-    model->texcoords = (GLfloat*)malloc(sizeof(GLfloat) * 
-        2 * (model->numtexcoords + 1));
-    
-    /* copy the optimized vertices into the actual vertex list */
-    for (i = 1; i <= model->numtexcoords; i++) {
-        model->texcoords[2 * i + 0] = copies[2 * i + 0];
-        model->texcoords[2 * i + 1] = copies[2 * i + 1];
-    }
-    
-    free(copies);
-}
-#endif
-
-#if 0
-/* look for unused vertices */
-/* look for unused normals */
-/* look for unused texcoords */
-for (i = 1; i <= model->numvertices; i++) {
-    for (j = 0; j < model->numtriangles; i++) {
-        if (T(j).vindices[0] == i || 
-            T(j).vindices[1] == i || 
-            T(j).vindices[1] == i)
-            break;
-    }
-}
-#endif

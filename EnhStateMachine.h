@@ -37,33 +37,7 @@ public:
 	virtual ENHSTATE nextState(bool onoff) = 0;
 	virtual void clear()=0;
 };
-#if 0
-class IFEnhStateGLRenderBridge
-{
-public:
-	void UseShaderOnPano();
-	void UseShaderOnOverLap();
-};
 
-class YubBridge:public EnhStateGLRenderBridge
-{
-public:
-	YubBridge(IFEnhBhv *host):mphost(host){};
-	void UseShaderOnPano();
-	void UseShaderOnOverLap();
-private:
-	 IFEnhBhv * mphost;
-};
-class RgbBridge:public EnhStateGLRenderBridge
-{
-public:
-	RgbBridge(IFEnhBhv *host):mphost(host){};
-	void UseShaderOnPano();
-	void UseShaderOnOverLap();
-private:
-	 IFEnhBhv * mphost;
-};
-#endif
 class BaseTransitionState:public IFEnhStateMachine
 {
 public:
