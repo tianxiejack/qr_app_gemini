@@ -2013,7 +2013,7 @@ void Render::getOffsetValue(int direction, int x, int* offset_L,
 	}
 	*offset_R = 0;
 	*offset_L = 0;
-#endif
+
 }
 //set direction false when this triangle has a vertex == (-1,-1)
 void Render::checkDirection(bool AppDirection[], int x) {
