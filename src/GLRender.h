@@ -86,6 +86,7 @@ private:
 public:
 	Render();
 	~Render();
+	void readMapXY(cv::Mat& matX, cv::Mat& matY,int index);//zyb 2019 1205
 	void ChangeChosenByForesight();
 	virtual void FBOdraw(bool &Isenhdata,bool &IsTouchenhdata);
 	bool getPointsValue(int direction, int x, Point2f *Point);

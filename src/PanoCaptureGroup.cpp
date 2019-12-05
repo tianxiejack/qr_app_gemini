@@ -66,7 +66,7 @@ PanoCaptureGroup::~PanoCaptureGroup()
 
 PanoCaptureGroup * PanoCaptureGroup::GetMainInstance()
 {
-	int queueid[3]={0,1,2};
+	int queueid[3]={2,1,0};
 	int count=3;
 	static bool once =true;
 	if(once){

@@ -207,6 +207,9 @@ float menu_tpic[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 extern bool isEnhanceOn;
 
+//zyb 2019 1205
+#define LEFTORRIGHT	 2
+
 #if MVDETECTOR_MODE
 mvDetector* pSingleMvDetector=mvDetector::getInstance();
 #endif
@@ -893,10 +896,15 @@ void Render::initPixle(void) {
 	for (int i = 0; i < CAM_COUNT; i++)
 		readPixleFile(file, i);
 }
+
+//zyb add map xy 2019 1205
 void Render::readPixleFile(const char* file, int index) {
 	char filename[64];
 	memset(filename, 0, sizeof(filename));
 	sprintf(filename, "%s_%02d.ini", file, index);
+
+	cv::Mat mapX,mapY;
+	readMapXY(mapX,mapY,index*2+LEFTORRIGHT);
 
 	FILE *fp = fopen(filename, "r");
 	char buf[256];
@@ -917,14 +925,41 @@ void Render::readPixleFile(const char* file, int index) {
 		if (retp == NULL)
 			break;
 		sscanf(buf, "\tvertexpixel\t%f\t%f", &fx, &fy);
+
+		if ((fx > 0 && fy > 0) && index < 3)
+		{
+			 float newfx = mapX.at<float>((int)fy,(int)fx);
+			 float newfy = mapY.at<float>((int)fy,(int)fx);
+			 fx = newfx;
+			 fy = newfy;
+		}
+
 		pixleList[index].push_back(cv::Point2f(fx, fy));
 
 		retp = fgets(buf, sizeof(buf), fp);
 		sscanf(buf, "\tvertexpixel\t%f\t%f", &fx, &fy);
+
+		if ((fx > 0 && fy > 0) && index < 3)
+		{
+			 float newfx = mapX.at<float>((int)fy,(int)fx);
+			 float newfy = mapY.at<float>((int)fy,(int)fx);
+			 fx = newfx;
+			 fy = newfy;
+		}
+
 		pixleList[index].push_back(cv::Point2f(fx, fy));
 
 		fgets(buf, sizeof(buf), fp);
 		sscanf(buf, "\tvertexpixel\t%f\t%f", &fx, &fy);
+
+		if ((fx > 0 && fy > 0) && index < 3)
+		{
+			 float newfx = mapX.at<float>((int)fy,(int)fx);
+			 float newfy = mapY.at<float>((int)fy,(int)fx);
+			 fx = newfx;
+			 fy = newfy;
+		}
+
 		pixleList[index].push_back(cv::Point2f(fx, fy));
 
 		fgets(buf, sizeof(buf), fp);
@@ -934,6 +969,21 @@ void Render::readPixleFile(const char* file, int index) {
 	fclose(fp);
 	//printf("file:%s size: %d\n",filename, (int)pixleList[index].size());
 }
+
+void Render::readMapXY(cv::Mat& matX, cv::Mat& matY,int index)
+{
+	char arr[32] = {};
+	sprintf(arr,"mapData%d.yml",index);
+	cv::FileStorage fs(arr, cv::FileStorage::READ);
+
+	fs["mapX"] >> matX;
+	fs["mapY"] >> matY;
+	fs.release();
+	printf("read map %d\n",index);
+}
+
+
+
 
 //-------------------------GL-related function---------------
 Render::Render() :
