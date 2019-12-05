@@ -9,8 +9,10 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir.mk
--include OSA_CAP/src/subdir.mk
--include GLTool/src/subdir.mk
+-include src/subdir.mk
+-include src/OSA_CAP/src/subdir.mk
+-include src/GLTool/src/subdir.mk
+-include config/subdir.mk
 
 OS_SUFFIX := $(subst Linux,linux,$(subst Darwin/x86_64,darwin,$(shell uname -s)/$(shell uname -m)))
 
@@ -53,19 +55,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: Gemini_d
+all: app_Gemini
 
 # Tool invocations
-Gemini_d: $(OBJS) $(USER_OBJS)
+app_Gemini: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: NVCC Linker'
-	/usr/local/cuda-8.0/bin/nvcc --cudart static -L/usr/lib -L../lib -Xlinker -rpath-link="/usr/lib/aarch64-linux-gnu/tegra" --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50 -m64 -ccbin aarch64-linux-gnu-g++ -link -o  "Gemini_d" $(OBJS) $(USER_OBJS) $(LIBS)
+	/usr/local/cuda-8.0/bin/nvcc --cudart static -L../lib -L/usr/lib -L/usr/lib/aarch64-linux-gnu/tegra --relocatable-device-code=false -gencode arch=compute_50,code=compute_50 -gencode arch=compute_50,code=sm_50 -m64 -ccbin aarch64-linux-gnu-g++ -link -o  "app_Gemini" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(CU_DEPS)$(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) Gemini_d
+	-$(RM) $(CU_DEPS)$(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) app_Gemini
 	-@echo ' '
 
 .PHONY: all clean dependents

@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="nvcc.errorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nvidia.cuda.ide.cubin" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nvidia.cuda.ide.elf" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nvidia.cuda.ide.macho" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.VCErrorParser;nvcc.errorParser;org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159" name="Debug" parent="com.nvidia.cuda.ide.eight_zero.configuration.debug" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
+					<folderInfo id="com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159." name="/" resourcePath="">
+						<toolChain errorParsers="" id="com.nvidia.cuda.tools.toolchain.eight_zero.exe.debug.239546001" name="CUDA Toolkit 8.0" superClass="com.nvidia.cuda.tools.toolchain.eight_zero.exe.debug">
+							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform.1608170643" isAbstract="false" name="Debug Platform" osList="linux,macosx" superClass="com.nvidia.cuda.ide.targetPlatform"/>
+							<builder buildPath="${workspace_loc:/app_Gemini}/Debug" errorParsers="org.eclipse.cdt.core.GmakeErrorParser" id="com.nvidia.cuda.ide.builder.1162995153" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CUDA Toolkit 8.0 Builder" superClass="com.nvidia.cuda.ide.builder"/>
+							<tool errorParsers="org.eclipse.cdt.core.VCErrorParser;nvcc.errorParser;org.eclipse.cdt.core.GCCErrorParser" id="nvcc.compiler.base.995815926" name="NVCC Compiler" superClass="nvcc.compiler.base">
+								<option id="nvcc.compiler.deviceDebug.1652275760" name="Generate device debug information (-G)" superClass="nvcc.compiler.deviceDebug" value="false" valueType="boolean"/>
+								<option id="nvcc.compiler.option.level.1722457919" name="Generate host debug information (-g)" superClass="nvcc.compiler.option.level" value="false" valueType="boolean"/>
+								<option defaultValue="nvcc.compiler.optimization.level.none" id="nvcc.compiler.optimization.level.629946563" name="Optimization Level" superClass="nvcc.compiler.optimization.level" value="nvcc.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="nvcc.compiler.pic.2035083428" name="Position Independent Code (-fPIC)" superClass="nvcc.compiler.pic"/>
+								<option id="nvcc.compiler.def.symbols.422639706" name="Defined symbols (-D)" superClass="nvcc.compiler.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="GAIN_MASK=1"/>
+									<listOptionValue builtIn="false" value="VALIDATION_PERIOD_SECONDS=0"/>
+									<listOptionValue builtIn="false" value="DISABLE_NEON_DEI=1"/>
+									<listOptionValue builtIn="false" value="NO_ARM_NEON=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_ENHANCE_FUNCTION=0"/>
+									<listOptionValue builtIn="false" value="MVDECT=0"/>
+									<listOptionValue builtIn="false" value="USE_BMPCAP=0"/>
+									<listOptionValue builtIn="false" value="WHOLE_PIC=1"/>
+									<listOptionValue builtIn="false" value="USE_GAIN=1"/>
+									<listOptionValue builtIn="false" value="CAM_COUNT=8"/>
+									<listOptionValue builtIn="false" value="USE_CAP_SPI=0"/>
+									<listOptionValue builtIn="false" value="TRACK_MODE=0"/>
+									<listOptionValue builtIn="false" value="DOUBLE_SCREEN=0"/>
+									<listOptionValue builtIn="false" value="TEST_GAIN=1"/>
+									<listOptionValue builtIn="false" value="GSTREAM_CAP=0"/>
+									<listOptionValue builtIn="false" value="USE_UART=0"/>
+									<listOptionValue builtIn="false" value="USE_12=1"/>
+								</option>
+								<option id="nvcc.compiler.include.paths.622473429" name="Include paths (-I)" superClass="nvcc.compiler.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="../src/OSA_CAP/inc"/>
+									<listOptionValue builtIn="false" value="../src/GLTool/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/opencv"/>
+									<listOptionValue builtIn="false" value="/usr/include/gstreamer-1.0"/>
+									<listOptionValue builtIn="false" value="/usr/include/GL"/>
+									<listOptionValue builtIn="false" value="/usr/include/glib-2.0"/>
+									<listOptionValue builtIn="false" value="/usr/lib/aarch64-linux-gnu/glib-2.0/include"/>
+									<listOptionValue builtIn="false" value="/usr/lib/aarch64-linux-gnu/include"/>
+									<listOptionValue builtIn="false" value="/usr/include"/>
+									<listOptionValue builtIn="false" value="/usr/lib/aarch64-linux-gnu/gstreamer-1.0/include"/>
+								</option>
+								<inputType id="nvcc.compiler.input.cu.1869853804" superClass="nvcc.compiler.input.cu"/>
+								<inputType id="nvcc.compiler.input.cpp.1297626989" superClass="nvcc.compiler.input.cpp"/>
+								<inputType id="nvcc.compiler.input.c.1491021762" superClass="nvcc.compiler.input.c"/>
+							</tool>
+							<tool errorParsers="nvcc.errorParser;org.eclipse.cdt.core.GLDErrorParser" id="nvcc.linker.base.1334788376" name="NVCC Linker" superClass="nvcc.linker.base">
+								<option id="nvcc.linker.option.libs.2005689135" name="Libraries (-l)" superClass="nvcc.linker.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="GL"/>
+									<listOptionValue builtIn="false" value="zbar"/>
+									<listOptionValue builtIn="false" value="GLU"/>
+									<listOptionValue builtIn="false" value="glut"/>
+									<listOptionValue builtIn="false" value="GLEW"/>
+									<listOptionValue builtIn="false" value="enh"/>
+									<listOptionValue builtIn="false" value="HWStencil"/>
+									<listOptionValue builtIn="false" value="gst_capture"/>
+									<listOptionValue builtIn="false" value="MvDetectLib"/>
+									<listOptionValue builtIn="false" value="opencv_core"/>
+									<listOptionValue builtIn="false" value="opencv_calib3d"/>
+									<listOptionValue builtIn="false" value="opencv_highgui"/>
+									<listOptionValue builtIn="false" value="opencv_imgproc"/>
+								</option>
+								<option id="nvcc.linker.option.paths.552556558" name="Library search path (-L)" superClass="nvcc.linker.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="../lib"/>
+									<listOptionValue builtIn="false" value="/usr/lib"/>
+									<listOptionValue builtIn="false" value="/usr/lib/aarch64-linux-gnu/tegra"/>
+								</option>
+								<option id="nvcc.linker.option.userobjs.1194228565" name="Other objects" superClass="nvcc.linker.option.userobjs" valueType="userObjs">
+									<listOptionValue builtIn="false" value="/usr/lib/libHWAuthentication.a"/>
+								</option>
+								<inputType id="nvcc.linker.input.1414101079" superClass="nvcc.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="nvcc.archiver.base.682964851" name="NVCC Archiver" superClass="nvcc.archiver.base"/>
+							<tool errorParsers="org.eclipse.cdt.core.GASErrorParser" id="com.nvidia.host.assembler.702216649" name="Host Assembler" superClass="com.nvidia.host.assembler">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1953531332" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159.1464762226" name="/" resourcePath="OSA_CAP">
+						<toolChain id="com.nvidia.cuda.tools.toolchain.eight_zero.exe.debug.1589761733" name="CUDA Toolkit 8.0" superClass="com.nvidia.cuda.tools.toolchain.eight_zero.exe.debug" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform" isAbstract="false" name="Debug Platform" osList="linux,macosx" superClass="com.nvidia.cuda.ide.targetPlatform"/>
+							<tool id="nvcc.compiler.base.1989705932" name="NVCC Compiler" superClass="nvcc.compiler.base.995815926">
+								<option id="nvcc.compiler.def.symbols.1386510896" name="Defined symbols (-D)" superClass="nvcc.compiler.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DISABLE_NEON_DEI=1"/>
+									<listOptionValue builtIn="false" value="NO_ARM_NEON=1"/>
+									<listOptionValue builtIn="false" value="USE_BMPCAP=0"/>
+									<listOptionValue builtIn="false" value="USE_GAIN=1"/>
+									<listOptionValue builtIn="false" value="CAM_COUNT=8"/>
+									<listOptionValue builtIn="false" value="TRACK_MODE=0"/>
+									<listOptionValue builtIn="false" value="TEST_GAIN=1"/>
+									<listOptionValue builtIn="false" value="GSTREAM_CAP=0"/>
+									<listOptionValue builtIn="false" value="USE_UART=0"/>
+									<listOptionValue builtIn="false" value="USE_12=1"/>
+								</option>
+								<option id="nvcc.compiler.include.paths.1874359231" name="Include paths (-I)" superClass="nvcc.compiler.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/usr/include/gstreamer-1.0"/>
+									<listOptionValue builtIn="false" value="/usr/include"/>
+									<listOptionValue builtIn="false" value="../OSA_CAP/inc"/>
+									<listOptionValue builtIn="false" value="../GLTool/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/GL"/>
+									<listOptionValue builtIn="false" value="/usr/include/glib-2.0"/>
+									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/opencv"/>
+									<listOptionValue builtIn="false" value="/usr/include/opencv2"/>
+								</option>
+								<inputType id="nvcc.compiler.input.cu.1290945366" superClass="nvcc.compiler.input.cu"/>
+								<inputType id="nvcc.compiler.input.cpp.1360560909" superClass="nvcc.compiler.input.cpp"/>
+								<inputType id="nvcc.compiler.input.c.1565813503" superClass="nvcc.compiler.input.c"/>
+							</tool>
+							<tool id="nvcc.linker.base.1820972379" name="NVCC Linker" superClass="nvcc.linker.base.1334788376"/>
+							<tool id="nvcc.archiver.base.878009038" name="NVCC Archiver" superClass="nvcc.archiver.base.682964851"/>
+							<tool id="com.nvidia.host.assembler.441111479" name="Host Assembler" superClass="com.nvidia.host.assembler.702216649">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1266551794" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159.590497345" name="/" resourcePath="GLTool">
+						<toolChain id="com.nvidia.cuda.tools.toolchain.eight_zero.exe.debug.845031042" name="CUDA Toolkit 8.0" superClass="com.nvidia.cuda.tools.toolchain.eight_zero.exe.debug" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform" isAbstract="false" name="Debug Platform" osList="linux,macosx" superClass="com.nvidia.cuda.ide.targetPlatform"/>
+							<tool id="nvcc.compiler.base.205475584" name="NVCC Compiler" superClass="nvcc.compiler.base.995815926">
+								<option id="nvcc.compiler.def.symbols.33769580" name="Defined symbols (-D)" superClass="nvcc.compiler.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="GAIN_MASK=1"/>
+									<listOptionValue builtIn="false" value="DISABLE_NEON_DEI=1"/>
+									<listOptionValue builtIn="false" value="NO_ARM_NEON=1"/>
+									<listOptionValue builtIn="false" value="USE_BMPCAP=0"/>
+									<listOptionValue builtIn="false" value="USE_GAIN=1"/>
+									<listOptionValue builtIn="false" value="CAM_COUNT=8"/>
+									<listOptionValue builtIn="false" value="TRACK_MODE=0"/>
+									<listOptionValue builtIn="false" value="TEST_GAIN=1"/>
+									<listOptionValue builtIn="false" value="GSTREAM_CAP=0"/>
+									<listOptionValue builtIn="false" value="USE_UART=0"/>
+									<listOptionValue builtIn="false" value="USE_12=1"/>
+								</option>
+								<option id="nvcc.compiler.include.paths.1808060310" name="Include paths (-I)" superClass="nvcc.compiler.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/usr/include/gstreamer-1.0"/>
+									<listOptionValue builtIn="false" value="/usr/include"/>
+									<listOptionValue builtIn="false" value="../OSA_CAP/inc"/>
+									<listOptionValue builtIn="false" value="../GLTool/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/GL"/>
+									<listOptionValue builtIn="false" value="/usr/include/glib-2.0"/>
+									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/opencv"/>
+									<listOptionValue builtIn="false" value="/usr/include/opencv2"/>
+								</option>
+								<inputType id="nvcc.compiler.input.cu.1434903800" superClass="nvcc.compiler.input.cu"/>
+								<inputType id="nvcc.compiler.input.cpp.1312015960" superClass="nvcc.compiler.input.cpp"/>
+								<inputType id="nvcc.compiler.input.c.1413160129" superClass="nvcc.compiler.input.c"/>
+							</tool>
+							<tool id="nvcc.linker.base.1878801805" name="NVCC Linker" superClass="nvcc.linker.base.1334788376"/>
+							<tool id="nvcc.archiver.base.929955012" name="NVCC Archiver" superClass="nvcc.archiver.base.682964851"/>
+							<tool id="com.nvidia.host.assembler.347517851" name="Host Assembler" superClass="com.nvidia.host.assembler.702216649">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.907269917" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="com.nvidia.cuda.ide.build.project.ICudaProjectConfiguration">
+				<executable devicelink="false">
+					<sass major="5" minor="0"/>
+					<ptx major="5" minor="0"/>
+				</executable>
+				<editor-arch major="5" minor="0"/>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="com.nvidia.cuda.ide.eight_zero.configuration.release.551024313">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.nvidia.cuda.ide.eight_zero.configuration.release.551024313" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings/>
+				<extensions>
+					<extension id="nvcc.errorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.nvidia.cuda.ide.cubin" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nvidia.cuda.ide.elf" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="com.nvidia.cuda.ide.macho" point="org.eclipse.cdt.core.BinaryParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.VCErrorParser;nvcc.errorParser;org.eclipse.cdt.core.GmakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser" id="com.nvidia.cuda.ide.eight_zero.configuration.release.551024313" name="Release" parent="com.nvidia.cuda.ide.eight_zero.configuration.release" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="" prebuildStep="">
+					<folderInfo id="com.nvidia.cuda.ide.eight_zero.configuration.release.551024313." name="/" resourcePath="">
+						<toolChain errorParsers="" id="com.nvidia.cuda.ide.toolchain.eight_zero.exe.release.1897580799" name="CUDA Toolkit 8.0" superClass="com.nvidia.cuda.ide.toolchain.eight_zero.exe.release">
+							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform.1325807480" isAbstract="false" name="Debug Platform" osList="linux,macosx" superClass="com.nvidia.cuda.ide.targetPlatform"/>
+							<builder buildPath="${workspace_loc:/app_Gemini}/Release" errorParsers="org.eclipse.cdt.core.GmakeErrorParser" id="com.nvidia.cuda.ide.builder.596757008" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CUDA Toolkit 8.0 Builder" superClass="com.nvidia.cuda.ide.builder"/>
+							<tool command="nvcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX} ${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.VCErrorParser;nvcc.errorParser;org.eclipse.cdt.core.GCCErrorParser" id="nvcc.compiler.base.2022415205" name="NVCC Compiler" superClass="nvcc.compiler.base">
+								<option id="nvcc.compiler.deviceDebug.361628641" name="Generate device debug information (-G)" superClass="nvcc.compiler.deviceDebug" value="false" valueType="boolean"/>
+								<option id="nvcc.compiler.option.level.1342811674" name="Generate host debug information (-g)" superClass="nvcc.compiler.option.level" value="false" valueType="boolean"/>
+								<option defaultValue="nvcc.compiler.optimization.level.most" id="nvcc.compiler.optimization.level.1424598922" name="Optimization Level" superClass="nvcc.compiler.optimization.level" value="nvcc.compiler.optimization.level.most" valueType="enumerated"/>
+								<option id="nvcc.compiler.pic.155461591" name="Position Independent Code (-fPIC)" superClass="nvcc.compiler.pic"/>
+								<option id="nvcc.compiler.def.symbols.1164622075" name="Defined symbols (-D)" superClass="nvcc.compiler.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="GAIN_MASK=1"/>
+									<listOptionValue builtIn="false" value="VALIDATION_PERIOD_SECONDS=0"/>
+									<listOptionValue builtIn="false" value="DISABLE_NEON_DEI=1"/>
+									<listOptionValue builtIn="false" value="NO_ARM_NEON=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_ENHANCE_FUNCTION=0"/>
+									<listOptionValue builtIn="false" value="MVDECT=0"/>
+									<listOptionValue builtIn="false" value="USE_BMPCAP=0"/>
+									<listOptionValue builtIn="false" value="WHOLE_PIC=1"/>
+									<listOptionValue builtIn="false" value="USE_GAIN=1"/>
+									<listOptionValue builtIn="false" value="CAM_COUNT=8"/>
+									<listOptionValue builtIn="false" value="USE_CAP_SPI=0"/>
+									<listOptionValue builtIn="false" value="TRACK_MODE=0"/>
+									<listOptionValue builtIn="false" value="DOUBLE_SCREEN=0"/>
+									<listOptionValue builtIn="false" value="TEST_GAIN=1"/>
+									<listOptionValue builtIn="false" value="GSTREAM_CAP=0"/>
+									<listOptionValue builtIn="false" value="USE_UART=0"/>
+									<listOptionValue builtIn="false" value="USE_12=1"/>
+								</option>
+								<option id="nvcc.compiler.include.paths.243576489" name="Include paths (-I)" superClass="nvcc.compiler.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="../src/OSA_CAP/inc"/>
+									<listOptionValue builtIn="false" value="../src/GLTool/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/opencv"/>
+									<listOptionValue builtIn="false" value="/usr/include/gstreamer-1.0"/>
+									<listOptionValue builtIn="false" value="/usr/include/GL"/>
+									<listOptionValue builtIn="false" value="/usr/include/glib-2.0"/>
+									<listOptionValue builtIn="false" value="/usr/lib/aarch64-linux-gnu/glib-2.0/include"/>
+									<listOptionValue builtIn="false" value="/usr/lib/aarch64-linux-gnu/include"/>
+									<listOptionValue builtIn="false" value="/usr/include"/>
+									<listOptionValue builtIn="false" value="/usr/lib/aarch64-linux-gnu/gstreamer-1.0/include"/>
+								</option>
+								<inputType id="nvcc.compiler.input.cu.1905718687" superClass="nvcc.compiler.input.cu"/>
+								<inputType id="nvcc.compiler.input.cpp.1107887018" superClass="nvcc.compiler.input.cpp"/>
+								<inputType id="nvcc.compiler.input.c.197371926" superClass="nvcc.compiler.input.c"/>
+							</tool>
+							<tool command="nvcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX} ${OUTPUT} ${INPUTS}" errorParsers="nvcc.errorParser;org.eclipse.cdt.core.GLDErrorParser" id="nvcc.linker.base.1939044883" name="NVCC Linker" superClass="nvcc.linker.base">
+								<option id="nvcc.linker.option.libs.1913819323" name="Libraries (-l)" superClass="nvcc.linker.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="GL"/>
+									<listOptionValue builtIn="false" value="zbar"/>
+									<listOptionValue builtIn="false" value="GLU"/>
+									<listOptionValue builtIn="false" value="glut"/>
+									<listOptionValue builtIn="false" value="GLEW"/>
+									<listOptionValue builtIn="false" value="enh"/>
+									<listOptionValue builtIn="false" value="HWStencil"/>
+									<listOptionValue builtIn="false" value="gst_capture"/>
+									<listOptionValue builtIn="false" value="MvDetectLib"/>
+									<listOptionValue builtIn="false" value="opencv_core"/>
+									<listOptionValue builtIn="false" value="opencv_calib3d"/>
+									<listOptionValue builtIn="false" value="opencv_highgui"/>
+									<listOptionValue builtIn="false" value="opencv_imgproc"/>
+								</option>
+								<option id="nvcc.linker.option.paths.1751409492" name="Library search path (-L)" superClass="nvcc.linker.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="../lib"/>
+									<listOptionValue builtIn="false" value="/usr/lib"/>
+									<listOptionValue builtIn="false" value="/usr/lib/aarch64-linux-gnu/tegra"/>
+								</option>
+								<option id="nvcc.linker.option.userobjs.624074959" name="Other objects" superClass="nvcc.linker.option.userobjs" valueType="userObjs">
+									<listOptionValue builtIn="false" value="/usr/lib/libHWAuthentication.a"/>
+								</option>
+								<inputType id="nvcc.linker.input.1510229603" superClass="nvcc.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="nvcc.archiver.base.1465428575" name="NVCC Archiver" superClass="nvcc.archiver.base"/>
+							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="com.nvidia.host.assembler.1006157965" name="Host Assembler" superClass="com.nvidia.host.assembler">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.873667625" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="com.nvidia.cuda.ide.eight_zero.configuration.release.551024313.2029428038" name="/" resourcePath="OSA_CAP">
+						<toolChain id="com.nvidia.cuda.ide.toolchain.eight_zero.exe.release.517949562" name="CUDA Toolkit 8.0" superClass="com.nvidia.cuda.ide.toolchain.eight_zero.exe.release" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform" isAbstract="false" name="Debug Platform" osList="linux,macosx" superClass="com.nvidia.cuda.ide.targetPlatform"/>
+							<tool id="nvcc.compiler.base.1547614907" name="NVCC Compiler" superClass="nvcc.compiler.base.2022415205">
+								<option id="nvcc.compiler.def.symbols.527767416" name="Defined symbols (-D)" superClass="nvcc.compiler.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DISABLE_NEON_DEI=1"/>
+									<listOptionValue builtIn="false" value="NO_ARM_NEON=1"/>
+									<listOptionValue builtIn="false" value="USE_BMPCAP=0"/>
+									<listOptionValue builtIn="false" value="USE_GAIN=1"/>
+									<listOptionValue builtIn="false" value="CAM_COUNT=8"/>
+									<listOptionValue builtIn="false" value="TRACK_MODE=0"/>
+									<listOptionValue builtIn="false" value="TEST_GAIN=1"/>
+									<listOptionValue builtIn="false" value="GSTREAM_CAP=0"/>
+									<listOptionValue builtIn="false" value="USE_UART=0"/>
+									<listOptionValue builtIn="false" value="USE_12=1"/>
+								</option>
+								<option id="nvcc.compiler.include.paths.1832095718" name="Include paths (-I)" superClass="nvcc.compiler.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/usr/include/gstreamer-1.0"/>
+									<listOptionValue builtIn="false" value="/usr/include"/>
+									<listOptionValue builtIn="false" value="../OSA_CAP/inc"/>
+									<listOptionValue builtIn="false" value="../GLTool/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/GL"/>
+									<listOptionValue builtIn="false" value="/usr/include/glib-2.0"/>
+									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/opencv"/>
+									<listOptionValue builtIn="false" value="/usr/include/opencv2"/>
+								</option>
+								<inputType id="nvcc.compiler.input.cu.1377939333" superClass="nvcc.compiler.input.cu"/>
+								<inputType id="nvcc.compiler.input.cpp.1854522141" superClass="nvcc.compiler.input.cpp"/>
+								<inputType id="nvcc.compiler.input.c.1169585809" superClass="nvcc.compiler.input.c"/>
+							</tool>
+							<tool id="nvcc.linker.base.53926788" name="NVCC Linker" superClass="nvcc.linker.base.1939044883"/>
+							<tool id="nvcc.archiver.base.801961204" name="NVCC Archiver" superClass="nvcc.archiver.base.1465428575"/>
+							<tool id="com.nvidia.host.assembler.879504927" name="Host Assembler" superClass="com.nvidia.host.assembler.1006157965">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.365238178" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="com.nvidia.cuda.ide.eight_zero.configuration.release.551024313.1636405974" name="/" resourcePath="GLTool">
+						<toolChain id="com.nvidia.cuda.ide.toolchain.eight_zero.exe.release.1285096312" name="CUDA Toolkit 8.0" superClass="com.nvidia.cuda.ide.toolchain.eight_zero.exe.release" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="com.nvidia.cuda.ide.elf;com.nvidia.cuda.ide.macho;com.nvidia.cuda.ide.cubin" id="com.nvidia.cuda.ide.targetPlatform" isAbstract="false" name="Debug Platform" osList="linux,macosx" superClass="com.nvidia.cuda.ide.targetPlatform"/>
+							<tool id="nvcc.compiler.base.2116819001" name="NVCC Compiler" superClass="nvcc.compiler.base.2022415205">
+								<option id="nvcc.compiler.def.symbols.1997736644" name="Defined symbols (-D)" superClass="nvcc.compiler.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="GAIN_MASK=1"/>
+									<listOptionValue builtIn="false" value="DISABLE_NEON_DEI=1"/>
+									<listOptionValue builtIn="false" value="NO_ARM_NEON=1"/>
+									<listOptionValue builtIn="false" value="USE_BMPCAP=0"/>
+									<listOptionValue builtIn="false" value="USE_GAIN=1"/>
+									<listOptionValue builtIn="false" value="CAM_COUNT=8"/>
+									<listOptionValue builtIn="false" value="TRACK_MODE=0"/>
+									<listOptionValue builtIn="false" value="TEST_GAIN=1"/>
+									<listOptionValue builtIn="false" value="GSTREAM_CAP=0"/>
+									<listOptionValue builtIn="false" value="USE_UART=0"/>
+									<listOptionValue builtIn="false" value="USE_12=1"/>
+								</option>
+								<option id="nvcc.compiler.include.paths.871785398" name="Include paths (-I)" superClass="nvcc.compiler.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/usr/include/gstreamer-1.0"/>
+									<listOptionValue builtIn="false" value="/usr/include"/>
+									<listOptionValue builtIn="false" value="../OSA_CAP/inc"/>
+									<listOptionValue builtIn="false" value="../GLTool/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/GL"/>
+									<listOptionValue builtIn="false" value="/usr/include/glib-2.0"/>
+									<listOptionValue builtIn="false" value="/usr/lib/x86_64-linux-gnu/glib-2.0/include"/>
+									<listOptionValue builtIn="false" value="/usr/include/opencv"/>
+									<listOptionValue builtIn="false" value="/usr/include/opencv2"/>
+								</option>
+								<inputType id="nvcc.compiler.input.cu.964100704" superClass="nvcc.compiler.input.cu"/>
+								<inputType id="nvcc.compiler.input.cpp.1361702306" superClass="nvcc.compiler.input.cpp"/>
+								<inputType id="nvcc.compiler.input.c.744763266" superClass="nvcc.compiler.input.c"/>
+							</tool>
+							<tool id="nvcc.linker.base.227860941" name="NVCC Linker" superClass="nvcc.linker.base.1939044883"/>
+							<tool id="nvcc.archiver.base.73278704" name="NVCC Archiver" superClass="nvcc.archiver.base.1465428575"/>
+							<tool id="com.nvidia.host.assembler.1139365951" name="Host Assembler" superClass="com.nvidia.host.assembler.1006157965">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1804243672" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="com.nvidia.cuda.ide.build.project.ICudaProjectConfiguration">
+				<executable devicelink="false">
+					<sass major="5" minor="0"/>
+					<ptx major="5" minor="0"/>
+				</executable>
+				<editor-arch major="5" minor="0"/>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="app_Gemini.com.nvidia.cuda.ide.eight_zero.exe.1743291323" name="Executable" projectType="com.nvidia.cuda.ide.eight_zero.exe"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159;com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159.;nvcc.compiler.base.995815926;nvcc.compiler.input.cpp.1297626989">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.nvidia.cuda.ide.build.NVCCPerProjectProfile"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159;com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159.;nvcc.compiler.base.995815926;nvcc.compiler.input.cu.1869853804">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.nvidia.cuda.ide.build.NVCCPerProjectProfile"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159;com.nvidia.cuda.ide.eight_zero.configuration.debug.48229159.;nvcc.compiler.base.995815926;nvcc.compiler.input.c.1491021762">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.nvidia.cuda.ide.build.NVCCPerProjectProfile"/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope"/>
+</cproject>

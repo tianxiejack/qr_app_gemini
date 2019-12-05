@@ -25,7 +25,8 @@ C_UPPER_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-. \
-OSA_CAP/src \
-GLTool/src \
+src \
+src/OSA_CAP/src \
+src/GLTool/src \
+config \
 
