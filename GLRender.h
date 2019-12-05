@@ -168,10 +168,6 @@ private:
 	float base_x_scale,base_y_scale;
 	int scale_count;
 	int thechannel_max_count;
-	#if TRACK_MODE
-	int getTrkId(int displayMode,int nextMode);
-	void clearTrackParams();
-	#endif
  enum DISPLAYMODE {
 
 		SPLIT_VIEW_MODE = 0, //birdview + rotating view

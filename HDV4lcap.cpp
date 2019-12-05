@@ -22,9 +22,6 @@
 #if ARM_NEON_ENABLE
 #include"yuv2rgb.h"
 #endif
-#if TRACK_MODE
-#include "VideoProcessTrack.hpp"
-#endif
 #include <malloc.h>
 #include <omp.h>
 #include"Thread_Priority.h"
@@ -67,26 +64,24 @@ unsigned char * GRAY_data_main[CAM_COUNT];
 
 unsigned char * vga_data=NULL;
 CMvDectInterface   *pMvIF=NULL;
-#if MVDECT
- MvDetect mv_detect(pMvIF);
-#endif
+
 HDv4l_cam::HDv4l_cam(int devId,int width,int height):io(IO_METHOD_USERPTR),imgwidth(width),
 imgheight(height),buffers(NULL),memType(MEMORY_NORMAL),cur_CHANnum(0),mallocOnce(true),
 force_format(1),m_devFd(-1),n_buffers(0),bRun(false),Id(devId),BaseVCap()
 {
-		imgformat 	= V4L2_PIX_FMT_YUYV;//当成YUYV来采
-		sprintf(dev_name, "/dev/video%d",devId);
-			imgstride 	= imgwidth*2;
-			bufSize 	= imgwidth * imgheight * 2;
-			imgtype     = CV_8UC2;
-			memType = MEMORY_NORMAL;
-			bufferCount = 8;
-			if(Once_buffer)
-			{
-				init_buffer();
-				Once_buffer=false;
-			}
-			Src=NULL;
+	imgformat 	= V4L2_PIX_FMT_YUYV;//当成YUYV来采
+	sprintf(dev_name, "/dev/video%d",devId);
+	imgstride 	= imgwidth*2;
+	bufSize 		= imgwidth * imgheight * 2;
+	imgtype     	= CV_8UC2;
+	memType 	= MEMORY_NORMAL;
+	bufferCount 	= 8;
+	if(Once_buffer)
+	{
+		init_buffer();
+		Once_buffer=false;
+	}
+	Src=NULL;
 }
 
 void HDv4l_cam::ReStart()
@@ -488,6 +483,26 @@ void save_gray(char *filename,void *pic,int w,int h)
 	imwrite(filename,Pic);
 }
 
+void extractUYVY2Gray(Mat src, Mat dst)
+{
+	int ImgHeight, ImgWidth,ImgStride;
+
+	ImgWidth = src.cols;
+	ImgHeight = src.rows;
+	ImgStride = ImgWidth*2;
+	uint8_t  *  pDst8_t;
+	uint8_t *  pSrc8_t;
+
+	pSrc8_t = (uint8_t*)(src.data);
+	pDst8_t = (uint8_t*)(dst.data);
+//#pragma UNROLL 4
+//#pragma omp parallel for
+	for(int y = 0; y < ImgHeight*ImgWidth; y++)
+	{
+		pDst8_t[y] = pSrc8_t[y*2];
+	}
+}
+
 int HDv4l_cam::read_frame(int now_pic_format)
 {
 	int t[10]={0};
@@ -529,29 +544,36 @@ int HDv4l_cam::read_frame(int now_pic_format)
 					unsigned char **transformed_src_sub=NULL;
 					switch(now_pic_format)
 					{
-					case 0:
-						chid[MAIN]=0;
-				//		chid[SUB]=SUB_FPGA_FOUR;
-						nowpicW=FPGA_SCREEN_WIDTH;
-						nowpicH=FPGA_SCREEN_HEIGHT;
-						transformed_src_main=&sigle_yuyv[0];
-			//			transformed_src_sub=&FPGA4_bgr_data_sub;
-						break;
-					case 1:
-						chid[MAIN]=1;
-						nowpicW=FPGA_SCREEN_WIDTH;
-						nowpicH=FPGA_SCREEN_HEIGHT;
-						transformed_src_main=&sigle_yuyv[1];
-						break;
-					case 2:
-						chid[MAIN]=2;
-						nowpicW=FPGA_SCREEN_WIDTH;
-						nowpicH=FPGA_SCREEN_HEIGHT;
-						transformed_src_main=&sigle_yuyv[2];
-						break;
-					default:
-						break;
+						case 0:
+							chid[MAIN]=0;
+							nowpicW=FPGA_SCREEN_WIDTH;
+							nowpicH=FPGA_SCREEN_HEIGHT;
+							transformed_src_main=&sigle_yuyv[0];
+							break;
+						case 1:
+							chid[MAIN]=1;
+							nowpicW=FPGA_SCREEN_WIDTH;
+							nowpicH=FPGA_SCREEN_HEIGHT;
+							transformed_src_main=&sigle_yuyv[1];
+							break;
+						case 2:
+							chid[MAIN]=2;
+							nowpicW=FPGA_SCREEN_WIDTH;
+							nowpicH=FPGA_SCREEN_HEIGHT;
+							transformed_src_main=&sigle_yuyv[2];
+							break;
+						default:
+							break;
 					}
+
+				/*
+					Mat cappic = Mat(1080,1920,CV_8UC2,(unsigned char *)buffers[buf.index].start);
+					Mat testgray = Mat(1080,1920,CV_8UC1);
+					extractUYVY2Gray(cappic,testgray);
+					imshow("11111",testgray);
+					waitKey(10);
+				*/
+
 
 					HD_YUYV2UYV(*transformed_src_main,(unsigned char *)buffers[buf.index].start,nowpicW,nowpicH);
 						Src=*transformed_src_main;

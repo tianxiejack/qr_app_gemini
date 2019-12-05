@@ -464,7 +464,7 @@ bool FBOManager::Init()
 void FBOManager::InToFrameBuffer()
 {
 	 glBindFramebuffer(GL_FRAMEBUFFER, fboId);
-	 glClearColor(0x87/255.0f, 0/255.0f, 0x87/255.0f, 1.0f);
+	 glClearColor(0x0/255.0f, 0/255.0f, 0x0/255.0f, 1.0f);
 	 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 void FBOManager::OutOfFrameBuffer()
@@ -510,51 +510,52 @@ void FBOManager::initscreenQuad(GLuint imageWidth, GLuint imageHeight)
 void FBOManager::DrawTex2Front(int mainOrsub,int w,int h)
 {
 	GLEnv &env=env1;
+
+	//glViewport(0, 0, w, h);
+	//glClear(GL_DEPTH_BUFFER_BIT);
+
+	env.GetviewFrustum()->SetPerspective(90.0f, float(w) / float(h), 1.0f, 4000.0f);
+	env.GetprojectionMatrix()->LoadMatrix(env.GetviewFrustum()->GetProjectionMatrix());
+
+	env.GetmodelViewMatrix()->PushMatrix();
+	env.GetmodelViewMatrix()->LoadIdentity();
+	
+	// move h since the shadow dimension is [-1,1], use h/2 if it is [0,1]
+	
+	//M3DMatrix44f camera ;
+	//render.getRender2FrontCameraFrame()->GetCameraMatrix(camera);
+	//render.getVGACameraFrame()->GetCameraMatrix(camera);
+	
+	
+	//env.GetmodelViewMatrix()->PushMatrix(*(	render.getRender2FrontCameraFrame()));
+	//env.GetmodelViewMatrix()->PopMatrix();
+
+	env.GetmodelViewMatrix()->Translate(0.0f, 0.0f, -h);//-h
+	env.GetmodelViewMatrix()->Scale(w, h, 1.0f);
+	//env.GetmodelViewMatrix()->Rotate(180.0f,0,0,1);////add render2front
+	//env.GetmodelViewMatrix()->Rotate(180.0f,0,1,0);//
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glViewport(0, 0, w, h);
-			glClear(GL_DEPTH_BUFFER_BIT);
-			env.GetviewFrustum()->SetPerspective(90.0f, float(w) / float(h), 1.0f, 4000.0f);
-			env.GetprojectionMatrix()->LoadMatrix(env.GetviewFrustum()->GetProjectionMatrix());
 
-			env.GetmodelViewMatrix()->PushMatrix();
-			env.GetmodelViewMatrix()->LoadIdentity();
-			// move h since the shadow dimension is [-1,1], use h/2 if it is [0,1]
-			M3DMatrix44f camera ;
-			render.getRender2FrontCameraFrame()->GetCameraMatrix(camera);
-	//		render.getVGACameraFrame()->GetCameraMatrix(camera);
-			env.GetmodelViewMatrix()->PushMatrix(*(	render.getRender2FrontCameraFrame()));
-			env.GetmodelViewMatrix()->PopMatrix();
-			env.GetmodelViewMatrix()->Translate(0.0f, 0.0f, -h);//-h
-			env.GetmodelViewMatrix()->Scale(w, h, 1.0f);
-			env.GetmodelViewMatrix()->Rotate(180.0f,0,0,1);////add render2front
-			env.GetmodelViewMatrix()->Rotate(180.0f,0,1,0);//
-
-			    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-				glViewport(0, 0, w, h);
-
-				env.GetmodelViewMatrix()->PushMatrix();
-				env.GetmodelViewMatrix()->Rotate(180.0f, 0.0f, 0.0f, 1.0f);
-				env.GetmodelViewMatrix()->Rotate(180.0f,0.0f, 1.0f, 0.0f);
-				glActiveTexture(GL_TEXTURE31);
-				glBindTexture(GL_TEXTURE_2D, textureId);
-				 render.getShaderManager()->UseStockShader(GLT_SHADER_ORI,env.GettransformPipeline()->GetModelViewProjectionMatrix(),31);
-				 env.Getp_shadowBatch()->Draw();
-				glBindTexture(GL_TEXTURE_2D, 0);
-				env.GetmodelViewMatrix()->PopMatrix();
-			env.GetmodelViewMatrix()->PopMatrix();
+	//env.GetmodelViewMatrix()->PushMatrix();
+	//env.GetmodelViewMatrix()->Rotate(180.0f, 0.0f, 0.0f, 1.0f);
+	//env.GetmodelViewMatrix()->Rotate(180.0f,0.0f, 1.0f, 0.0f);
+	glActiveTexture(GL_TEXTURE31);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	render.getShaderManager()->UseStockShader(GLT_SHADER_ORI,env.GettransformPipeline()->GetModelViewProjectionMatrix(),31);
+	env.Getp_shadowBatch()->Draw();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//env.GetmodelViewMatrix()->PopMatrix();
+	env.GetmodelViewMatrix()->PopMatrix();
+	return ;
 }
 
 void FBOManager::PboDraw(InterfacepboDrawCB& icb,bool &Isenhdata,bool &IsTouchenhdata)
 {
-//	int t[10]={0};
-//	static timeval startT[20]={0};
 	InToFrameBuffer();
-//	gettimeofday(&startT[4],0);
 	DrawFrame(Isenhdata,IsTouchenhdata);
-//	gettimeofday(&startT[5],0);
-	//	t[2]=(startT[5].tv_sec-startT[4].tv_sec)*1000000+(startT[5].tv_usec-startT[4].tv_usec);
-	//	printf("deltatimet[5]-t[4] =%d us\n",t[2]);
-//	icb.callbackPBODraw();
-    OutOfFrameBuffer();
+	OutOfFrameBuffer();
 }
 
 

@@ -241,22 +241,9 @@ void STLASCIILoader::PrintExtents()
 
 
 
-void STLASCIILoader::cpyl1l2(){
-//	vector<cv::Point3f>::iterator iter;
+void STLASCIILoader::cpyl1l2()
+{
 	list2.clear();
 	list2.assign(list.begin(),list.end());
-//	int a=0,b=0;
-//	for(iter=list.begin();iter!=list.end();iter++)
-	{
-//		a++;
-		//cout<<*iter<<endl;
-	}
-//	for(iter=list2.begin();iter!=list2.end();iter++)
-	{
-	//	b++;
-	//	cout<<*iter<<endl;
-	}
-//	printf("numa=%d\n,b=%d\n",a,b);
-//	sleep(5);
 };
 

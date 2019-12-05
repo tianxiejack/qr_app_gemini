@@ -25,9 +25,7 @@
 #include "thread.h"
 #include <osa_buf.h>
 #include "buffer.h"
-#if TRACK_MODE
-#include "VideoProcessTrack.hpp"
-#endif
+
 #ifdef CAPTURE_SCREEN
 #include "cabinCapture.h"
 #endif
@@ -156,11 +154,7 @@ int v4l2_camera::alloc_split_buffer()
 }
 
 void v4l2_camera::parse_line_header2(int channels, unsigned char *p)
-{
-	#if TRACK_MODE
-	   static int frame_count =0;
-	#endif
-	
+{	
 	int line, lines;
 	int max_line_per_ch = IMAGE_HEIGHT/2 + 1;
 	lines = channels * max_line_per_ch;//total num;
@@ -192,26 +186,7 @@ void v4l2_camera::parse_line_header2(int channels, unsigned char *p)
 			unsigned char * lastBuf;
 			DeinterlaceYUV_Neon(split_buffer_ch[chId], IMAGE_WIDTH/2, IMAGE_HEIGHT, IMAGE_WIDTH/2);
 			lastBuf = split_buffer_ch[chId];
-			#if TRACK_MODE
-			if((Id*4+chId)==12)
-			{
-				if(frame_count++>=100)
-				{
-					CVideoProcess* trackMode=CVideoProcess::getInstance();
-					Mat frame(576,720,CV_8UC2,lastBuf);
-					trackMode->process_frame(pal_Track,frame);
-				}
-			}
-			if((Id*4+chId)==13)
-			{
-				if(frame_count++>=100)
-				{
-					CVideoProcess* trackMode=CVideoProcess::getInstance();
-					Mat frame(576,720,CV_8UC2,lastBuf);
-					trackMode->process_frame(pal2_Track,frame);
-				}
-			}
-			#endif
+
 			if(Data2Queue(split_buffer_ch[chId],DEFAULT_IMAGE_WIDTH,DEFAULT_IMAGE_HEIGHT,chId)){
 				if(getEmpty(&split_buffer_ch[chId], chId)){
 				    memcpy(split_buffer_ch[chId], lastBuf, 2*DEFAULT_IMAGE_WIDTH*DEFAULT_IMAGE_HEIGHT);// ready for next field

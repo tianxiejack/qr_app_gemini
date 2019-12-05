@@ -28,20 +28,6 @@ void Render::InitBowlDS()
 				int net_open_mvdetect=getKey_TargetDetectionState(TRANSFER_TO_APP_DRIVER);
 				if(net_open_mvdetect==1)	//todo useless
 				{
-#if MVDECT
-					if(!mv_detect.isNotStopped())
-					{
-						tIdle.threadRun(MVDECT_CN);
-						tIdle.threadRun(MVDECT_ADD_CN);
-						mv_detect.mvOpen();
-						mv_detect.ClearAllVector(true);
-					}
-					else
-					{
-						mv_detect.mvClose();
-						mv_detect.ClearAllVector(false);
-					}
-#endif
 				}
 			}
 

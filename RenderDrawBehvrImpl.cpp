@@ -9,18 +9,16 @@ float Rh=0;
 float Lh=0;
 void Render::FBOdraw(bool &Isenhdata,bool &IsTouchenhdata)
 {
-	#if 1
 	GLEnv &env=env1;
 	bool needSendData=true;
 	switch(fboMode)
 	{
-	case  FBO_ALL_VIEW_MODE:
-//		RenderRightPanoView(Isenhdata,env,0,1080.0*664.0/1080.0,1920, 1080.0*216.0/1080.0,MAIN,0,0,0,0,true);
-		RenderLeftPanoView(Isenhdata,env,0,1080.0*540.0/1080.0,1920, 1080.0*540.0/1080.0,MAIN,false);
-		break;
-	default:
-		break;
+		case  FBO_ALL_VIEW_MODE:
+			//RenderLeftPanoView(Isenhdata,env,0,1080.0*540.0/1080.0,1920, 1080.0*540.0/1080.0,MAIN,false);
+			RenderLeftPanoView(Isenhdata,env,0,0,1920, 1080,MAIN,false);
+			break;
+		default:
+			break;
 	}
-#endif
 }
 

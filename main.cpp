@@ -9,12 +9,6 @@
 #include "Cap_Spi_Message.h"
 #endif
 
-
-
-#if TRACK_MODE
-#include "VideoProcessTrack.hpp"
-#endif
-
 #if MVDETECTOR_MODE
 #include "mvDetector.hpp"
 #endif
@@ -33,27 +27,8 @@ AlarmTarget mainAlarmTarget;
 GLEnv env1;
 GLEnv env2;
 
-#if MVDECT
-extern MvDetect mv_detect;
-#endif
-float track_pos[4];
 
-#if TRACK_MODE
-void TrkSuccess(UTC_RECT_float m_rctrack)
-{
-	track_pos[0]=m_rctrack.x;
-	track_pos[1]=m_rctrack.y;
-	track_pos[2]=m_rctrack.width;
-	track_pos[3]=m_rctrack.height;
-}
-void Trkfailed()
-{
-	track_pos[0]=0;
-	track_pos[1]=0;
-	track_pos[2]=0;
-	track_pos[3]=0;
-}
-#endif
+float track_pos[4];
 
 #if MVDETECTOR_MODE
 void mvDetectorDraw(std::vector<TRK_RECT_INFO> &resTarget,int chId)
@@ -74,9 +49,7 @@ int main(int argc, char** argv)
 	SpiSet();
 	//InitIPCModule();
 #endif
-#if MVDECT
-	mv_detect.init();
-#endif
+
 	Parayml param;
 	if(!param.readParams("./Param.yml"))
 		printf("read param error\n");
@@ -121,11 +94,6 @@ int main(int argc, char** argv)
 	init_GPIO_IPCMessage();
 #endif
 	start_stitch();
-	#if TRACK_MODE
-	CVideoProcess* trackTsk=CVideoProcess::getInstance();
-	trackTsk->registerCB(TrkSuccess,Trkfailed);
-	trackTsk->creat();
-	#endif 
 
 	 #if MVDETECTOR_MODE
         mvDetector* mvDetector=mvDetector::getInstance();

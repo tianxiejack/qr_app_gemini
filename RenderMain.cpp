@@ -42,7 +42,7 @@ void RenderMain::DrawGLScene()
 
 	if(ONCE_FULLSCREEN){
 		ONCE_FULLSCREEN = false;
-		render.ProcessOitKeys(env,'F', 0, 0);
+		//render.ProcessOitKeys(env,'F', 0, 0);
 	}
 		render.DrawGLScene();
 	DrawIdle();
@@ -118,10 +118,6 @@ void RenderMain::initGlut(int argc, char **argv,int startx,int starty)
 	glutSetCursor(GLUT_CURSOR_NONE);
 
 	/* Register the event callback functions since we are using GLUT */
-
-
-
-
 	glutDisplayFunc(DrawGLScene); /* Register the function to do all our OpenGL drawing. */
 	//glutIdleFunc(DrawIdle); /* Even if there are no events, redraw our gl scene. */
 	glutReshapeFunc(ReSizeGLScene); /* Register the function called when our window is resized. */
@@ -183,12 +179,12 @@ void RenderMain::parseArgs(int argc, char** argv)
 //--------main entry------------------
 int RenderMain::start(int argc, char** argv)
 {
-		parseArgs(argc, argv);
+	parseArgs(argc, argv);
 
-		initGlut(argc, argv);
-		initGlew();
-		render.initPixle();
-		//glutFullScreen();
+	initGlut(argc, argv);
+	initGlew();
+	render.initPixle();
+	//glutFullScreen();
 		
 #if DOUBLE_SCREEN
 	doubleScreenInit(argc, argv);

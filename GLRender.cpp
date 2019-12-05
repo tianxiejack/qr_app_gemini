@@ -31,9 +31,6 @@
 #include"overLapRegion.h"
 #include "thread.h"
 #endif
-#if TRACK_MODE
-#include "VideoProcessTrack.hpp"
-#endif
 
 #if MVDETECTOR_MODE
 #include "mvDetector.hpp"
@@ -69,7 +66,7 @@
 float turret_Moveline_Y = 0.0f;
 float surround_Moveline_Y = 0.0f;
 #endif
-float mx = 0.0f,my = 0.0f,mw = 0.0f,mh = 0.0f;
+float mx = 0.0f,my = 0.0f,mw = 0.0f,mh = 0.0f , mz =0.0f , mo = 0.0f;
 bool IstoShowDeviceState[2] = { false, false };
 #define  SHOWTIME 200
 extern int MV_CHOSE_IDX;
@@ -83,9 +80,6 @@ extern float Rh;
 extern float Lh;
 extern thread_idle tIdle;
 extern unsigned char * target_data[CAM_COUNT];
-#if MVDECT
-extern MvDetect mv_detect;
-#endif
 int BMODE_1 = 1;
 int BMODE_6 = 6;
 int BMODE_8 = 8;
@@ -99,9 +93,6 @@ static bool IsRegionalViewMiror(int camIdx) {
 	else
 		return false;
 }
-#if MVDECT
-//extern MvDetect mv_detect;
-#endif
 int m_cam_pos = -1;
 
 extern GLEnv env1;
@@ -216,9 +207,6 @@ float menu_tpic[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
 extern bool isEnhanceOn;
 
-#if TRACK_MODE
-CVideoProcess* trackMode=CVideoProcess::getInstance();
-#endif
 #if MVDETECTOR_MODE
 mvDetector* pSingleMvDetector=mvDetector::getInstance();
 #endif
@@ -620,9 +608,6 @@ void Render::SendtoTrack() {
 			y=foresightPos.Getsendtotrack()[SEND_TRACK_START_Y];
 			width=foresightPos.Getsendtotrack()[SEND_TRACK_FRAME_X];
 			height=foresightPos.Getsendtotrack()[SEND_TRACK_FRAME_Y];
-#if TRACK_MODE
-			trackMode->enableTrackAcq( x, y,width,height,VGA_TRACK);
-#endif
 		}
 		else if(displayMode==SDI1_WHITE_BIG_VIEW_MODE
 				||displayMode==SDI1_WHITE_SMALL_VIEW_MODE
@@ -639,10 +624,6 @@ void Render::SendtoTrack() {
 			y=foresightPos.Getsendtotrack()[SEND_TRACK_START_Y];
 			width=foresightPos.Getsendtotrack()[SEND_TRACK_FRAME_X];
 			height=foresightPos.Getsendtotrack()[SEND_TRACK_FRAME_Y];
-#if TRACK_MODE
-
-			trackMode->enableTrackAcq( x, y,width,height,SDI_TRACK);
-#endif
 		}
 		else if(displayMode==PAL1_WHITE_BIG_VIEW_MODE
 				||displayMode==PAL1_WHITE_SMALL_VIEW_MODE
@@ -659,19 +640,6 @@ void Render::SendtoTrack() {
 			y=foresightPos.Getsendtotrack()[SEND_TRACK_START_Y];
 			width=foresightPos.Getsendtotrack()[SEND_TRACK_FRAME_X];
 			height=foresightPos.Getsendtotrack()[SEND_TRACK_FRAME_Y];
-#if TRACK_MODE
-			if(displayMode==PAL1_WHITE_BIG_VIEW_MODE
-					||displayMode==PAL1_WHITE_SMALL_VIEW_MODE)
-			{
-				trackMode->enableTrackAcq( x, y,width,height,PAL_TRACK);
-			}
-			else if(displayMode==PAL2_HOT_BIG_VIEW_MODE
-					||displayMode==PAL2_HOT_SMALL_VIEW_MODE)
-			{
-				trackMode->enableTrackAcq( x, y,width,height,PAL2_TRACK);
-			}
-
-#endif
 		}
 		g_MSG[1].payload.ipc_settings.display_mode=100;
 	}
@@ -683,97 +651,6 @@ void Render::SendtoTrack() {
 
 }
 
-#if TRACK_MODE
-
-int Render::getTrkId(int displayMode,int nextMode)
-{
-
-	int trackId;  ///0:sdi,1:vga 2:pal
-	switch(displayMode)
-	{
-		case VGA_WHITE_VIEW_MODE:
-		case VGA_HOT_BIG_VIEW_MODE:
-		case VGA_HOT_SMALL_VIEW_MODE:
-		case VGA_FUSE_WOOD_LAND_VIEW_MODE:
-		case VGA_FUSE_GRASS_LAND_VIEW_MODE:
-		case VGA_FUSE_SNOW_FIELD_VIEW_MODE:
-		case VGA_FUSE_DESERT_VIEW_MODE:
-		case VGA_FUSE_CITY_VIEW_MODE:
-		trackId=1;
-		break;
-		case SDI1_WHITE_BIG_VIEW_MODE:
-		case SDI1_WHITE_SMALL_VIEW_MODE:
-		case SDI2_HOT_BIG_VIEW_MODE:
-		case SDI2_HOT_SMALL_VIEW_MODE:
-		trackId=0;
-		break;
-		case PAL1_WHITE_BIG_VIEW_MODE:
-		case PAL1_WHITE_SMALL_VIEW_MODE:
-		trackId=2;
-		break;
-		case PAL2_HOT_BIG_VIEW_MODE:
-		case PAL2_HOT_SMALL_VIEW_MODE:
-		trackId=3;
-		break;
-		default:
-		return -1;
-	}
-	if(trackId==1)
-	{
-		switch(nextMode)
-		{
-			case VGA_WHITE_VIEW_MODE:
-			case VGA_HOT_BIG_VIEW_MODE:
-			case VGA_HOT_SMALL_VIEW_MODE:
-			case VGA_FUSE_WOOD_LAND_VIEW_MODE:
-			case VGA_FUSE_GRASS_LAND_VIEW_MODE:
-			case VGA_FUSE_SNOW_FIELD_VIEW_MODE:
-			case VGA_FUSE_DESERT_VIEW_MODE:
-			case VGA_FUSE_CITY_VIEW_MODE:
-			return 1;
-			default:
-			return -1;
-		}
-	} else if(trackId==0) {
-		switch(nextMode)
-		{
-			case SDI1_WHITE_BIG_VIEW_MODE:
-			case SDI1_WHITE_SMALL_VIEW_MODE:
-			case SDI2_HOT_BIG_VIEW_MODE:
-			case SDI2_HOT_SMALL_VIEW_MODE:
-			return 0;
-			default :
-			return -1;
-		}
-	} else if(trackId==2) {
-		switch(nextMode)
-		{
-			case PAL1_WHITE_BIG_VIEW_MODE:
-			case PAL1_WHITE_SMALL_VIEW_MODE:
-			return 2;
-			default :
-			return -1;
-		}
-	} else {
-		switch(nextMode)
-		{
-			case PAL2_HOT_BIG_VIEW_MODE:
-			case PAL2_HOT_SMALL_VIEW_MODE:
-			return 3;
-			default :
-			return -1;
-		}
-	}
-}
-
-void Render::clearTrackParams()
-{
-	track_pos[0]=0;
-	track_pos[1]=0;
-	track_pos[2]=0;
-	track_pos[3]=0;
-}
-#endif
 
 void Render::InitSelectBlock() {
 	GLfloat point_x = 3.85f;
@@ -1261,41 +1138,9 @@ void Render::destroyPixList() {
 }
 
 static void captureVGACam(GLubyte *ptr, int index, GLEnv &env) {
-
-#if TRACK_MODE
-	Point p1,p2;
-	p1.x=track_pos[0];
-	p1.y=track_pos[1];
-	p2.x=p1.x+track_pos[2];
-	p2.y=p1.y+track_pos[3];
-	if(track_pos[2]>0&&track_pos[3]>0)
-	{
-		if(isTracking)
-		{
-			Mat frame(768,1024,CV_8UC4,ptr);
-			cv::rectangle( frame,p1,p2,Scalar(0,0,0, 0),2);
-		}
-	}
-#endif
 }
 
 static void captureSDICam(GLubyte *ptr, int index, GLEnv &env) {
-
-#if TRACK_MODE
-	Point p1,p2;
-	p1.x=track_pos[0];
-	p1.y=track_pos[1];
-	p2.x=p1.x+track_pos[2];
-	p2.y=p1.y+track_pos[3];
-	if(track_pos[2]>0&&track_pos[3]>0)
-	{
-		if(isTracking)
-		{
-			Mat frame(1080,1920,CV_8UC4,ptr);
-			cv::rectangle( frame,p1,p2,Scalar(0,0,0, 0),2);
-		}
-	}
-#endif
 }
 
  bool capturePanoCam(GLubyte *ptr, int index, GLEnv &env) {
@@ -1373,20 +1218,23 @@ static void captureRuler180Cam(GLubyte *ptr, int index, GLEnv &env) {
 #endif
 }
 #endif
+
 /* Sets up Projection matrix according to command switch -o or -p */
+
 /* called from initgl and the window resize function */
-void Render::SetView(int Width, int Height) {
+void Render::SetView(int Width, int Height) 
+{
 	float aspect = (float) Width / (float) Height;
 	float Z_Depth = BowlLoader.GetZ_Depth();
 	float Big_Extent = BowlLoader.GetBig_Extent();
-	float extent_neg_x = BowlLoader.Getextent_neg_x(), extent_neg_y =
-			BowlLoader.Getextent_neg_y();
-	float extent_pos_x = BowlLoader.Getextent_pos_x(), extent_pos_y =
-			BowlLoader.Getextent_pos_y();
+	float extent_neg_x = BowlLoader.Getextent_neg_x(), extent_neg_y = BowlLoader.Getextent_neg_y();
+	float extent_pos_x = BowlLoader.Getextent_pos_x(), extent_pos_y = BowlLoader.Getextent_pos_y();
 	g_windowWidth = Width;
 	g_windowHeight = Height;
+	
 //	cout<<"Bowl neg_x, y, z = "<<extent_neg_x<<", "<<extent_neg_y<<", "<<BowlLoader.Getextent_neg_z()<<endl;
 //	cout<<"Bolw pos_x, y, z = "<<extent_pos_x<<", "<<extent_pos_y<<", "<<BowlLoader.Getextent_pos_z()<<endl;
+
 	if (common.isVerbose())
 		printf("Window Aspect is: %f\n", aspect);
 
@@ -1401,7 +1249,6 @@ void Render::SetView(int Width, int Height) {
 		glOrtho((extent_neg_x * 1.2f), (extent_pos_x * 1.2f),
 				(extent_neg_y * aspect), (extent_pos_y * aspect), -1.0f, 10.0f);
 	}
-
 }
 
 /* Frame rate counter.  Based off of the Oreilly OGL demo !  */
@@ -1430,23 +1277,15 @@ void Render::GetFPS() {
 void Render::SetupRC(int windowWidth, int windowHeight) {
 	IPC_Init_All();
 	readmenu_tpic();
-#if 1
+
 	ChangeMainChosenCamidx(2);
 	ChangeSubChosenCamidx(2);
-#endif
+
 	GLEnv & env = env1;
 	GLubyte *pBytes;
-#if 1
-	GLint nWidth = DEFAULT_IMAGE_WIDTH, nHeight = DEFAULT_IMAGE_HEIGHT,
-			nComponents = GL_RGB8;
-	GLenum format = GL_BGR;
-#else
-	GLint nWidth=DEFAULT_IMAGE_WIDTH, nHeight=DEFAULT_IMAGE_HEIGHT, nComponents=GL_RGBA8;
-	GLenum format= GL_BGRA;
-#endif
 
-#if MVDECT
-#endif
+	GLint nWidth = DEFAULT_IMAGE_WIDTH, nHeight = DEFAULT_IMAGE_HEIGHT,nComponents = GL_RGB8;
+	GLenum format = GL_BGR;
 
 	if (!shaderManager.InitializeStockShaders()) {
 		cout << "failed to intialize shaders" << endl;
@@ -1465,7 +1304,7 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		exit(-1);
 	}
 	// midNight blue background
-#if 1
+
 	glClearColor(0.0f, 0 / 255.0f, 0.0f, 1.0f); //25/255.0f, 25/255.0f, 112/255.0f, 0.0f);
 	glLineWidth(1.5f);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1478,7 +1317,7 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	SetView(windowWidth, windowHeight);
-#endif
+
 	{     //setting up models and their textures
 
 		ReadPanoFloatDataFromFile(PANO_FLOAT_DATA_FILENAME);
@@ -1488,7 +1327,6 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 				*(env.GetprojectionMatrix()));
 		InitLineofRuler(env);
 
-#if 1
 		GenerateCenterView();
 		GenerateCompassView();
 		GenerateScanPanelView();
@@ -1502,16 +1340,17 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		GenerateLeftPanoView();
 		GenerateRightPanoView();
 		GenerateTouchCrossView();
-#endif
+
 		GenerateLeftSmallPanoView();
 		GenerateRightSmallPanoView();
-#if 1
 		float x;
 		x = (p_LineofRuler->Load()) / 360.0
 				* (render.get_PanelLoader().Getextent_pos_x()
 						- render.get_PanelLoader().Getextent_neg_x());
 		RulerAngle = p_LineofRuler->Load();
-		for (int i = 0; i < 2; i++) {
+		
+		for (int i = 0; i < 2; i++) 
+		{
 			GenerateOnetimeView(i);
 			GenerateOnetimeView2(i);
 
@@ -1521,8 +1360,8 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 			GenerateTwotimesTelView(i);
 			GenerateFourtimesTelView(i);
 		}
+		
 		GenerateCheckView();
-
 		GenerateBirdView();
 		GenerateFrontView();
 		GenerateRearTopView();
@@ -1533,15 +1372,13 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		GenerateVGAView();
 		GenerateRender2FrontView();
 		GenerateTargetFrameView();
-#endif
 
-		PanoLen =
-				(PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x());
-		PanoHeight = (PanelLoader.Getextent_pos_z()
-				- PanelLoader.Getextent_neg_z());
-		for (int i = 0; i < MS_COUNT; i++) {
+		PanoLen = (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x());
+		PanoHeight = (PanelLoader.Getextent_pos_z() - PanelLoader.Getextent_neg_z());
+		
+		for (int i = 0; i < MS_COUNT; i++) 
+		{
 			foresightPos[i].SetPanoLen_Height(PanoLen, PanoHeight);
-
 			panocamonforesight[i].setPanoheight(PanoHeight);
 			panocamonforesight[i].setPanolen(PanoLen);
 			telcamonforesight[i].setPanoheight(PanoHeight);
@@ -1554,13 +1391,10 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 
 		InitPanoScaleArrayData();
 		InitPanel(env);
-#if MVDECT
-		mv_detect.ReSetLineY();
-#endif
+
 		InitFollowCross();
 		InitRuler(env);
 		InitCalibrate();
-
 
 		InitShadow(env);
 		InitBillBoard(env);
@@ -1602,7 +1436,6 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 		glGenTextures(7, textures);
 
 
-#if 1
 		for (int i = 0; i < 3; i++) {
 			glBindTexture(GL_TEXTURE_2D, textures[i]);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -1615,23 +1448,6 @@ void Render::SetupRC(int windowWidth, int windowHeight) {
 					PANO_TEXTURE_HEIGHT, 0, format, GL_UNSIGNED_BYTE, 0);
 		}
 
-#else
-		for (int i = 0; i < CAM_COUNT; i++) {
-			glBindTexture(GL_TEXTURE_2D, textures[i]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-			if (i == 1) {
-				glTexImage2D(GL_TEXTURE_2D, 0, nComponents, 1280, 1080, 0,
-						format, GL_UNSIGNED_BYTE, 0);
-			} else
-				glTexImage2D(GL_TEXTURE_2D, 0, nComponents, PANO_TEXTURE_WIDTH,
-				PANO_TEXTURE_HEIGHT, 0, format, GL_UNSIGNED_BYTE, 0);
-		}
-#endif
 		//nComponents=GL_RGBA8;
 		// format= GL_RGBA;
 		// Alpha mask: 1/16 size of 1920x1080
@@ -2392,7 +2208,7 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 
 	int notdraw = 2;
 	for (int x = 0; x < poly_count; x++)  //loop through all vertex in triangles
-			{
+	{
 
 		if (x >= (poly_count / 80 * (19 - notdraw))
 				&& (x < poly_count / 80 * (62 + notdraw))) {		//	38400
@@ -2439,10 +2255,10 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 										+ scale_ver[(new_dir) % CAM_COUNT];
 								Point2[k].y = Point2[k].y
 										+ PanoFloatData[(new_dir) % CAM_COUNT];
-								Point1[k].x = Point1[k].x / 1920.0*1280.0;
-								Point1[k].y = Point1[k].y / 1080.0*720.0;
-								Point2[k].x = Point2[k].x / 1920.0*1280.0;
-								Point2[k].y = Point2[k].y /1080.0*720.0;
+								Point1[k].x = Point1[k].x / 1920.0*1920.0;
+								Point1[k].y = Point1[k].y / 1080.0*1080.0;
+								Point2[k].x = Point2[k].x / 1920.0*1920.0;
+								Point2[k].y = Point2[k].y /1080.0*1080.0;
 
 								Point1[k] = RotatePoint(Point1[k], rotate_center[over_lap_direction],
 										rotate_angle[over_lap_direction], max_panel_length,
@@ -2496,10 +2312,10 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 							+ scale_ver[(new_dir) % CAM_COUNT];
 					Point2[k].y = Point2[k].y
 							+ PanoFloatData[(new_dir) % CAM_COUNT];
-					Point1[k].x = Point1[k].x / 1920.0*1280.0;
-					Point1[k].y = Point1[k].y / 1080.0*720.0;
-					Point2[k].x = Point2[k].x / 1920.0*1280.0;
-					Point2[k].y = Point2[k].y /1080.0*720.0;
+					Point1[k].x = Point1[k].x / 1920.0*1920.0;
+					Point1[k].y = Point1[k].y / 1080.0*1080.0;
+					Point2[k].x = Point2[k].x / 1920.0*1920.0;
+					Point2[k].y = Point2[k].y /1080.0*1080.0;
 
 					Point1[k] = RotatePoint(Point1[k], rotate_center[direction],
 							rotate_angle[direction], max_panel_length,
@@ -2511,18 +2327,11 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 				}
 			}
 
-		} else if (!pixleList[direction].empty()) {
+		} else if (!pixleList[direction].empty())/* enter */ {
 			App = true;
 			pBatch = m_env.GetPanel_Petal(direction % CAM_COUNT);
 			getPointsValue(direction, x, Point); //todo Getfloor_Line
-#if MVDECT
-					static bool SetLineOnce[CAM_COUNT] = {true, true, true, true, true,
-						true, true, true};
-					if (SetLineOnce[direction]) {
-						mv_detect.SetLineY(direction, Point[0].y);
-						SetLineOnce[direction] = false;
-					}
-#endif
+
 			{
 				direction = ExchangeChannel(direction);
 				for (int k = 0; k < 3; k++) {
@@ -2533,8 +2342,8 @@ void Render::InitPanel(GLEnv &m_env, int idx, bool reset) {
 							* move_ver_scale[direction] + scale_ver[direction];
 					Point[k].y = Point[k].y + PanoFloatData[direction];
 
-					Point[k].x = Point[k].x /1920* 1280;
-					Point[k].y = Point[k].y /1080* 720;
+					Point[k].x = Point[k].x /1920* 1920;
+					Point[k].y = Point[k].y /1080* 1080;
 
 					Point[k] = RotatePoint(Point[k], rotate_center[direction],
 							rotate_angle[direction], max_panel_length,
@@ -2707,15 +2516,17 @@ void Render::DrawTrackRear(GLEnv &m_env) {
 	WheelTrackBatchRear.Draw();
 	m_env.GetmodelViewMatrix()->PopMatrix();
 }
-void Render::DrawShadow(GLEnv &m_env) {
+
+
+void Render::DrawShadow(GLEnv &m_env) 
+{
 	m_env.GetmodelViewMatrix()->PushMatrix();
 	glDisable(GL_BLEND);
 	const GLfloat* pVehicleDimension = pVehicle->GetDimensions();
 	m_env.GetmodelViewMatrix()->Scale(
 	DEFAULT_SHADOW_TO_VEHICLE_RATE_WIDTH * pVehicleDimension[2] / 2,
 	DEFAULT_SHADOW_TO_VEHICLE_RATE_LENGTH * pVehicleDimension[1] / 2, 1.0f); //since the plate is [-1,1], divide the factors by 2. And make it a rect
-	m_env.GetmodelViewMatrix()->Translate(0.0f,
-	DEFAULT_SHADOW_TRANSLATE_LENGTH_METER, 0.01f);
+	m_env.GetmodelViewMatrix()->Translate(0.0f,DEFAULT_SHADOW_TRANSLATE_LENGTH_METER, 0.01f);
 	shaderManager.UseStockShader(GLT_SHADER_FLAT,
 			m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),
 			vBlack);
@@ -2723,6 +2534,8 @@ void Render::DrawShadow(GLEnv &m_env) {
 	glEnable(GL_BLEND);
 	m_env.GetmodelViewMatrix()->PopMatrix();
 }
+
+
 // draw the individual video on shadow rect
 void Render::DrawIndividualVideo(GLEnv &m_env, bool needSendData) {
 	int idx = p_BillBoard->m_Direction;
@@ -3084,10 +2897,9 @@ GLT_STOCK_SHADER Render::GetShaderIDByState(bool ispano)
 }
 
 void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_petalNum,
-		int mainOrsub) {
-#ifdef GET_ALARM_AERA
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pVehicle->msFBO);
-#endif
+		int mainOrsub) 
+{
+
 	glDisable(GL_BLEND);
 	m_env.GetmodelViewMatrix()->PushMatrix();
 
@@ -3106,7 +2918,7 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 		for (int i = 0; i < CAM_COUNT; i++) {
 
 
-				shaderManager.UseStockShader(GetShaderIDByState(), m_env.GettransformPipeline()->GetModelViewProjectionMatrix(), 0,i);
+			shaderManager.UseStockShader(GetShaderIDByState(), m_env.GettransformPipeline()->GetModelViewProjectionMatrix(), 0,i);
 
 			(*m_env.GetPanel_Petal(i)).Draw();
 
@@ -3114,67 +2926,62 @@ void Render::DrawPanel(bool &Isenhdata,GLEnv &m_env, bool needSendData, int *p_p
 			            m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),0,
 			           0,ALPHA_TEXTURE_IDX,i);
 
-		m_env.Getp_Panel_Petal_OverLap(i)->Draw();
+			m_env.Getp_Panel_Petal_OverLap(i)->Draw();
 
-	}
-} else {
-	glActiveTexture(GL_TextureIDs[3]);
-	glBindTexture(GL_TEXTURE_2D, textures[3]);
-	for(int j =0;j<3;j++){
-			glActiveTexture(GL_TextureIDs[j]);
-			glBindTexture(GL_TEXTURE_2D, textures[j]);
-			p_EnhStateMachineGroup->SendData(j,needSendData);
-	}
-
-	for (int i = 1; i < 4; i++) {
-		if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
-		{
-			if(GainisNew[i])
-			{
-					glActiveTexture(GL_TextureIDs[ALPHA_TEXTURE_IDX+i]);
-					glBindTexture(GL_TEXTURE_2D, textures[i+3]);
-					glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,GAIN_TEX_WIDTH, GAIN_TEX_HEIGHT, 0,
-							GL_RGBA, GL_UNSIGNED_BYTE, GainMask[i]);
-					GainisNew[i]=false;
-			}
-			else
-				glActiveTexture(GL_TextureIDs[ALPHA_TEXTURE_IDX+i]);
-				glBindTexture(GL_TEXTURE_2D, textures[i+3]);
 		}
-		if (p_petalNum[i] != -1) {
-
-			if (overLapRegion::GetoverLapRegion()->get_change_gain() == false) {
-				USE_GAIN_ON_PETAL(p_petalNum[i]);
-		} else {
-			shaderManager.UseStockShader(GetShaderIDByState(), m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),i-1,i);
+	} else {
+		glActiveTexture(GL_TextureIDs[3]);
+		glBindTexture(GL_TEXTURE_2D, textures[3]);
+		for(int j =0;j<3;j++){
+				glActiveTexture(GL_TextureIDs[j]);
+				glBindTexture(GL_TEXTURE_2D, textures[j]);
+				p_EnhStateMachineGroup->SendData(j,needSendData);
 		}
 
-		(*m_env.GetPanel_Petal(p_petalNum[i])).Draw();
-			if(i!=3)
+		for (int i = 1; i < 4; i++) {
+			if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
 			{
-				if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
+				if(GainisNew[i])
 				{
-					USE_TWO_GAIN_TEXTURE_ON_PETAL_OVERLAP(p_petalNum[i]);
+						glActiveTexture(GL_TextureIDs[ALPHA_TEXTURE_IDX+i]);
+						glBindTexture(GL_TEXTURE_2D, textures[i+3]);
+						glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,GAIN_TEX_WIDTH, GAIN_TEX_HEIGHT, 0,
+								GL_RGBA, GL_UNSIGNED_BYTE, GainMask[i]);
+						GainisNew[i]=false;
 				}
 				else
-				{
-					shaderManager.UseStockShader(GetShaderIDByState(false),
-											m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),i-1,
-										   i,ALPHA_TEXTURE_IDX,i);
-				}
+					glActiveTexture(GL_TextureIDs[ALPHA_TEXTURE_IDX+i]);
+					glBindTexture(GL_TEXTURE_2D, textures[i+3]);
 			}
-		m_env.Getp_Panel_Petal_OverLap(p_petalNum[i])->Draw();
-	}
-}
+			if (p_petalNum[i] != -1) {
+
+				if (overLapRegion::GetoverLapRegion()->get_change_gain() == false) {
+					USE_GAIN_ON_PETAL(p_petalNum[i]);
+				} else {
+					shaderManager.UseStockShader(GetShaderIDByState(), m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),i-1,i);
+				}
+
+				(*m_env.GetPanel_Petal(p_petalNum[i])).Draw();
+				if(i!=3)
+				{
+					if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
+					{
+						USE_TWO_GAIN_TEXTURE_ON_PETAL_OVERLAP(p_petalNum[i]);
+					}
+					else
+					{
+						shaderManager.UseStockShader(GetShaderIDByState(false),
+												m_env.GettransformPipeline()->GetModelViewProjectionMatrix(),i-1,
+											   i,ALPHA_TEXTURE_IDX,i);
+					}
+				}
+				m_env.Getp_Panel_Petal_OverLap(p_petalNum[i])->Draw();
+			}
+		}
 }
 	//NoSigInf();
 m_env.GetmodelViewMatrix()->PopMatrix();
 
-#ifdef GET_ALARM_AERA
-glReadBuffer(GL_FRONT);
-glReadPixels(0,0,720,576,GL_BGRA_EXT,GL_UNSIGNED_BYTE,screen_data_1920X1080);
-
-#endif
 }
 
 void Render::initAlphaMask() {
@@ -4170,18 +3977,19 @@ m_env.Getp_CircleFanBatch()->End();
 #endif
 
 // Trick: put the indivial video on the shadow rect texture
-void Render::InitShadow(GLEnv &m_env) {
-GLuint texture = 0;
-m_env.Getp_shadowBatch()->Begin(GL_TRIANGLE_FAN, 4, 1);
-m_env.Getp_shadowBatch()->MultiTexCoord2f(texture, 0.0f, 0.0f);
-m_env.Getp_shadowBatch()->Vertex3f(-1.0f, -1.0f, 0.0f);
-m_env.Getp_shadowBatch()->MultiTexCoord2f(texture, 0.0f, 1.0f);
-m_env.Getp_shadowBatch()->Vertex3f(-1.0f, 1.0f, 0.0f);
-m_env.Getp_shadowBatch()->MultiTexCoord2f(texture, 1.0f, 1.0f);
-m_env.Getp_shadowBatch()->Vertex3f(1.0f, 1.0f, 0.0f);
-m_env.Getp_shadowBatch()->MultiTexCoord2f(texture, 1.0f, 0.0f);
-m_env.Getp_shadowBatch()->Vertex3f(1.0f, -1.0f, 0.0f);
-m_env.Getp_shadowBatch()->End();
+void Render::InitShadow(GLEnv &m_env) 
+{
+	GLuint texture = 0;
+	m_env.Getp_shadowBatch()->Begin(GL_TRIANGLE_FAN, 4, 1);
+	m_env.Getp_shadowBatch()->MultiTexCoord2f(texture, 0.0f, 0.0f);
+	m_env.Getp_shadowBatch()->Vertex3f(-1.0f, -1.0f, 0.0f);
+	m_env.Getp_shadowBatch()->MultiTexCoord2f(texture, 0.0f, 1.0f);
+	m_env.Getp_shadowBatch()->Vertex3f(-1.0f, 1.0f, 0.0f);
+	m_env.Getp_shadowBatch()->MultiTexCoord2f(texture, 1.0f, 1.0f);
+	m_env.Getp_shadowBatch()->Vertex3f(1.0f, 1.0f, 0.0f);
+	m_env.Getp_shadowBatch()->MultiTexCoord2f(texture, 1.0f, 0.0f);
+	m_env.Getp_shadowBatch()->Vertex3f(1.0f, -1.0f, 0.0f);
+	m_env.Getp_shadowBatch()->End();
 }
 
 // __   __ 8m
@@ -5992,30 +5800,7 @@ m_env.GetmodelViewMatrix()->PopMatrix();
 
 void Render::TargectTelView(GLEnv &m_env, GLint x, GLint y, GLint w, GLint h,
 int targetIdx, int camIdx, int enlarge, int mainOrsub) {
-#if MVDECT
-glViewport(x, y, w, h);
-glClear(GL_DEPTH_BUFFER_BIT);
-m_env.GetviewFrustum()->SetPerspective(90.0f, float(w) / float(h), 1.0f,
-	4000.0f);
 
-m_env.GetprojectionMatrix()->LoadMatrix(
-	m_env.GetviewFrustum()->GetProjectionMatrix());
-
-m_env.GetmodelViewMatrix()->PushMatrix();
-m_env.GetmodelViewMatrix()->LoadIdentity();
- // move h since the shadow dimension is [-1,1], use h/2 if it is [0,1]
-M3DMatrix44f camera;
-
-targetFrame[targetIdx].GetCameraMatrix(camera);
-m_env.GetmodelViewMatrix()->PushMatrix(targetFrame[targetIdx]);
-m_env.GetmodelViewMatrix()->PopMatrix();
-m_env.GetmodelViewMatrix()->Translate(0.0f, 0.0f, -h);//-h
-m_env.GetmodelViewMatrix()->Scale(w, h, 1.0f);
-DrawTargetVideo(m_env, targetIdx, camIdx, true);
-m_env.GetmodelViewMatrix()->PopMatrix();
-#else
-RenderSDIView(m_env, x, y, w, h, true);
-#endif
 }
 
 void Render::RenderFourtimesTelView(bool &Isenhdata,GLEnv &m_env, GLint x, GLint y, GLint w,
@@ -6175,112 +5960,122 @@ m_env.GetmodelViewMatrix()->PopMatrix();
 m_env.GetmodelViewMatrix()->PopMatrix();
 m_env.GetmodelViewMatrix()->PopMatrix();
 }
+
+
 void Render::RenderLeftPanoView(bool &Isenhdata,GLEnv &m_env, GLint x, GLint y, GLint w,
-GLint h, int mainOrsub, bool needSendData) {
-int petal1[CAM_COUNT];
-memset(petal1, -1, sizeof(petal1));
-int petal2[CAM_COUNT];
-memset(petal2, -1, sizeof(petal2));
-int petal3[CAM_COUNT];
-memset(petal1, -1, sizeof(petal3));
-int petal4[CAM_COUNT];
-memset(petal2, -1, sizeof(petal4));
-
-glViewport(x, y, w, h);
-m_env.GetviewFrustum()->SetPerspective(40.0f, float(w) / float(h), 1.0f,
-	100.0f);
-m_env.GetprojectionMatrix()->LoadMatrix(
-	m_env.GetviewFrustum()->GetProjectionMatrix());
-
- //pVehicle->PrepareBlendMode();
-m_env.GetmodelViewMatrix()->PushMatrix();
-
- //get center camera matrix apply to the modelviewmatrix
+GLint h, int mainOrsub, bool needSendData) 
 {
-M3DMatrix44f mCamera;
-repositioncamera();
-if ( fboMode == FBO_ALL_VIEW_MODE || displayMode == TRIM_MODE) {
-	LeftSmallPanoViewCameraFrame.GetCameraMatrix(mCamera);
-}
-m_env.GetmodelViewMatrix()->PushMatrix(mCamera);
-}
-if (displayMode == FRONT_BACK_PANO_ADD_MONITOR_VIEW_MODE
-	|| displayMode == FRONT_BACK_PANO_ADD_SMALLMONITOR_VIEW_MODE)
+	int petal1[CAM_COUNT];
+	memset(petal1, -1, sizeof(petal1));
+	int petal2[CAM_COUNT];
+	memset(petal2, -1, sizeof(petal2));
+	int petal3[CAM_COUNT];
+	memset(petal1, -1, sizeof(petal3));
+	int petal4[CAM_COUNT];
+	memset(petal2, -1, sizeof(petal4));
 
+	glViewport(x, y, w, h);
+	m_env.GetviewFrustum()->SetPerspective(40.0f, float(w) / float(h), 1.0f,100.0f);
+	m_env.GetprojectionMatrix()->LoadMatrix(m_env.GetviewFrustum()->GetProjectionMatrix());
+	
+	 //pVehicle->PrepareBlendMode();
+	m_env.GetmodelViewMatrix()->PushMatrix();
+
+	 //get center camera matrix apply to the modelviewmatrix
+	M3DMatrix44f mCamera;
+	repositioncamera();
+	
+	if ( fboMode == FBO_ALL_VIEW_MODE || displayMode == TRIM_MODE) 
 	{
-m_env.GetmodelViewMatrix()->Scale(2.50, 1.0, 3.3);
-m_env.GetmodelViewMatrix()->Translate(9.50, 0.0, 0.0);
-}
-
-else if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE) {
-m_env.GetmodelViewMatrix()->Scale(2.50, 1.0, 3.3);
-m_env.GetmodelViewMatrix()->Translate(9.50, 0.0, 0.0);
-} else if (displayMode == ALL_VIEW_MODE
-	|| SecondDisplayMode == SECOND_ALL_VIEW_MODE
-	|| SecondDisplayMode == SECOND_559_ALL_VIEW_MODE
-	|| fboMode == FBO_ALL_VIEW_MODE || fboMode == FBO_ALL_VIEW_SCAN_MODE
-	|| fboMode == FBO_ALL_VIEW_559_MODE || displayMode == TRIM_MODE) {
-//m_env.GetmodelViewMatrix()->Translate(0.0, 0.0, -1.2); //-17.6
-m_env.GetmodelViewMatrix()->Scale(6.0+mw, 1.0, 6.8+mh); //6.0 4.58
-m_env.GetmodelViewMatrix()->Translate(-12.8+mx, 14.8+my, -0.1); //-17.6
-}
-m_env.GetmodelViewMatrix()->Translate(0.0, 0.0, -2.0);
-
-if (RulerAngle < 180.0) {
-m_env.GetmodelViewMatrix()->Translate(
-		(PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x()), 0.0,
-		0.0);
-}
-if (displayMode == ALL_VIEW_MODE || SecondDisplayMode == SECOND_ALL_VIEW_MODE
-	|| SecondDisplayMode == SECOND_559_ALL_VIEW_MODE
-	|| fboMode == FBO_ALL_VIEW_MODE || fboMode == FBO_ALL_VIEW_SCAN_MODE
-	|| fboMode == FBO_ALL_VIEW_559_MODE || displayMode == TRIM_MODE) {
-for (int i = 1; i < 4; i++) {
-	petal2[i] = i;
-}
-petal1[0] = 0;
-
-m_env.GetmodelViewMatrix()->PushMatrix();
-DrawPanel(Isenhdata,m_env, true, petal2, mainOrsub);
-m_env.GetmodelViewMatrix()->PopMatrix();
-
-} else {
-petal3[0] = 0;
-DrawPanel(Isenhdata,m_env, true, petal3, mainOrsub);
-petal3[0] = 0;
-petal3[1] = 1;
-petal3[2] = 2;
-petal3[3] = 3;
-m_env.GetmodelViewMatrix()->PushMatrix();
-m_env.GetmodelViewMatrix()->Translate(-PanoLen, 0.0, 0.0);
-DrawPanel(Isenhdata,m_env, true, petal3, mainOrsub);
-m_env.GetmodelViewMatrix()->PopMatrix();
-}
-
-
-{
-m_env.GetmodelViewMatrix()->PopMatrix(); //pop camera matrix
-}
-m_env.GetmodelViewMatrix()->PopMatrix();
-
-Rect * temp_rect;
-char text[16];
-if ((EnablePanoFloat == true)) {
-if ((ALL_VIEW_MODE == displayMode)) {
-	if (PanoDirectionLeft == true) {
-		strcpy(text, "left");
-	} else {
-		strcpy(text, "right");
+		LeftSmallPanoViewCameraFrame.GetCameraMatrix(mCamera);
+		m_env.GetmodelViewMatrix()->PushMatrix(mCamera);
 	}
-	temp_rect = new Rect(w * 1 / 5, h * 1 / 5, w / 8, h / 8);
-	DrawAngleCordsView(m_env, temp_rect, text, 1);
-	strcpy(text, "");
-	sprintf(text, "ch:%.2d", testPanoNumber);
-	temp_rect = new Rect(w * 1 / 5, h * 2 / 5, w / 8, h / 8);
-	DrawAngleCordsView(m_env, temp_rect, text, 1);
+	
+	if (displayMode == FRONT_BACK_PANO_ADD_MONITOR_VIEW_MODE
+		|| displayMode == FRONT_BACK_PANO_ADD_SMALLMONITOR_VIEW_MODE)
+	{
+		m_env.GetmodelViewMatrix()->Scale(2.50, 1.0, 3.3);
+		m_env.GetmodelViewMatrix()->Translate(9.50, 0.0, 0.0);
+	}
+	else if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE) 
+	{
+		m_env.GetmodelViewMatrix()->Scale(2.50, 1.0, 3.3);
+		m_env.GetmodelViewMatrix()->Translate(9.50, 0.0, 0.0);
+	}
+	else if (displayMode == ALL_VIEW_MODE
+		|| SecondDisplayMode == SECOND_ALL_VIEW_MODE
+		|| SecondDisplayMode == SECOND_559_ALL_VIEW_MODE
+		|| fboMode == FBO_ALL_VIEW_MODE || fboMode == FBO_ALL_VIEW_SCAN_MODE
+		|| fboMode == FBO_ALL_VIEW_559_MODE || displayMode == TRIM_MODE) 
+	{
+		//m_env.GetmodelViewMatrix()->Scale(6.0+mw, 1.0+mo, 6.8+mh); //6.0 4.58
+		//m_env.GetmodelViewMatrix()->Translate(-12.8+mx, 14.8+my, -0.1+mz); //-17.6
+		m_env.GetmodelViewMatrix()->Scale(8.8+mw, 1.0+mo, 9.4+mh); //6.0 4.58
+		m_env.GetmodelViewMatrix()->Translate(-24.2+mx, 14.8+my, -0.71+mz); //-17.6
+	}
+	
+	m_env.GetmodelViewMatrix()->Translate(0.0, 0.0, -2.0);
+
+	if (RulerAngle < 180.0) 
+	{
+		m_env.GetmodelViewMatrix()->Translate(
+				(PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x()), 0.0,
+				0.0);
+	}
+	
+	if (displayMode == ALL_VIEW_MODE || SecondDisplayMode == SECOND_ALL_VIEW_MODE
+		|| SecondDisplayMode == SECOND_559_ALL_VIEW_MODE
+		|| fboMode == FBO_ALL_VIEW_MODE || fboMode == FBO_ALL_VIEW_SCAN_MODE
+		|| fboMode == FBO_ALL_VIEW_559_MODE || displayMode == TRIM_MODE) 
+	{
+		for (int i = 1; i < 4; i++) {
+			petal2[i] = i;
+		}
+		petal1[0] = 0;
+
+		m_env.GetmodelViewMatrix()->PushMatrix();
+		DrawPanel(Isenhdata,m_env, true, petal2, mainOrsub);
+		m_env.GetmodelViewMatrix()->PopMatrix();
+
+	} 
+	else 
+	{
+		petal3[0] = 0;
+		DrawPanel(Isenhdata,m_env, true, petal3, mainOrsub);
+		petal3[0] = 0;
+		petal3[1] = 1;
+		petal3[2] = 2;
+		petal3[3] = 3;
+		m_env.GetmodelViewMatrix()->PushMatrix();
+		m_env.GetmodelViewMatrix()->Translate(-PanoLen, 0.0, 0.0);
+		DrawPanel(Isenhdata,m_env, true, petal3, mainOrsub);
+		m_env.GetmodelViewMatrix()->PopMatrix();
+	}
+
+	m_env.GetmodelViewMatrix()->PopMatrix(); //pop camera matrix
+	m_env.GetmodelViewMatrix()->PopMatrix();
+
+	Rect * temp_rect;
+	char text[16];
+	if ((EnablePanoFloat == true)) 
+	{
+		if ((ALL_VIEW_MODE == displayMode)) 
+		{
+			if (PanoDirectionLeft == true) {
+				strcpy(text, "left");
+			} else {
+				strcpy(text, "right");
+			}
+			temp_rect = new Rect(w * 1 / 5, h * 1 / 5, w / 8, h / 8);
+			DrawAngleCordsView(m_env, temp_rect, text, 1);
+			strcpy(text, "");
+			sprintf(text, "ch:%.2d", testPanoNumber);
+			temp_rect = new Rect(w * 1 / 5, h * 2 / 5, w / 8, h / 8);
+			DrawAngleCordsView(m_env, temp_rect, text, 1);
+		}
+	}
 }
-}
-}
+
 
 void Render::RenderLeftForeSightView(GLEnv &m_env, GLint x, GLint y, GLint w,
 GLint h, int mainOrsub) {
@@ -6663,17 +6458,20 @@ DrawSDIVideo(m_env, needSendData);
 m_env.GetmodelViewMatrix()->PopMatrix();
 }
 
-void Render::ChangeMainChosenCamidx(char idx) {
-idx = transIdx(idx - 1) + 1;
-chosenCamidx = idx;
-//	printf("now msg 1~10:   idx=%d\n",idx);
+void Render::ChangeMainChosenCamidx(char idx) 
+{
+	idx = transIdx(idx - 1) + 1;
+	chosenCamidx = idx;
+	//printf("now msg 1~10:   idx=%d\n",idx);
 #if USE_CAP_SPI
-WriteMessage(MSG_TYPE_YUANJING_DATA2,idx ); //0~9
+	WriteMessage(MSG_TYPE_YUANJING_DATA2,idx ); //0~9
 #endif
 }
-void Render::ChangeSubChosenCamidx(char idx) {
+
+void Render::ChangeSubChosenCamidx(char idx) 
+{
 #if USE_CAP_SPI
-WriteMessage(MSG_TYPE_YUANJING_DATA1, idx); //0~9
+	WriteMessage(MSG_TYPE_YUANJING_DATA1, idx); //0~9
 #endif
 }
 
@@ -7275,120 +7073,86 @@ int net_open_mvdetect;
 int net_open_enhance;
 int current_control = 0;
 int height_delta = 16;
-void Render::RenderScene(void) {
-static bool setpriorityOnce = true;
-if (setpriorityOnce) {
-setCurrentThreadHighPriority(THREAD_L_M_RENDER);
-setpriorityOnce = false;
 
-}
-GLEnv &env = env1;
-bool bShowDirection = false, isBillBoardExtOn = false;
-bool needSendData = true;
-int billBoardx = 0, billBoardy = g_windowHeight * 15 / 16;			//7/8;
-int extBillBoardx = 0, extBillBoardy = g_windowHeight * 15 / 16;	//*7/8;
-static int last_mode = 0;
-#ifdef GL_TIME_STAMP
-GLuint queries[4];
-GLuint startTime, rearTime, birdTime, fboTime;
-glGenQueries(3, queries);
-
-glBeginQuery(GL_TIME_ELAPSED, queries[0]);
-#endif
-
-#ifdef GET_ALARM_AERA
-glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pVehicle->msFBO);
-#endif
-	// Clear the window with current clearing color
-glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-bool Isenhdata=false;
-bool IsTouchenhdata=false;
-if (env.Getp_FboPboFacade()->IsFboUsed()) {
-env.Getp_FBOmgr()->SetDrawBehaviour(&render);
-env.Getp_FboPboFacade()->DrawAndGet( Isenhdata,IsTouchenhdata);
-}
-Debuging();
-
-static bool Once=true;
-if(Once==true)
+void Render::RenderScene(void) 
 {
-	Once=false;
-	overLapRegion::GetoverLapRegion()->set_change_gain(false);
-	start_exposure_thread();
-	start_SelfCheck_thread();
-}
-switch (displayMode) {
-case TRIM_MODE:
-env.Getp_FboPboFacade()->Render2Front(MAIN, g_windowWidth, g_windowHeight);
-break;
-default:
-	break;
-	}
-}
-
-void Render::setOverlapPeta(int chId, float alphaId) {
-//	setPetaUpdate(chId, true);
-alpha[chId] = alphaId;
-//	printf("chId:%d,alpha:%f\n",chId,la);
-}
-/* The main drawing function. */
-void Render::DrawGLScene() {
-char arg1[128], arg2[128];
-unsigned char screen_data[720 * 576 * 4];
-unsigned char full_screen_data[1920 * 1080 * 4];
-#if USE_TRACK
-glReadBuffer(GL_FRONT);
-glReadPixels(0,0,1920,1080,GL_BGRA_EXT,GL_UNSIGNED_BYTE,full_screen_data);
-#endif
-
-{
-RenderScene();
-glutSwapBuffers();
-}
-/* swap the buffers to display, since double buffering is used.*/
-#if ENABLE_SCREEN_CAPTURE
-{
-static timeval lasttime,nowtime;
-static int frametime=-1;
-gettimeofday(&nowtime,0);
-if(frametime>=0)
-{
-	frametime=frametime+(nowtime.tv_sec-lasttime.tv_sec)*1000000+(nowtime.tv_usec-lasttime.tv_usec);
-	if(frametime>40000)
+	static bool setpriorityOnce = true;
+	if (setpriorityOnce) 
 	{
-		glReadBuffer(GL_FRONT);
+		setCurrentThreadHighPriority(THREAD_L_M_RENDER);
+		setpriorityOnce = false;
+	}
+	GLEnv &env = env1;
+	bool bShowDirection = false, isBillBoardExtOn = false;
+	bool needSendData = true;
+	int billBoardx = 0, billBoardy = g_windowHeight * 15 / 16;		//7/8;
+	int extBillBoardx = 0, extBillBoardy = g_windowHeight * 15 / 16;	//*7/8;
+	static int last_mode = 0;
+	
 
-		glReadPixels(0,0,720,576,GL_BGRA_EXT,GL_UNSIGNED_BYTE,screen_data);
+	//Clear the window with current clearing color
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		//CabinPushData(screen_handle,(char *)screen_data,720*576*4);//record screen
+	bool Isenhdata=false;
+	bool IsTouchenhdata=false;
+	if (env.Getp_FboPboFacade()->IsFboUsed()) 
+	{
+		env.Getp_FBOmgr()->SetDrawBehaviour(&render);
+		env.Getp_FboPboFacade()->DrawAndGet( Isenhdata,IsTouchenhdata);
+	}
+	Debuging();
 
-		frametime=frametime-40000;
+	static bool Once=true;
+	if(Once==true)
+	{
+		Once=false;
+		overLapRegion::GetoverLapRegion()->set_change_gain(false);
+		start_exposure_thread();
+		start_SelfCheck_thread();
+	}
+	switch (displayMode) 
+	{
+		case TRIM_MODE:
+			env.Getp_FboPboFacade()->Render2Front(MAIN, g_windowWidth, g_windowHeight);
+			break;
+		default:
+			break;
 	}
 }
-else
+
+void Render::setOverlapPeta(int chId, float alphaId) 
 {
-	frametime=0;
-}
-lasttime=nowtime;
-}
-#endif
-
-
-glFinish();
-GetFPS(); /* Get frame rate stats */
-
-/* Copy saved window name into temp string arg1 so that we can add stats */
-strcpy(arg1, common.getWindowName());
-
-if (sprintf(arg2, "%.2f FPS", common.getFrameRate())) {
-strcat(arg1, arg2);
+	//	setPetaUpdate(chId, true);
+	alpha[chId] = alphaId;
+	//	printf("chId:%d,alpha:%f\n",chId,la);
 }
 
-/* cut down on the number of redraws on window title.  Only draw once per sample*/
-if (common.isCountUpdate()) {
-glutSetWindowTitle(arg1);
-}
+/* The main drawing function. */
+void Render::DrawGLScene() 
+{
+	char arg1[128], arg2[128];
+	unsigned char screen_data[720 * 576 * 4];
+	unsigned char full_screen_data[1920 * 1080 * 4];
+
+	RenderScene();
+	glutSwapBuffers();
+	
+	/* swap the buffers to display, since double buffering is used.*/
+
+	glFinish();
+	GetFPS(); /* Get frame rate stats */
+
+	/* Copy saved window name into temp string arg1 so that we can add stats */
+	strcpy(arg1, common.getWindowName());
+
+	if (sprintf(arg2, "%.2f FPS", common.getFrameRate())) {
+	strcat(arg1, arg2);
+	}
+
+	/* cut down on the number of redraws on window title.  Only draw once per sample*/
+	if (common.isCountUpdate()) {
+	glutSetWindowTitle(arg1);
+	}
 }
 
 /* The function called whenever a mouse button event occurs */
@@ -8024,997 +7788,927 @@ m_presetCameraRotateCounter = PRESET_CAMERA_ROTATE_MAX;
 
 }
 
-void Render::ProcessOitKeys(GLEnv &m_env, unsigned char key, int x, int y) {
-GLEnv & env = env1;
+void Render::ProcessOitKeys(GLEnv &m_env, unsigned char key, int x, int y) 
+{
+	GLEnv & env = env1;
 
-int Now_Window_Width, Now_Window_Height;
-Now_Window_Width = glutGet(GLUT_WINDOW_WIDTH);
-Now_Window_Width = glutGet(GLUT_WINDOW_HEIGHT);
-int Milx = 0;
-bool istochangeTelMode = false;
-float pano_pos2angle = 0.0;
+	int Now_Window_Width, Now_Window_Height;
+	Now_Window_Width = glutGet(GLUT_WINDOW_WIDTH);
+	Now_Window_Width = glutGet(GLUT_WINDOW_HEIGHT);
+	int Milx = 0;
+	bool istochangeTelMode = false;
+	float pano_pos2angle = 0.0;
 
-float mydelta = 0.0;
-float ori_ruler_angle = 0.0;
-float now_ruler_angle = 0.0;
+	float mydelta = 0.0;
+	float ori_ruler_angle = 0.0;
+	float now_ruler_angle = 0.0;
 
 #define DISPLAYMODE_SWITCH_TO(mode) 		{\
-			DISPLAYMODE nextMode = mode;\
-			if(BACK_VIEW_MODE == displayMode){\
-				p_BillBoard->m_Direction = lastSingleViewDirection;\
-			}else{\
-			       lastSingleViewDirection = p_BillBoard->m_Direction;\
-			}\
-			displayMode = nextMode;\
+				DISPLAYMODE nextMode = mode;\
+				if(BACK_VIEW_MODE == displayMode){\
+					p_BillBoard->m_Direction = lastSingleViewDirection;\
+				}else{\
+				       lastSingleViewDirection = p_BillBoard->m_Direction;\
+				}\
+				displayMode = nextMode;\
+			}
+
+	char cmdBuf[128];
+	static int mode = OitVehicle::USER_BLEND;
+	static int blendMode = 6;
+	float cross_pos[2];
+	float set_follow_angle[2];		//0:hor;1:ver;
+	float panel_pos_hor_start = 0.0;
+	float panel_pos_ver_start = 0.0;
+	float math_ruler_angle = 0.0;
+
+	float zoom_data = 0.0;  //getALPHA_ZOOM_SCALE();
+	GLint nWidth = DEFAULT_IMAGE_WIDTH, nHeight = DEFAULT_IMAGE_HEIGHT,
+		nComponents = GL_RGBA8;
+	GLenum format = GL_BGRA;
+
+		static unsigned int lastSingleViewDirection = BillBoard::BBD_FRONT;
+		//static DISPLAYMODE rember_tel = SPLIT_VIEW_MODE;
+			if (key != '?') {
+				IstoShowDeviceState[MAIN] = false;
+			}
+		do {
+			switch (key) {
+			case ';':
+				stop_scan = !stop_scan;
+				break;
+			case 'o':
+
+
+		//mv_detect.OpenMD(MAIN);
+		break;
+	case 'O':
+		tIdle.threadRun(MVDECT_CN);
+		tIdle.threadRun(MVDECT_ADD_CN);
+
+		//	mode = OitVehicle::USER_OIT;
+		break;
+		//case 'b':
+	case 'B':
+		//	mode = OitVehicle::USER_BLEND;
+		MV_CHOSE_IDX = (MV_CHOSE_IDX + 1) % CAM_COUNT;
+		printf("MV_CHOSE_IDX=%d\n", MV_CHOSE_IDX);
+		break;
+	case '1':
+		parm_inputArea += 1;
+		printf("parm_inputArea=%d\n", parm_inputArea);
+		//	displayMode=ALL_VIEW_MODE;
+		break;
+	case '2':
+		parm_inputArea -= 1;
+		printf("parm_inputArea=%d\n", parm_inputArea);
+		break;
+	case '3':
+		parm_threshold += 1;
+		printf("parm_threshold=%d\n", parm_threshold);
+
+		break;
+	case '4':
+		parm_threshold -= 1;
+		printf("parm_threshold=%d\n", parm_threshold);
+
+		break;
+
+		//case 's' :
+	case 'S': {
+		DISPLAYMODE nextMode = DISPLAYMODE(
+				((int) displayMode + 1) % TOTAL_MODE_COUNT);
+
+
+		if (nextMode == TELESCOPE_FRONT_MODE) {
+			nextMode = ALL_VIEW_MODE;
+
 		}
-char cmdBuf[128];
-static int mode = OitVehicle::USER_BLEND;
-static int blendMode = 6;
-float cross_pos[2];
-float set_follow_angle[2];		//0:hor;1:ver;
-float panel_pos_hor_start = 0.0;
-float panel_pos_ver_start = 0.0;
-float math_ruler_angle = 0.0;
-
-float zoom_data = 0.0;  //getALPHA_ZOOM_SCALE();
-GLint nWidth = DEFAULT_IMAGE_WIDTH, nHeight = DEFAULT_IMAGE_HEIGHT,
-	nComponents = GL_RGBA8;
-GLenum format = GL_BGRA;
-
-	static unsigned int lastSingleViewDirection = BillBoard::BBD_FRONT;
-	//static DISPLAYMODE rember_tel = SPLIT_VIEW_MODE;
-		if (key != '?') {
-			IstoShowDeviceState[MAIN] = false;
+		bool isEnterringBackView = (nextMode == BACK_VIEW_MODE);
+		if (isEnterringBackView) {
+			lastSingleViewDirection = p_BillBoard->m_Direction;
+		} else if (BACK_VIEW_MODE == displayMode) {
+			p_BillBoard->m_Direction = lastSingleViewDirection;
 		}
-	do {
-		switch (key) {
-		case ';':
-			stop_scan = !stop_scan;
-			break;
-		case 'o':
-#if MVDECT
-	mv_detect.mvClose();
-#endif
 
-#if MVDECT
-	mv_detect.ClearAllVector(false);
-#endif
-	//mv_detect.OpenMD(MAIN);
-	break;
-case 'O':
-	tIdle.threadRun(MVDECT_CN);
-	tIdle.threadRun(MVDECT_ADD_CN);
-#if MVDECT
-	mv_detect.mvOpen();
-#if MVDECT
-	mv_detect.ClearAllVector(true);
-#endif
-#endif
-	//	mode = OitVehicle::USER_OIT;
-	break;
-	//case 'b':
-case 'B':
-	//	mode = OitVehicle::USER_BLEND;
-	MV_CHOSE_IDX = (MV_CHOSE_IDX + 1) % CAM_COUNT;
-	printf("MV_CHOSE_IDX=%d\n", MV_CHOSE_IDX);
-	break;
-case '1':
-	parm_inputArea += 1;
-	printf("parm_inputArea=%d\n", parm_inputArea);
-	//	displayMode=ALL_VIEW_MODE;
-	break;
-case '2':
-	parm_inputArea -= 1;
-	printf("parm_inputArea=%d\n", parm_inputArea);
-	break;
-case '3':
-	parm_threshold += 1;
-	printf("parm_threshold=%d\n", parm_threshold);
-
-	break;
-case '4':
-	parm_threshold -= 1;
-	printf("parm_threshold=%d\n", parm_threshold);
-
-	break;
-
-	//case 's' :
-case 'S': {
-	DISPLAYMODE nextMode = DISPLAYMODE(
-			((int) displayMode + 1) % TOTAL_MODE_COUNT);
-
-
-	if (nextMode == TELESCOPE_FRONT_MODE) {
-		nextMode = ALL_VIEW_MODE;
+		displayMode = nextMode;
+		if (PREVIEW_MODE == displayMode) {
+			bRotTimerStart = true;
+		}
+	}
+		break;
+	case 'x':
+		displayMode = PREVIEW_MODE;
+		break;
+	case 'n': {
+		chosenCam[MAIN] = chosenCam[MAIN] + 1;
+		if (chosenCam[MAIN] == 11)
+			chosenCam[MAIN] = 1;
+		ChangeMainChosenCamidx(chosenCam[MAIN]);
 
 	}
-	bool isEnterringBackView = (nextMode == BACK_VIEW_MODE);
-	if (isEnterringBackView) {
-		lastSingleViewDirection = p_BillBoard->m_Direction;
-	} else if (BACK_VIEW_MODE == displayMode) {
-		p_BillBoard->m_Direction = lastSingleViewDirection;
-	}
-#if TRACK_MODE
-	if(nextMode==VGA_WHITE_VIEW_MODE)
-	{
-		trackMode->SwitchTrackChId(vga_Track);
-	} else if(nextMode==SDI1_WHITE_BIG_VIEW_MODE)
-	{
-		trackMode->SwitchTrackChId(sdi_Track);
-	} else if(nextMode==PAL1_WHITE_BIG_VIEW_MODE)
-	{
-		trackMode->SwitchTrackChId(pal_Track);
-	} else if(nextMode==PAL2_HOT_BIG_VIEW_MODE)
-	{
-		trackMode->SwitchTrackChId(pal2_Track);
-	}
-	if(isTracking)
-	{
-		int set_track_params[4];
-		memcpy(set_track_params,gettrackcontrolparams(),sizeof(set_track_params));
-		int trkId=getTrkId(displayMode,nextMode);
-		if(trkId==-1)
-		{
-			isTracking=false;
-			trackMode->disableTrack(sdi_Track);
-			trackMode->disableTrack(pal_Track);
-			trackMode->disableTrack(vga_Track);
-			trackMode->disableTrack(pal2_Track);
+		break;
+	case 'L':
+		mx+=0.1f;
+		break;
+	case 'Z':
+		mx-=0.1f;
+		break;
+	case 'E':
+		my+=0.1f;
+		break;
+	case 'R':
+		my-=0.1f;
+		break;
+	case 'M':
+		mw +=0.1f;
+		printf("mw +\n");
+		break;
 
+	case 'F':
+		mw-=0.1f;
+		printf("mw -\n");
+		break;
+
+	case 'C':
+		mh+=0.1f;
+		break;
+
+	case 'D':
+		mh-=0.1f;
+		break;
+
+	case '5':
+		mz +=0.01f;
+		break;
+
+	case '6':
+		mz-=0.01f;
+		break;
+
+	case '7':
+		mo+=0.1f;
+		break;
+
+	case '8':
+		mo-=0.1f;
+		break;
+
+	case 'Q':
+		printf("mx = %f,my=%f,mz=%f,mw=%f,mo=%f,mh=%f\n",mx,my,mz,mw,mo,mh);
+		break;
+	case 'A':
+
+	{
+		DISPLAYMODE nextMode = BACK_VIEW_MODE;
+		if (BACK_VIEW_MODE != displayMode) {
+			lastSingleViewDirection = p_BillBoard->m_Direction;
+		}
+		displayMode = nextMode;
+	}
+		break;
+
+	case 'I': {
+		DISPLAYMODE nextMode = INIT_VIEW_MODE;
+		if (BACK_VIEW_MODE != displayMode) {
+			p_BillBoard->m_Direction = lastSingleViewDirection;
+		}
+		displayMode = nextMode;
+	}
+		break;
+
+	case 'U':
+		SetShowDirection(BillBoard::BBD_FRONT, SHOW_DIRECTION_DYNAMIC);
+		break;
+
+	case 'W':
+		for (int set_i = 0; set_i < CAM_COUNT; set_i++) {
+				int test_dir = set_i;
+				channel_left_scale[test_dir] = define_channel_left_scale[set_i];
+				channel_right_scale[test_dir] = define_channel_right_scale[set_i];
+				move_hor[test_dir] = define_move_hor[set_i];
+				PanoFloatData[test_dir] = define_PanoFloatData[set_i];
+				rotate_angle[test_dir] = define_rotate_angle[set_i];
+				move_hor_scale[test_dir] = define_move_hor_scale[set_i];
+				move_ver_scale[test_dir] = define_move_ver_scale[set_i];
+			}
+			InitPanel(m_env, 0, true);
+			WritePanoScaleArrayData(PANO_SCALE_ARRAY_FILE, channel_left_scale,
+						channel_right_scale, move_hor);
+				WritePanoFloatDataFromFile(PANO_FLOAT_DATA_FILENAME, PanoFloatData);
+				WriteRotateAngleDataToFile(PANO_ROTATE_ANGLE_FILENAME, rotate_angle);
+				WritePanoHorVerScaleData(PANO_HOR_VER_SCALE_FILE, move_hor_scale,
+						move_ver_scale);
+		break;
+
+	case 'X':
+		fboMode = FBO_ALL_VIEW_SCAN_MODE;
+		break;
+
+	case 'Y':
+		delayT += 1;
+		printf("delayT=%f\n", delayT);
+
+		break;
+
+	case 'T':
+		delayT -= 1;
+		printf("delayT=%f\n", delayT);
+
+		break;
+
+	case 'J':
+		if (rotateangle_per_second < 72) {
+			rotateangle_per_second = rotateangle_per_second + 2;
+		}
+		break;
+	case 'j':
+		videoReset[0]=true;
+		break;
+	case 'k':
+		videoReset[1]=true;
+		break;
+	case 'l':
+		videoReset[2]=true;
+		break;
+	case 'K':
+		if (rotateangle_per_second > 4) {
+			rotateangle_per_second = rotateangle_per_second - 2;
+		}
+		break;
+	case 'H':
+		//case 'h':
+	{
+		common.setScanned(true);
+		DISPLAYMODE nextMode = INIT_VIEW_MODE;
+		if (BACK_VIEW_MODE != displayMode) {
+			p_BillBoard->m_Direction = lastSingleViewDirection;
+		}
+		displayMode = nextMode;
+
+		if ((INIT_VIEW_MODE == displayMode)
+				&& (EnterSinglePictureSaveMode == true)) {
+			SetThreadStitchState(STITCH_ONLY);
 		} else {
-			if(trkId==sdi_Track) {
-				trackMode->disableTrack(trkId);
-				clearTrackParams();
-				trackMode->enableTrackAcq(set_track_params[0],set_track_params[1],
-						set_track_params[2],set_track_params[3],trkId);
-			} else if(trkId==vga_Track) {
-				clearTrackParams();
-				trackMode->enableTrackAcq(482,354,
-						60,60,trkId);
-			} else if(trkId==pal_Track) {
-				clearTrackParams();
-				trackMode->enableTrackAcq(330,258,
-						60,60,trkId);
-			} else if(trkId==pal2_Track) {
-				clearTrackParams();
-				trackMode->enableTrackAcq(330,258,
-						60,60,trkId);}
+			SetThreadStitchState(SAVEPIC_STITCH);
 		}
 	}
-
-#endif
-	displayMode = nextMode;
-	if (PREVIEW_MODE == displayMode) {
-		bRotTimerStart = true;
-	}
-}
-	break;
-case 'x':
-	displayMode = PREVIEW_MODE;
-	break;
-case 'n': {
-	chosenCam[MAIN] = chosenCam[MAIN] + 1;
-	if (chosenCam[MAIN] == 11)
-		chosenCam[MAIN] = 1;
-	ChangeMainChosenCamidx(chosenCam[MAIN]);
-
-}
-	break;
-case 'L':
-mx+=0.1f;
-	break;
-case 'Z':
-	mx-=0.1f;
-	break;
-case 'E':
-	my+=0.1f;
-	break;
-case 'R':
-my-=0.1f;
-	break;
-case 'M':
-mw +=0.1f;
-	break;
-
-case 'F':
-mw-=0.1f;
-	break;
-
-case 'C':
-mh+=0.1f;
-	break;
-
-case 'D':
-mh-=0.1f;
-	break;
-
-case 'Q':
-printf("mx = %f,my=%f,mw=%f,mh=%f\n",mx,my,mw,mh);
-	break;
-case 'A':
-
-{
-	DISPLAYMODE nextMode = BACK_VIEW_MODE;
-	if (BACK_VIEW_MODE != displayMode) {
-		lastSingleViewDirection = p_BillBoard->m_Direction;
-	}
-	displayMode = nextMode;
-}
-	break;
-
-case 'I': {
-	DISPLAYMODE nextMode = INIT_VIEW_MODE;
-	if (BACK_VIEW_MODE != displayMode) {
-		p_BillBoard->m_Direction = lastSingleViewDirection;
-	}
-	displayMode = nextMode;
-}
-	break;
-
-case 'U':
-	SetShowDirection(BillBoard::BBD_FRONT, SHOW_DIRECTION_DYNAMIC);
-	break;
-
-case 'W':
-	for (int set_i = 0; set_i < CAM_COUNT; set_i++) {
-			int test_dir = set_i;
-			channel_left_scale[test_dir] = define_channel_left_scale[set_i];
-			channel_right_scale[test_dir] = define_channel_right_scale[set_i];
-			move_hor[test_dir] = define_move_hor[set_i];
-			PanoFloatData[test_dir] = define_PanoFloatData[set_i];
-			rotate_angle[test_dir] = define_rotate_angle[set_i];
-			move_hor_scale[test_dir] = define_move_hor_scale[set_i];
-			move_ver_scale[test_dir] = define_move_ver_scale[set_i];
+		break;
+	case 'r':
+		if (EnablePanoFloat == true && TRIM_MODE == displayMode) {
+			shaderManager.ResetTrimColor();
+			testPanoNumber = (CAM_COUNT - testPanoNumber - 1) % CAM_COUNT;
+			shaderManager.SetTrimColor(testPanoNumber);
 		}
-		InitPanel(m_env, 0, true);
-		WritePanoScaleArrayData(PANO_SCALE_ARRAY_FILE, channel_left_scale,
-					channel_right_scale, move_hor);
-			WritePanoFloatDataFromFile(PANO_FLOAT_DATA_FILENAME, PanoFloatData);
-			WriteRotateAngleDataToFile(PANO_ROTATE_ANGLE_FILENAME, rotate_angle);
-			WritePanoHorVerScaleData(PANO_HOR_VER_SCALE_FILE, move_hor_scale,
-					move_ver_scale);
-	break;
+		break;
+	case 't':		//PANO add PTZ view
+		SetTuneSteps(10);
+		break;
+	case 'y':		//two half PANO view
+		SetTuneSteps(5);
+		break;
+	case 'u':		//single high quality view
+		testPanoNumber =1;
+		break;
+	case 'i':		//pano view mode
+		testPanoNumber =2;
+		break;
+	case 'p':		//high definition pano add pano view
+		testPanoNumber =3;
+		break;
+	case 'w':		//up
+	{
 
-case 'X':
-	fboMode = FBO_ALL_VIEW_SCAN_MODE;
-	break;
+				int new_dir = ExchangeChannel(testPanoNumber);
+				move_ver_scale[new_dir] = move_ver_scale[new_dir] + pano_hor_scale;
+				if (move_ver_scale[new_dir] > 3.0) {
+					move_ver_scale[new_dir] = 3.0;
+				}
+				InitPanel(m_env, 0, true);
 
-case 'Y':
-	delayT += 1;
-	printf("delayT=%f\n", delayT);
+		}
 
-	break;
+		break;
+	case 's':		//down
+	 {
 
-case 'T':
-	delayT -= 1;
-	printf("delayT=%f\n", delayT);
+				int new_dir = ExchangeChannel(testPanoNumber);
+				move_ver_scale[new_dir] = move_ver_scale[new_dir] - pano_hor_scale;
+				if (move_ver_scale[new_dir] < 0.01) {
+					move_ver_scale[new_dir] = 0.01;
+				}
+				InitPanel(m_env, 0, true);
 
-	break;
-
-case 'J':
-	if (rotateangle_per_second < 72) {
-		rotateangle_per_second = rotateangle_per_second + 2;
-	}
-	break;
-case 'j':
-	videoReset[0]=true;
-	break;
-case 'k':
-	videoReset[1]=true;
-	break;
-case 'l':
-	videoReset[2]=true;
-	break;
-case 'K':
-	if (rotateangle_per_second > 4) {
-		rotateangle_per_second = rotateangle_per_second - 2;
-	}
-	break;
-case 'H':
-	//case 'h':
-{
-	common.setScanned(true);
-	DISPLAYMODE nextMode = INIT_VIEW_MODE;
-	if (BACK_VIEW_MODE != displayMode) {
-		p_BillBoard->m_Direction = lastSingleViewDirection;
-	}
-	displayMode = nextMode;
-
-	if ((INIT_VIEW_MODE == displayMode)
-			&& (EnterSinglePictureSaveMode == true)) {
-		SetThreadStitchState(STITCH_ONLY);
-	} else {
-		SetThreadStitchState(SAVEPIC_STITCH);
-	}
-}
-	break;
-case 'r':
-	if (EnablePanoFloat == true && TRIM_MODE == displayMode) {
-		shaderManager.ResetTrimColor();
-		testPanoNumber = (CAM_COUNT - testPanoNumber - 1) % CAM_COUNT;
-		shaderManager.SetTrimColor(testPanoNumber);
-	}
-	break;
-case 't':		//PANO add PTZ view
-	SetTuneSteps(10);
-	break;
-case 'y':		//two half PANO view
-	SetTuneSteps(5);
-	break;
-case 'u':		//single high quality view
-	testPanoNumber =1;
-	break;
-case 'i':		//pano view mode
-	testPanoNumber =2;
-	break;
-case 'p':		//high definition pano add pano view
-	testPanoNumber =3;
-	break;
-case 'w':		//up
-{
-
-			int new_dir = ExchangeChannel(testPanoNumber);
-			move_ver_scale[new_dir] = move_ver_scale[new_dir] + pano_hor_scale;
-			if (move_ver_scale[new_dir] > 3.0) {
-				move_ver_scale[new_dir] = 3.0;
-			}
-			InitPanel(m_env, 0, true);
-
-	}
-
-	break;
-case 's':		//down
- {
-
-			int new_dir = ExchangeChannel(testPanoNumber);
-			move_ver_scale[new_dir] = move_ver_scale[new_dir] - pano_hor_scale;
-			if (move_ver_scale[new_dir] < 0.01) {
-				move_ver_scale[new_dir] = 0.01;
-			}
-			InitPanel(m_env, 0, true);
-
-	}
-	break;
-case 'a':		//left
-
- {
-
-			int new_dir = ExchangeChannel(testPanoNumber);
-			move_hor[new_dir] = move_hor[new_dir] + pano_hor_step;
-			InitPanel(m_env, 0, true);
-
-	}
-
-	break;
-case 'd':		//right
-{
-			int new_dir = ExchangeChannel(testPanoNumber);
-			move_hor[new_dir] = move_hor[new_dir] - pano_hor_step;
-			InitPanel(m_env, 0, true);
-
-	}
-
-	break;
-case 'q':		//enter
+		}
+		break;
+	case 'a':		//left
 
 	 {
 
-			int new_dir = ExchangeChannel(testPanoNumber);
-			rotate_angle[new_dir] += pano_rotate_angle;
-			if (rotate_angle[new_dir] > 360.0) {
-				rotate_angle[new_dir] -= 360.0;
+				int new_dir = ExchangeChannel(testPanoNumber);
+				move_hor[new_dir] = move_hor[new_dir] + pano_hor_step;
+				InitPanel(m_env, 0, true);
+
 		}
-			InitPanel(m_env, 0, true);
-	}
-	break;
-case 'e':
-{
-			int new_dir = ExchangeChannel(testPanoNumber);
-			rotate_angle[new_dir] -= pano_rotate_angle;
-			if (rotate_angle[new_dir] < 0.0) {
-				rotate_angle[new_dir] += 360.0;
+
+		break;
+	case 'd':		//right
+	{
+				int new_dir = ExchangeChannel(testPanoNumber);
+				move_hor[new_dir] = move_hor[new_dir] - pano_hor_step;
+				InitPanel(m_env, 0, true);
+
+		}
+
+		break;
+	case 'q':		//enter
+
+		 {
+
+				int new_dir = ExchangeChannel(testPanoNumber);
+				rotate_angle[new_dir] += pano_rotate_angle;
+				if (rotate_angle[new_dir] > 360.0) {
+					rotate_angle[new_dir] -= 360.0;
 			}
-			InitPanel(m_env, 0, true);
-}
-
-
-	break;
-case 'G':		//PTZ--CCD
-	break;
-case 'V':
-#if GAIN_MASK
-{
-		if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
-		{
-			overLapRegion::GetoverLapRegion()->set_change_gain(true);
+				InitPanel(m_env, 0, true);
 		}
-		else
-		{
-		overLapRegion::GetoverLapRegion()->set_change_gain(false);
-
-		}
+		break;
+	case 'e':
+	{
+				int new_dir = ExchangeChannel(testPanoNumber);
+				rotate_angle[new_dir] -= pano_rotate_angle;
+				if (rotate_angle[new_dir] < 0.0) {
+					rotate_angle[new_dir] += 360.0;
+				}
+				InitPanel(m_env, 0, true);
 	}
+
+
+		break;
+	case 'G':		//PTZ--CCD
+		break;
+	case 'V':
+#if GAIN_MASK
+	{
+			if (overLapRegion::GetoverLapRegion()->get_change_gain() == false)
+			{
+				overLapRegion::GetoverLapRegion()->set_change_gain(true);
+			}
+			else
+			{
+			overLapRegion::GetoverLapRegion()->set_change_gain(false);
+
+			}
+		}
 
 #endif
-	break;
-case 'g':		//PTZ--FIR
-	if (IsgstCap == false) {
-		IsgstCap = true;
-	} else {
-		IsgstCap = false;
-	}
-	break;
-case 'z':		//steady on
-	break;
-
-case 'c':		//follow on
-	if (!getFollowValue()) {
-		setFollowVaule(true);
-	}
-
-	if ((INIT_VIEW_MODE == displayMode)
-			&& (EnterSinglePictureSaveMode == true)) {
-		for (int cam_num = 0; cam_num < MAX_PANO_CAMERA_COUNT; cam_num++) {
-			picSaveState[cam_num] = false;
-		}
-		enterNumberofCam = 0;
-	}
-	break;
-case 'v':		//follow off
-	setFollowVaule(false);
-	break;
-case '[':		//show ruler
-	if (displayMode == PANO_VIEW_MODE || displayMode == TWO_HALF_PANO_VIEW_MODE
-			|| displayMode == FRONT_BACK_PANO_ADD_MONITOR_VIEW_MODE
-			|| displayMode == FRONT_BACK_PANO_ADD_SMALLMONITOR_VIEW_MODE
-			|| displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE) {
-		setenableshowruler(true);
-	}
-	break;
-case ']':		//hide ruler
-	if (displayMode == PANO_VIEW_MODE || displayMode == TWO_HALF_PANO_VIEW_MODE
-			|| displayMode == FRONT_BACK_PANO_ADD_MONITOR_VIEW_MODE
-			|| displayMode == FRONT_BACK_PANO_ADD_SMALLMONITOR_VIEW_MODE
-			|| displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE) {
-		setenableshowruler(false);
-	}
-	break;
-case ',':		//move ruler to left
-	if (getenableshowruler()) {
-		math_ruler_angle = p_LineofRuler->GetAngle();		//getrulerangle();
-		math_ruler_angle = math_ruler_angle - RULER_ANGLE_MOVE_STEP;
-		if (math_ruler_angle > 0.0) {
-			p_LineofRuler->SetAngle(math_ruler_angle);//setrulerangle(math_ruler_angle);
+		break;
+	case 'g':		//PTZ--FIR
+		if (IsgstCap == false) {
+			IsgstCap = true;
 		} else {
+			IsgstCap = false;
+		}
+		break;
+	case 'z':		//steady on
+		break;
+
+	case 'c':		//follow on
+		if (!getFollowValue()) {
+			setFollowVaule(true);
+		}
+
+		if ((INIT_VIEW_MODE == displayMode)
+				&& (EnterSinglePictureSaveMode == true)) {
+			for (int cam_num = 0; cam_num < MAX_PANO_CAMERA_COUNT; cam_num++) {
+				picSaveState[cam_num] = false;
+			}
+			enterNumberofCam = 0;
+		}
+		break;
+	case 'v':		//follow off
+		setFollowVaule(false);
+		break;
+	case '[':		//show ruler
+		if (displayMode == PANO_VIEW_MODE || displayMode == TWO_HALF_PANO_VIEW_MODE
+				|| displayMode == FRONT_BACK_PANO_ADD_MONITOR_VIEW_MODE
+				|| displayMode == FRONT_BACK_PANO_ADD_SMALLMONITOR_VIEW_MODE
+				|| displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE) {
+			setenableshowruler(true);
+		}
+		break;
+	case ']':		//hide ruler
+		if (displayMode == PANO_VIEW_MODE || displayMode == TWO_HALF_PANO_VIEW_MODE
+				|| displayMode == FRONT_BACK_PANO_ADD_MONITOR_VIEW_MODE
+				|| displayMode == FRONT_BACK_PANO_ADD_SMALLMONITOR_VIEW_MODE
+				|| displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE) {
+			setenableshowruler(false);
+		}
+		break;
+	case ',':		//move ruler to left
+		if (getenableshowruler()) {
+			math_ruler_angle = p_LineofRuler->GetAngle();		//getrulerangle();
+			math_ruler_angle = math_ruler_angle - RULER_ANGLE_MOVE_STEP;
+			if (math_ruler_angle > 0.0) {
+				p_LineofRuler->SetAngle(math_ruler_angle);//setrulerangle(math_ruler_angle);
+			} else {
+				p_LineofRuler->SetAngle(math_ruler_angle + 360.0);//setrulerangle(math_ruler_angle+360.0);
+			}
+
+		}
+		//	camonforesight.MoveLimit(MOVE_LEFT);
+		if ((EnablePanoFloat == true)) {
+			if ((displayMode == TRIM_MODE)) {
+				PanoDirectionLeft = true;
+			}
+		}
+
+		break;
+	case '.':		//move ruler to right
+		if (getenableshowruler()) {
+			math_ruler_angle = p_LineofRuler->GetAngle();		//getrulerangle();
+			math_ruler_angle = math_ruler_angle + RULER_ANGLE_MOVE_STEP;
+			if (math_ruler_angle < 360.0) {
+				p_LineofRuler->SetAngle(math_ruler_angle);//setrulerangle(math_ruler_angle);
+			} else {
+				p_LineofRuler->SetAngle(math_ruler_angle - 360.0);//setrulerangle(math_ruler_angle-360.0);
+			}
+		}
+		if (EnablePanoFloat == true) {
+			if (displayMode == TRIM_MODE) {
+				PanoDirectionLeft = false;
+			}
+		}
+	//			camonforesight.MoveLimit(MOVE_RIGHT);
+		break;
+	case '9':
+		blendMode = key - '0';
+		if ((INIT_VIEW_MODE == displayMode)
+				&& (EnterSinglePictureSaveMode == true)) {
+			enterNumberofCam = enterNumberofCam * 10 + blendMode;
+		} else {
+			DISPLAYMODE_SWITCH_TO(FRONT_BACK_PANO_ADD_MONITOR_VIEW_MODE);
+		}
+		break;
+	case '0':
+		blendMode = key - '0';
+		if ((INIT_VIEW_MODE == displayMode)
+				&& (EnterSinglePictureSaveMode == true)) {
+			enterNumberofCam = enterNumberofCam * CAM_COUNT + blendMode;
+		} else {
+			DISPLAYMODE_SWITCH_TO(FRONT_BACK_PANO_ADD_SMALLMONITOR_VIEW_MODE);
+		}
+		break;
+	case '+':       //add alpha
+		if (EnablePanoFloat == true) {
+			if ((TRIM_MODE == displayMode)) {
+				if (PanoDirectionLeft == true) {
+					channel_left_scale[testPanoNumber] =
+							channel_left_scale[testPanoNumber] - DELTA_OF_PANO_SCALE;
+				} else {
+					channel_right_scale[testPanoNumber] =
+							channel_right_scale[testPanoNumber]
+									- DELTA_OF_PANO_SCALE;
+				}
+				InitPanel(m_env, 0, true);
+			}
+		} else {
+			zoom_data = getALPHA_ZOOM_SCALE();
+			zoom_data += 0.1;
+			if (zoom_data >= 1.1) {
+				;
+			} else {
+				setALPHA_ZOOM_SCALE(zoom_data);
+
+				initAlphaMask();
+				glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX]);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+				GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+				GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+				GL_REPEAT);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+				GL_REPEAT);
+				glTexImage2D(GL_TEXTURE_2D, 0, nComponents, ALPHA_MASK_WIDTH,
+						ALPHA_MASK_HEIGHT, 0, format,
+						GL_UNSIGNED_BYTE, alphaMask);
+			}
+		}
+		break;
+	case '-':       //dec alpha
+		if (EnablePanoFloat == true) {
+			if ((TRIM_MODE == displayMode)) {
+				if (PanoDirectionLeft == true) {
+					channel_left_scale[testPanoNumber] =
+							channel_left_scale[testPanoNumber] + DELTA_OF_PANO_SCALE;
+				} else {
+					channel_right_scale[testPanoNumber] =
+							channel_right_scale[testPanoNumber]
+									+ DELTA_OF_PANO_SCALE;
+				}
+				InitPanel(m_env, 0, true);
+			}
+		} else {
+			zoom_data = getALPHA_ZOOM_SCALE();
+			zoom_data -= 0.1;
+			if (zoom_data < 0.0) {
+				;
+			} else {
+				setALPHA_ZOOM_SCALE(zoom_data);
+
+				initAlphaMask();
+				glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX]);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+				GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+				GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+				GL_REPEAT);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+				GL_REPEAT);
+				glTexImage2D(GL_TEXTURE_2D, 0, nComponents, ALPHA_MASK_WIDTH,
+						ALPHA_MASK_HEIGHT, 0, format,
+						GL_UNSIGNED_BYTE, alphaMask);
+
+			}
+		}
+		break;
+	case '=':       //save alpha data
+		zoom_data = getALPHA_ZOOM_SCALE();
+		render.writeALPHA_ZOOM_SCALE("ALPHA_ZOOM_SCALE.txt", zoom_data);
+		break;
+
+	case '!':
+		if (displayMode == ALL_VIEW_MODE) {
+
+			if (fboMode == FBO_ALL_VIEW_MODE) {
+				chosenCamMove(true, center_cam[MAIN]);
+				//p_ForeSightFacade[MAIN]->MoveLeft(-PanoLen*100.0);
+			} else if (FBO_ALL_VIEW_SCAN_MODE == fboMode) {
+				p_ForeSightFacadeScan[MAIN]->MoveLeft(-PanoLen * 100.0);
+			}
+			ChangeChosenByForesight();
+
+		} else if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE
+				|| displayMode == PREVIEW_MODE) {
+
+		}
+
+		else if (displayMode == TELESCOPE_FRONT_MODE
+				|| displayMode == TELESCOPE_RIGHT_MODE
+				|| displayMode == TELESCOPE_BACK_MODE
+				|| displayMode == TELESCOPE_LEFT_MODE) {
+			istochangeTelMode = p_ForeSightFacade2[MAIN]->MoveLeft(
+					-PanoLen / TELXLIMIT);
+			if (displayMode == TELESCOPE_FRONT_MODE)
+				p_ForeSightFacade[MAIN]->GetTelMil(0);
+			else if (displayMode == TELESCOPE_RIGHT_MODE)
+				p_ForeSightFacade[MAIN]->GetTelMil(1);
+			else if (displayMode == TELESCOPE_BACK_MODE)
+				p_ForeSightFacade[MAIN]->GetTelMil(2);
+			else if (displayMode == TELESCOPE_LEFT_MODE)
+				p_ForeSightFacade[MAIN]->GetTelMil(3);
+			if (istochangeTelMode) {
+				DISPLAYMODE nextMode = DISPLAYMODE(
+						((int) displayMode - 1) % TOTAL_MODE_COUNT);
+				if (nextMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE) {
+					nextMode = TELESCOPE_LEFT_MODE;	//DISPLAYMODE(((int)displayMode+15) % TOTAL_MODE_COUNT);
+				}
+				displayMode = nextMode;
+
+			}
+		} else if (displayMode == VGA_WHITE_VIEW_MODE
+				|| displayMode == VGA_HOT_BIG_VIEW_MODE
+				|| displayMode == VGA_HOT_SMALL_VIEW_MODE
+				|| displayMode == VGA_FUSE_WOOD_LAND_VIEW_MODE
+				|| displayMode == VGA_FUSE_GRASS_LAND_VIEW_MODE
+				|| displayMode == VGA_FUSE_SNOW_FIELD_VIEW_MODE
+				|| displayMode == VGA_FUSE_DESERT_VIEW_MODE
+				|| displayMode == VGA_FUSE_CITY_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveLeft(-PanoLen / 37.685200 * 15.505);
+
+		} else if (displayMode == SDI1_WHITE_BIG_VIEW_MODE
+				|| displayMode == SDI1_WHITE_SMALL_VIEW_MODE
+				|| displayMode == SDI2_HOT_BIG_VIEW_MODE
+				|| displayMode == SDI2_HOT_SMALL_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveLeft(-PanoLen / 37.685200 * 15.505);
+
+		} else if (displayMode == PAL1_WHITE_BIG_VIEW_MODE
+				|| displayMode == PAL1_WHITE_SMALL_VIEW_MODE
+				|| displayMode == PAL2_HOT_BIG_VIEW_MODE
+				|| displayMode == PAL2_HOT_SMALL_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveLeft(-PanoLen / 37.685200 * 14.524);
+
+		}
+		break;
+	case '@':
+		if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE
+				|| displayMode == PREVIEW_MODE) {
+
+		}
+		if (displayMode == ALL_VIEW_MODE) {
+
+			if (fboMode == FBO_ALL_VIEW_MODE) {
+				chosenCamMove(false, center_cam[MAIN]);
+
+			} else if (FBO_ALL_VIEW_SCAN_MODE == fboMode) {
+				p_ForeSightFacadeScan[MAIN]->MoveRight(PanoLen * 100.0);
+			}
+
+			ChangeChosenByForesight();
+
+		} else if (displayMode == TELESCOPE_FRONT_MODE
+				|| displayMode == TELESCOPE_RIGHT_MODE
+				|| displayMode == TELESCOPE_BACK_MODE
+				|| displayMode == TELESCOPE_LEFT_MODE) {
+			istochangeTelMode = p_ForeSightFacade2[MAIN]->MoveRight(
+					PanoLen / TELXLIMIT);
+			if (displayMode == TELESCOPE_FRONT_MODE)
+				p_ForeSightFacade2[MAIN]->GetTelMil(0);
+			else if (displayMode == TELESCOPE_RIGHT_MODE)
+				p_ForeSightFacade[MAIN]->GetTelMil(1);
+			else if (displayMode == TELESCOPE_BACK_MODE)
+				p_ForeSightFacade[MAIN]->GetTelMil(2);
+			else if (displayMode == TELESCOPE_LEFT_MODE)
+				p_ForeSightFacade[MAIN]->GetTelMil(3);
+
+			if (istochangeTelMode) {
+				DISPLAYMODE nextMode = DISPLAYMODE(
+						((int) displayMode + 1) % TOTAL_MODE_COUNT);
+				if (nextMode == SDI1_WHITE_BIG_VIEW_MODE) {
+					nextMode = TELESCOPE_FRONT_MODE;//DISPLAYMODE(((int)displayMode+15) % TOTAL_MODE_COUNT);
+				}
+				displayMode = nextMode;
+
+			}
+		} else if (displayMode == VGA_WHITE_VIEW_MODE
+				|| displayMode == VGA_HOT_BIG_VIEW_MODE
+				|| displayMode == VGA_HOT_SMALL_VIEW_MODE
+				|| displayMode == VGA_FUSE_WOOD_LAND_VIEW_MODE
+				|| displayMode == VGA_FUSE_GRASS_LAND_VIEW_MODE
+				|| displayMode == VGA_FUSE_SNOW_FIELD_VIEW_MODE
+				|| displayMode == VGA_FUSE_DESERT_VIEW_MODE
+				|| displayMode == VGA_FUSE_CITY_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveRight(PanoLen / 37.685200 * 15.505);
+
+		} else if (displayMode == SDI1_WHITE_BIG_VIEW_MODE
+				|| displayMode == SDI1_WHITE_SMALL_VIEW_MODE
+				|| displayMode == SDI2_HOT_BIG_VIEW_MODE
+				|| displayMode == SDI2_HOT_SMALL_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveRight(PanoLen / 37.685200 * 15.505);
+
+		} else if (displayMode == PAL1_WHITE_BIG_VIEW_MODE
+				|| displayMode == PAL1_WHITE_SMALL_VIEW_MODE
+				|| displayMode == PAL2_HOT_BIG_VIEW_MODE
+				|| displayMode == PAL2_HOT_SMALL_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveRight(PanoLen / 37.685200 * 14.524);
+
+		}
+		break;
+	case '#': {
+
+		if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE
+				|| displayMode == PREVIEW_MODE) {
+			if (fboMode == FBO_ALL_VIEW_MODE) {
+				p_ForeSightFacade[MAIN]->MoveUp(PanoHeight / 5.7);
+			} else if (FBO_ALL_VIEW_SCAN_MODE == fboMode) {
+				p_ForeSightFacadeScan[MAIN]->MoveUp(PanoHeight / 5.7);
+			}
+
+
+		} else if (displayMode == ALL_VIEW_MODE) {
+
+
+			if (fboMode == FBO_ALL_VIEW_MODE) {
+				p_ForeSightFacade[MAIN]->MoveUp(PanoHeight / (CORE_AND_POS_LIMIT));
+			} else if (FBO_ALL_VIEW_SCAN_MODE == fboMode) {
+				p_ForeSightFacadeScan[MAIN]->MoveUp(
+						PanoHeight / (CORE_AND_POS_LIMIT));
+			}
+
+			float *pos = foresightPos[MAIN].GetAngle();
+			pos[1] += 180.0;
+			pos[1] = pos[1] / 360.0;
+			pos[1] = 1 - pos[1];
+			render.Get_p_ics()->SetTouchForesightPos(pos);
+
+		}
+
+		else if (displayMode == TELESCOPE_FRONT_MODE
+				|| displayMode == TELESCOPE_RIGHT_MODE
+				|| displayMode == TELESCOPE_BACK_MODE
+				|| displayMode == TELESCOPE_LEFT_MODE) {
+			p_ForeSightFacade2[MAIN]->MoveUp(PanoHeight / 5.7);
+		} else if (displayMode == VGA_WHITE_VIEW_MODE
+				|| displayMode == VGA_HOT_BIG_VIEW_MODE
+				|| displayMode == VGA_HOT_SMALL_VIEW_MODE
+				|| displayMode == VGA_FUSE_WOOD_LAND_VIEW_MODE
+				|| displayMode == VGA_FUSE_GRASS_LAND_VIEW_MODE
+				|| displayMode == VGA_FUSE_SNOW_FIELD_VIEW_MODE
+				|| displayMode == VGA_FUSE_DESERT_VIEW_MODE
+				|| displayMode == VGA_FUSE_CITY_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveUp(PanoHeight / 6.0000 * 11.600);
+
+		} else if (displayMode == SDI1_WHITE_BIG_VIEW_MODE
+				|| displayMode == SDI1_WHITE_SMALL_VIEW_MODE
+				|| displayMode == SDI2_HOT_BIG_VIEW_MODE
+				|| displayMode == SDI2_HOT_SMALL_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveUp(PanoHeight / 6.0000 * 11.600);
+
+		} else if (displayMode == PAL1_WHITE_BIG_VIEW_MODE
+				|| displayMode == PAL1_WHITE_SMALL_VIEW_MODE
+				|| displayMode == PAL2_HOT_BIG_VIEW_MODE
+				|| displayMode == PAL2_HOT_SMALL_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveUp(PanoHeight / 6.0000 * 11.600);
+
+		}
+	}
+		break;
+	case '$': {
+		if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE
+				|| displayMode == PREVIEW_MODE) {
+			p_ForeSightFacade[MAIN]->MoveDown(-PanoHeight / 5.7);
+		} else if (displayMode == ALL_VIEW_MODE) {
+
+			if (fboMode == FBO_ALL_VIEW_MODE) {
+				p_ForeSightFacade[MAIN]->MoveDown(
+						-PanoHeight / (CORE_AND_POS_LIMIT));
+			} else if (FBO_ALL_VIEW_SCAN_MODE == fboMode) {
+				p_ForeSightFacadeScan[MAIN]->MoveDown(
+						-PanoHeight / (CORE_AND_POS_LIMIT));
+			}
+
+			float *pos = foresightPos[MAIN].GetAngle();
+			pos[1] += 180.0;
+			pos[1] = pos[1] / 360.0;
+			pos[1] = 1 - pos[1];
+			render.Get_p_ics()->SetTouchForesightPos(pos);
+
+		} else if (displayMode == TELESCOPE_FRONT_MODE
+				|| displayMode == TELESCOPE_RIGHT_MODE
+				|| displayMode == TELESCOPE_BACK_MODE
+				|| displayMode == TELESCOPE_LEFT_MODE) {
+			p_ForeSightFacade2[MAIN]->MoveDown(
+					-PanoHeight / OUTER_RECT_AND_PANO_TWO_TIMES_CAM_LIMIT);
+		} else if (displayMode == VGA_WHITE_VIEW_MODE
+				|| displayMode == VGA_HOT_BIG_VIEW_MODE
+				|| displayMode == VGA_HOT_SMALL_VIEW_MODE
+				|| displayMode == VGA_FUSE_WOOD_LAND_VIEW_MODE
+				|| displayMode == VGA_FUSE_GRASS_LAND_VIEW_MODE
+				|| displayMode == VGA_FUSE_SNOW_FIELD_VIEW_MODE
+				|| displayMode == VGA_FUSE_DESERT_VIEW_MODE
+				|| displayMode == VGA_FUSE_CITY_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveDown(-PanoHeight / 6.0000 * 11.600);
+
+		} else if (displayMode == SDI1_WHITE_BIG_VIEW_MODE
+				|| displayMode == SDI1_WHITE_SMALL_VIEW_MODE
+				|| displayMode == SDI2_HOT_BIG_VIEW_MODE
+				|| displayMode == SDI2_HOT_SMALL_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveDown(-PanoHeight / 6.0000 * 11.600);
+
+		} else if (displayMode == PAL1_WHITE_BIG_VIEW_MODE
+				|| displayMode == PAL1_WHITE_SMALL_VIEW_MODE
+				|| displayMode == PAL2_HOT_BIG_VIEW_MODE
+				|| displayMode == PAL2_HOT_SMALL_VIEW_MODE) {
+			p_ForeSightFacade_Track->TrackMoveDown(-PanoHeight / 6.0000 * 11.600);
+
+		}
+	}
+		break;
+	case '~': {
+		if (CHOSEN_VIEW_MODE == displayMode) {
+#if USE_CAP_SPI
+			saveSinglePic[chosenCam[MAIN]]=true;
+#endif
+		}
+		if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE) {
+			SendBackXY(p_ForeSightFacade[MAIN]->GetMil());
+
+		} else if (displayMode == TELESCOPE_FRONT_MODE) {
+			SendBackXY(p_ForeSightFacade2[MAIN]->GetTelMil(0));
+
+		} else if (displayMode == TELESCOPE_RIGHT_MODE) {
+			SendBackXY(p_ForeSightFacade2[MAIN]->GetTelMil(1));
+
+		} else if (displayMode == TELESCOPE_BACK_MODE) {
+			SendBackXY(p_ForeSightFacade2[MAIN]->GetTelMil(2));
+
+		} else if (displayMode == TELESCOPE_LEFT_MODE) {
+			SendBackXY(p_ForeSightFacade2[MAIN]->GetTelMil(3));
+
+		}
+
+	}
+		break;
+	case '%':
+
+		break;
+	case '^': {
+		pano_pos2angle = p_ForeSightFacade[MAIN]->GetForeSightPosX() / PanoLen
+				* 360.0;
+
+		math_ruler_angle = p_LineofRuler->GetAngle();	//getrulerangle();
+		math_ruler_angle = math_ruler_angle + pano_pos2angle;
+		if (math_ruler_angle > 0.0 && math_ruler_angle < 360.0) {
+			p_LineofRuler->SetAngle(math_ruler_angle);//setrulerangle(math_ruler_angle);
+		} else if (math_ruler_angle < 0.0) {
 			p_LineofRuler->SetAngle(math_ruler_angle + 360.0);//setrulerangle(math_ruler_angle+360.0);
-		}
-
-	}
-	//	camonforesight.MoveLimit(MOVE_LEFT);
-	if ((EnablePanoFloat == true)) {
-		if ((displayMode == TRIM_MODE)) {
-			PanoDirectionLeft = true;
-		}
-	}
-
-	break;
-case '.':		//move ruler to right
-	if (getenableshowruler()) {
-		math_ruler_angle = p_LineofRuler->GetAngle();		//getrulerangle();
-		math_ruler_angle = math_ruler_angle + RULER_ANGLE_MOVE_STEP;
-		if (math_ruler_angle < 360.0) {
-			p_LineofRuler->SetAngle(math_ruler_angle);//setrulerangle(math_ruler_angle);
-		} else {
+		} else if (math_ruler_angle > 360.0) {
 			p_LineofRuler->SetAngle(math_ruler_angle - 360.0);//setrulerangle(math_ruler_angle-360.0);
 		}
+		ori_ruler_angle = p_LineofRuler->Load();
+		mydelta = (p_LineofRuler->GetAngle()) / 360.0
+				* (render.get_PanelLoader().Getextent_pos_x()
+						- render.get_PanelLoader().Getextent_neg_x());
+		now_ruler_angle = p_LineofRuler->GetAngle();
+		p_LineofRuler->Save(now_ruler_angle);
+		setenablerefrushruler(true);
+		break;
 	}
-	if (EnablePanoFloat == true) {
-		if (displayMode == TRIM_MODE) {
-			PanoDirectionLeft = false;
-		}
+	case '(':
+		foresightPos[MAIN].SetSpeedX(
+				(render.get_PanelLoader().Getextent_pos_x()
+						- render.get_PanelLoader().Getextent_neg_x()) / 1920.0
+						* 10.0);
+		break;
+	case ')':
+		foresightPos[MAIN].SetSpeedY(
+				(render.get_PanelLoader().Getextent_pos_z()
+						- render.get_PanelLoader().Getextent_neg_z()) / 1920.0
+						* 20.0);
+		break;
+	case '?': {
+		isEnhanceOn = !isEnhanceOn;
 	}
-//			camonforesight.MoveLimit(MOVE_RIGHT);
-	break;
-case '9':
-	blendMode = key - '0';
-	if ((INIT_VIEW_MODE == displayMode)
-			&& (EnterSinglePictureSaveMode == true)) {
-		enterNumberofCam = enterNumberofCam * 10 + blendMode;
-	} else {
-		DISPLAYMODE_SWITCH_TO(FRONT_BACK_PANO_ADD_MONITOR_VIEW_MODE);
+		break;
+
+	case '{': {
+		int set_track_params[4];
 	}
-	break;
-case '0':
-	blendMode = key - '0';
-	if ((INIT_VIEW_MODE == displayMode)
-			&& (EnterSinglePictureSaveMode == true)) {
-		enterNumberofCam = enterNumberofCam * CAM_COUNT + blendMode;
-	} else {
-		DISPLAYMODE_SWITCH_TO(FRONT_BACK_PANO_ADD_SMALLMONITOR_VIEW_MODE);
+		break;
+	case '}': {
 	}
-	break;
-case '+':       //add alpha
-	if (EnablePanoFloat == true) {
-		if ((TRIM_MODE == displayMode)) {
-			if (PanoDirectionLeft == true) {
-				channel_left_scale[testPanoNumber] =
-						channel_left_scale[testPanoNumber] - DELTA_OF_PANO_SCALE;
-			} else {
-				channel_right_scale[testPanoNumber] =
-						channel_right_scale[testPanoNumber]
-								- DELTA_OF_PANO_SCALE;
+		break;
+	case '`': {
+		bool button_f1 = GetPSYButtonF1();
+		SetPSYButtonF1(!button_f1);
+	}
+		break;
+	case ':': 
+
+		if (EnablePanoFloat == true) {
+			if ((TRIM_MODE == displayMode)) {
+				int new_dir = ExchangeChannel(testPanoNumber);
+				move_hor_scale[new_dir] = move_hor_scale[new_dir] - pano_hor_scale;
+				if (move_hor_scale[new_dir] < 0.01) {
+					move_hor_scale[new_dir] = 0.01;
+				}
+				InitPanel(m_env, 0, true);
 			}
-			InitPanel(m_env, 0, true);
 		}
-	} else {
-		zoom_data = getALPHA_ZOOM_SCALE();
-		zoom_data += 0.1;
-		if (zoom_data >= 1.1) {
-			;
-		} else {
-			setALPHA_ZOOM_SCALE(zoom_data);
-
-			initAlphaMask();
-			glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-			GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-			GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-			GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-			GL_REPEAT);
-			glTexImage2D(GL_TEXTURE_2D, 0, nComponents, ALPHA_MASK_WIDTH,
-					ALPHA_MASK_HEIGHT, 0, format,
-					GL_UNSIGNED_BYTE, alphaMask);
-		}
-	}
-	break;
-case '-':       //dec alpha
-	if (EnablePanoFloat == true) {
-		if ((TRIM_MODE == displayMode)) {
-			if (PanoDirectionLeft == true) {
-				channel_left_scale[testPanoNumber] =
-						channel_left_scale[testPanoNumber] + DELTA_OF_PANO_SCALE;
-			} else {
-				channel_right_scale[testPanoNumber] =
-						channel_right_scale[testPanoNumber]
-								+ DELTA_OF_PANO_SCALE;
+		break;
+	case '"':
+		if (EnablePanoFloat == true) {
+			if ((TRIM_MODE == displayMode)) {
+				int new_dir = ExchangeChannel(testPanoNumber);
+				move_hor_scale[new_dir] = move_hor_scale[new_dir] + pano_hor_scale;
+				if (move_hor_scale[new_dir] > 3.0) {
+					move_hor_scale[new_dir] = 3.0;
+				}
+				InitPanel(m_env, 0, true);
 			}
-			InitPanel(m_env, 0, true);
 		}
-	} else {
-		zoom_data = getALPHA_ZOOM_SCALE();
-		zoom_data -= 0.1;
-		if (zoom_data < 0.0) {
-			;
-		} else {
-			setALPHA_ZOOM_SCALE(zoom_data);
-
-			initAlphaMask();
-			glBindTexture(GL_TEXTURE_2D, textures[ALPHA_TEXTURE_IDX]);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-			GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-			GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-			GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-			GL_REPEAT);
-			glTexImage2D(GL_TEXTURE_2D, 0, nComponents, ALPHA_MASK_WIDTH,
-					ALPHA_MASK_HEIGHT, 0, format,
-					GL_UNSIGNED_BYTE, alphaMask);
-
+		break;
+	case '|': {
+		bool button_f3 = GetPSYButtonF3();
+		SetPSYButtonF3(!button_f3);
+	}
+		break;
+	case '*': {
+		bool button_f8 = GetPSYButtonF8();
+		SetPSYButtonF8(!button_f8);
+	}
+		break;
+	case '_':
+		test_angle += 1.0;
+		if (test_angle >= 360.0) {
+			test_angle = 0.0;
 		}
-	}
-	break;
-case '=':       //save alpha data
-	zoom_data = getALPHA_ZOOM_SCALE();
-	render.writeALPHA_ZOOM_SCALE("ALPHA_ZOOM_SCALE.txt", zoom_data);
-	break;
+		hide_label_state = (hide_label_state + 1) % HIDE_LABEL_STATE_COUNT;
+		break;
 
-case '!':
-	if (displayMode == ALL_VIEW_MODE) {
-
-		if (fboMode == FBO_ALL_VIEW_MODE) {
-			chosenCamMove(true, center_cam[MAIN]);
-			//p_ForeSightFacade[MAIN]->MoveLeft(-PanoLen*100.0);
-		} else if (FBO_ALL_VIEW_SCAN_MODE == fboMode) {
-			p_ForeSightFacadeScan[MAIN]->MoveLeft(-PanoLen * 100.0);
-		}
-		ChangeChosenByForesight();
-
-	} else if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE
-			|| displayMode == PREVIEW_MODE) {
-
+	default:
+		break;
 	}
 
-	else if (displayMode == TELESCOPE_FRONT_MODE
-			|| displayMode == TELESCOPE_RIGHT_MODE
-			|| displayMode == TELESCOPE_BACK_MODE
-			|| displayMode == TELESCOPE_LEFT_MODE) {
-		istochangeTelMode = p_ForeSightFacade2[MAIN]->MoveLeft(
-				-PanoLen / TELXLIMIT);
-		if (displayMode == TELESCOPE_FRONT_MODE)
-			p_ForeSightFacade[MAIN]->GetTelMil(0);
-		else if (displayMode == TELESCOPE_RIGHT_MODE)
-			p_ForeSightFacade[MAIN]->GetTelMil(1);
-		else if (displayMode == TELESCOPE_BACK_MODE)
-			p_ForeSightFacade[MAIN]->GetTelMil(2);
-		else if (displayMode == TELESCOPE_LEFT_MODE)
-			p_ForeSightFacade[MAIN]->GetTelMil(3);
-		if (istochangeTelMode) {
-			DISPLAYMODE nextMode = DISPLAYMODE(
-					((int) displayMode - 1) % TOTAL_MODE_COUNT);
-			if (nextMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE) {
-				nextMode = TELESCOPE_LEFT_MODE;	//DISPLAYMODE(((int)displayMode+15) % TOTAL_MODE_COUNT);
-			}
-			displayMode = nextMode;
+	} while (0);
 
-		}
-	} else if (displayMode == VGA_WHITE_VIEW_MODE
-			|| displayMode == VGA_HOT_BIG_VIEW_MODE
-			|| displayMode == VGA_HOT_SMALL_VIEW_MODE
-			|| displayMode == VGA_FUSE_WOOD_LAND_VIEW_MODE
-			|| displayMode == VGA_FUSE_GRASS_LAND_VIEW_MODE
-			|| displayMode == VGA_FUSE_SNOW_FIELD_VIEW_MODE
-			|| displayMode == VGA_FUSE_DESERT_VIEW_MODE
-			|| displayMode == VGA_FUSE_CITY_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveLeft(-PanoLen / 37.685200 * 15.505);
-
-	} else if (displayMode == SDI1_WHITE_BIG_VIEW_MODE
-			|| displayMode == SDI1_WHITE_SMALL_VIEW_MODE
-			|| displayMode == SDI2_HOT_BIG_VIEW_MODE
-			|| displayMode == SDI2_HOT_SMALL_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveLeft(-PanoLen / 37.685200 * 15.505);
-
-	} else if (displayMode == PAL1_WHITE_BIG_VIEW_MODE
-			|| displayMode == PAL1_WHITE_SMALL_VIEW_MODE
-			|| displayMode == PAL2_HOT_BIG_VIEW_MODE
-			|| displayMode == PAL2_HOT_SMALL_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveLeft(-PanoLen / 37.685200 * 14.524);
+	if ((SINGLE_PORT_MODE != displayMode)
+		|| (BillBoard::BBD_REAR != p_BillBoard->m_Direction
+				&& BillBoard::BBD_FRONT != p_BillBoard->m_Direction)) {
 
 	}
-	break;
-case '@':
-	if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE
-			|| displayMode == PREVIEW_MODE) {
-
-	}
-	if (displayMode == ALL_VIEW_MODE) {
-
-		if (fboMode == FBO_ALL_VIEW_MODE) {
-			chosenCamMove(false, center_cam[MAIN]);
-
-		} else if (FBO_ALL_VIEW_SCAN_MODE == fboMode) {
-			p_ForeSightFacadeScan[MAIN]->MoveRight(PanoLen * 100.0);
-		}
-
-		ChangeChosenByForesight();
-
-	} else if (displayMode == TELESCOPE_FRONT_MODE
-			|| displayMode == TELESCOPE_RIGHT_MODE
-			|| displayMode == TELESCOPE_BACK_MODE
-			|| displayMode == TELESCOPE_LEFT_MODE) {
-		istochangeTelMode = p_ForeSightFacade2[MAIN]->MoveRight(
-				PanoLen / TELXLIMIT);
-		if (displayMode == TELESCOPE_FRONT_MODE)
-			p_ForeSightFacade2[MAIN]->GetTelMil(0);
-		else if (displayMode == TELESCOPE_RIGHT_MODE)
-			p_ForeSightFacade[MAIN]->GetTelMil(1);
-		else if (displayMode == TELESCOPE_BACK_MODE)
-			p_ForeSightFacade[MAIN]->GetTelMil(2);
-		else if (displayMode == TELESCOPE_LEFT_MODE)
-			p_ForeSightFacade[MAIN]->GetTelMil(3);
-
-		if (istochangeTelMode) {
-			DISPLAYMODE nextMode = DISPLAYMODE(
-					((int) displayMode + 1) % TOTAL_MODE_COUNT);
-			if (nextMode == SDI1_WHITE_BIG_VIEW_MODE) {
-				nextMode = TELESCOPE_FRONT_MODE;//DISPLAYMODE(((int)displayMode+15) % TOTAL_MODE_COUNT);
-			}
-			displayMode = nextMode;
-
-		}
-	} else if (displayMode == VGA_WHITE_VIEW_MODE
-			|| displayMode == VGA_HOT_BIG_VIEW_MODE
-			|| displayMode == VGA_HOT_SMALL_VIEW_MODE
-			|| displayMode == VGA_FUSE_WOOD_LAND_VIEW_MODE
-			|| displayMode == VGA_FUSE_GRASS_LAND_VIEW_MODE
-			|| displayMode == VGA_FUSE_SNOW_FIELD_VIEW_MODE
-			|| displayMode == VGA_FUSE_DESERT_VIEW_MODE
-			|| displayMode == VGA_FUSE_CITY_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveRight(PanoLen / 37.685200 * 15.505);
-
-	} else if (displayMode == SDI1_WHITE_BIG_VIEW_MODE
-			|| displayMode == SDI1_WHITE_SMALL_VIEW_MODE
-			|| displayMode == SDI2_HOT_BIG_VIEW_MODE
-			|| displayMode == SDI2_HOT_SMALL_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveRight(PanoLen / 37.685200 * 15.505);
-
-	} else if (displayMode == PAL1_WHITE_BIG_VIEW_MODE
-			|| displayMode == PAL1_WHITE_SMALL_VIEW_MODE
-			|| displayMode == PAL2_HOT_BIG_VIEW_MODE
-			|| displayMode == PAL2_HOT_SMALL_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveRight(PanoLen / 37.685200 * 14.524);
-
-	}
-	break;
-case '#': {
-
-	if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE
-			|| displayMode == PREVIEW_MODE) {
-		if (fboMode == FBO_ALL_VIEW_MODE) {
-			p_ForeSightFacade[MAIN]->MoveUp(PanoHeight / 5.7);
-		} else if (FBO_ALL_VIEW_SCAN_MODE == fboMode) {
-			p_ForeSightFacadeScan[MAIN]->MoveUp(PanoHeight / 5.7);
-		}
-
-
-	} else if (displayMode == ALL_VIEW_MODE) {
-
-
-		if (fboMode == FBO_ALL_VIEW_MODE) {
-			p_ForeSightFacade[MAIN]->MoveUp(PanoHeight / (CORE_AND_POS_LIMIT));
-		} else if (FBO_ALL_VIEW_SCAN_MODE == fboMode) {
-			p_ForeSightFacadeScan[MAIN]->MoveUp(
-					PanoHeight / (CORE_AND_POS_LIMIT));
-		}
-
-		float *pos = foresightPos[MAIN].GetAngle();
-		pos[1] += 180.0;
-		pos[1] = pos[1] / 360.0;
-		pos[1] = 1 - pos[1];
-		render.Get_p_ics()->SetTouchForesightPos(pos);
-
-	}
-
-	else if (displayMode == TELESCOPE_FRONT_MODE
-			|| displayMode == TELESCOPE_RIGHT_MODE
-			|| displayMode == TELESCOPE_BACK_MODE
-			|| displayMode == TELESCOPE_LEFT_MODE) {
-		p_ForeSightFacade2[MAIN]->MoveUp(PanoHeight / 5.7);
-	} else if (displayMode == VGA_WHITE_VIEW_MODE
-			|| displayMode == VGA_HOT_BIG_VIEW_MODE
-			|| displayMode == VGA_HOT_SMALL_VIEW_MODE
-			|| displayMode == VGA_FUSE_WOOD_LAND_VIEW_MODE
-			|| displayMode == VGA_FUSE_GRASS_LAND_VIEW_MODE
-			|| displayMode == VGA_FUSE_SNOW_FIELD_VIEW_MODE
-			|| displayMode == VGA_FUSE_DESERT_VIEW_MODE
-			|| displayMode == VGA_FUSE_CITY_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveUp(PanoHeight / 6.0000 * 11.600);
-
-	} else if (displayMode == SDI1_WHITE_BIG_VIEW_MODE
-			|| displayMode == SDI1_WHITE_SMALL_VIEW_MODE
-			|| displayMode == SDI2_HOT_BIG_VIEW_MODE
-			|| displayMode == SDI2_HOT_SMALL_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveUp(PanoHeight / 6.0000 * 11.600);
-
-	} else if (displayMode == PAL1_WHITE_BIG_VIEW_MODE
-			|| displayMode == PAL1_WHITE_SMALL_VIEW_MODE
-			|| displayMode == PAL2_HOT_BIG_VIEW_MODE
-			|| displayMode == PAL2_HOT_SMALL_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveUp(PanoHeight / 6.0000 * 11.600);
-
-	}
-}
-	break;
-case '$': {
-	if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE
-			|| displayMode == PREVIEW_MODE) {
-		p_ForeSightFacade[MAIN]->MoveDown(-PanoHeight / 5.7);
-	} else if (displayMode == ALL_VIEW_MODE) {
-
-		if (fboMode == FBO_ALL_VIEW_MODE) {
-			p_ForeSightFacade[MAIN]->MoveDown(
-					-PanoHeight / (CORE_AND_POS_LIMIT));
-		} else if (FBO_ALL_VIEW_SCAN_MODE == fboMode) {
-			p_ForeSightFacadeScan[MAIN]->MoveDown(
-					-PanoHeight / (CORE_AND_POS_LIMIT));
-		}
-
-		float *pos = foresightPos[MAIN].GetAngle();
-		pos[1] += 180.0;
-		pos[1] = pos[1] / 360.0;
-		pos[1] = 1 - pos[1];
-		render.Get_p_ics()->SetTouchForesightPos(pos);
-
-	} else if (displayMode == TELESCOPE_FRONT_MODE
-			|| displayMode == TELESCOPE_RIGHT_MODE
-			|| displayMode == TELESCOPE_BACK_MODE
-			|| displayMode == TELESCOPE_LEFT_MODE) {
-		p_ForeSightFacade2[MAIN]->MoveDown(
-				-PanoHeight / OUTER_RECT_AND_PANO_TWO_TIMES_CAM_LIMIT);
-	} else if (displayMode == VGA_WHITE_VIEW_MODE
-			|| displayMode == VGA_HOT_BIG_VIEW_MODE
-			|| displayMode == VGA_HOT_SMALL_VIEW_MODE
-			|| displayMode == VGA_FUSE_WOOD_LAND_VIEW_MODE
-			|| displayMode == VGA_FUSE_GRASS_LAND_VIEW_MODE
-			|| displayMode == VGA_FUSE_SNOW_FIELD_VIEW_MODE
-			|| displayMode == VGA_FUSE_DESERT_VIEW_MODE
-			|| displayMode == VGA_FUSE_CITY_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveDown(-PanoHeight / 6.0000 * 11.600);
-
-	} else if (displayMode == SDI1_WHITE_BIG_VIEW_MODE
-			|| displayMode == SDI1_WHITE_SMALL_VIEW_MODE
-			|| displayMode == SDI2_HOT_BIG_VIEW_MODE
-			|| displayMode == SDI2_HOT_SMALL_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveDown(-PanoHeight / 6.0000 * 11.600);
-
-	} else if (displayMode == PAL1_WHITE_BIG_VIEW_MODE
-			|| displayMode == PAL1_WHITE_SMALL_VIEW_MODE
-			|| displayMode == PAL2_HOT_BIG_VIEW_MODE
-			|| displayMode == PAL2_HOT_SMALL_VIEW_MODE) {
-		p_ForeSightFacade_Track->TrackMoveDown(-PanoHeight / 6.0000 * 11.600);
-
-	}
-}
-	break;
-case '~': {
-	if (CHOSEN_VIEW_MODE == displayMode) {
-#if USE_CAP_SPI
-		saveSinglePic[chosenCam[MAIN]]=true;
-#endif
-	}
-	if (displayMode == ALL_VIEW_FRONT_BACK_ONE_DOUBLE_MODE) {
-		SendBackXY(p_ForeSightFacade[MAIN]->GetMil());
-
-	} else if (displayMode == TELESCOPE_FRONT_MODE) {
-		SendBackXY(p_ForeSightFacade2[MAIN]->GetTelMil(0));
-
-	} else if (displayMode == TELESCOPE_RIGHT_MODE) {
-		SendBackXY(p_ForeSightFacade2[MAIN]->GetTelMil(1));
-
-	} else if (displayMode == TELESCOPE_BACK_MODE) {
-		SendBackXY(p_ForeSightFacade2[MAIN]->GetTelMil(2));
-
-	} else if (displayMode == TELESCOPE_LEFT_MODE) {
-		SendBackXY(p_ForeSightFacade2[MAIN]->GetTelMil(3));
-
-	}
-
-}
-	break;
-case '%':
-
-	break;
-case '^': {
-	pano_pos2angle = p_ForeSightFacade[MAIN]->GetForeSightPosX() / PanoLen
-			* 360.0;
-
-	math_ruler_angle = p_LineofRuler->GetAngle();	//getrulerangle();
-	math_ruler_angle = math_ruler_angle + pano_pos2angle;
-	if (math_ruler_angle > 0.0 && math_ruler_angle < 360.0) {
-		p_LineofRuler->SetAngle(math_ruler_angle);//setrulerangle(math_ruler_angle);
-	} else if (math_ruler_angle < 0.0) {
-		p_LineofRuler->SetAngle(math_ruler_angle + 360.0);//setrulerangle(math_ruler_angle+360.0);
-	} else if (math_ruler_angle > 360.0) {
-		p_LineofRuler->SetAngle(math_ruler_angle - 360.0);//setrulerangle(math_ruler_angle-360.0);
-	}
-	ori_ruler_angle = p_LineofRuler->Load();
-	mydelta = (p_LineofRuler->GetAngle()) / 360.0
-			* (render.get_PanelLoader().Getextent_pos_x()
-					- render.get_PanelLoader().Getextent_neg_x());
-	now_ruler_angle = p_LineofRuler->GetAngle();
-	p_LineofRuler->Save(now_ruler_angle);
-	setenablerefrushruler(true);
-	break;
-}
-case '(':
-	foresightPos[MAIN].SetSpeedX(
-			(render.get_PanelLoader().Getextent_pos_x()
-					- render.get_PanelLoader().Getextent_neg_x()) / 1920.0
-					* 10.0);
-	break;
-case ')':
-	foresightPos[MAIN].SetSpeedY(
-			(render.get_PanelLoader().Getextent_pos_z()
-					- render.get_PanelLoader().Getextent_neg_z()) / 1920.0
-					* 20.0);
-	break;
-case '?': {
-	isEnhanceOn = !isEnhanceOn;
-}
-	break;
-
-case '{': {
-	int set_track_params[4];
-#if TRACK_MODE
-	int trkId=getTrkId(displayMode,displayMode);
-	memcpy(set_track_params,gettrackcontrolparams(),sizeof(set_track_params));
-	if(trkId!=-1)
-	{
-		if(trkId==sdi_Track) {
-			clearTrackParams();
-			trackMode->enableTrackAcq(set_track_params[0],set_track_params[1],
-					set_track_params[2],set_track_params[3],trkId);
-		} else if(trkId==vga_Track) {
-			clearTrackParams();
-			trackMode->enableTrackAcq(482,354,
-					60,60,trkId);
-		} else if(trkId==pal_Track) {
-			clearTrackParams();
-			trackMode->enableTrackAcq(330,258,
-					60,60,trkId);
-		} else if(trkId==pal2_Track) {
-			clearTrackParams();
-			trackMode->enableTrackAcq(330,258,
-					60,60,trkId);
-		}
-		isTracking=true;
-	}
-#endif
-}
-	break;
-case '}': {
-#if TRACK_MODE
-	trackMode->disableTrack(sdi_Track);
-	trackMode->disableTrack(pal_Track);
-	trackMode->disableTrack(vga_Track);
-	trackMode->disableTrack(pal2_Track);
-	isTracking=false;
-#endif
-}
-	break;
-case '`': {
-	bool button_f1 = GetPSYButtonF1();
-	SetPSYButtonF1(!button_f1);
-}
-	break;
-case ':': 
-
-	if (EnablePanoFloat == true) {
-		if ((TRIM_MODE == displayMode)) {
-			int new_dir = ExchangeChannel(testPanoNumber);
-			move_hor_scale[new_dir] = move_hor_scale[new_dir] - pano_hor_scale;
-			if (move_hor_scale[new_dir] < 0.01) {
-				move_hor_scale[new_dir] = 0.01;
-			}
-			InitPanel(m_env, 0, true);
-		}
-	}
-	break;
-case '"':
-	if (EnablePanoFloat == true) {
-		if ((TRIM_MODE == displayMode)) {
-			int new_dir = ExchangeChannel(testPanoNumber);
-			move_hor_scale[new_dir] = move_hor_scale[new_dir] + pano_hor_scale;
-			if (move_hor_scale[new_dir] > 3.0) {
-				move_hor_scale[new_dir] = 3.0;
-			}
-			InitPanel(m_env, 0, true);
-		}
-	}
-	break;
-case '|': {
-	bool button_f3 = GetPSYButtonF3();
-	SetPSYButtonF3(!button_f3);
-}
-	break;
-case '*': {
-	bool button_f8 = GetPSYButtonF8();
-	SetPSYButtonF8(!button_f8);
-}
-	break;
-case '_':
-	test_angle += 1.0;
-	if (test_angle >= 360.0) {
-		test_angle = 0.0;
-	}
-	hide_label_state = (hide_label_state + 1) % HIDE_LABEL_STATE_COUNT;
-	break;
-
-default:
-	break;
-}
-
-} while (0);
-
-if ((SINGLE_PORT_MODE != displayMode)
-	|| (BillBoard::BBD_REAR != p_BillBoard->m_Direction
-			&& BillBoard::BBD_FRONT != p_BillBoard->m_Direction)) {
-
-}
 
 }
 
@@ -9143,7 +8837,24 @@ if (FREE_VIEW_MODE == displayMode) {		//reset to default position
 	p_CornerMarkerGroup->SaveCorners();
 }
 break;
-case 3: {
+case 3: 
+	{
+		static bool x_modeflag = false;
+		if(x_modeflag)
+		{
+			my=mz=mw=mh=0.0;
+			mo=0;
+			mx=0;
+		}
+		else
+		{
+			mx=my=mz=mw=mh=0.0;
+			mo=4.5;
+			mx=0.1;
+		}
+		x_modeflag = !x_modeflag;
+	}
+	/*{
 static bool b_set_arcWidth = true;
 if (b_set_arcWidth) {
 	float set_arcWidth = DEFAULT_ARC_WIDTH_SET;
@@ -9165,6 +8876,7 @@ if ((angle > 73 && angle < 107) || (angle > 253 && angle < 287)) {
 	angle = angle + 2 * sign * 1.57f;
 }
 }
+*/
 break;
 case 4: {
 static bool bRevMode = true;
@@ -10995,73 +10707,70 @@ fwrite(data, strlen(data), 1, fp);
 }
 fclose(fp);
 }
-void Render::repositioncamera() {
-float tel_pano_dis = 0.0;
-static float last_tel_pano_dis = 0.0;
-float Len = (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x());
-float move_dis = 0.0;
-float right_move_dis = 0.0;
-float pano_dis = 0.0;
-static float last_move_dis = 0.0;
-static float last_pano_dis = 0.0;
-static float last_right_move_dis = 0.0;	//((PanelLoader.Getextent_pos_x()-PanelLoader.Getextent_neg_x())*(3.0-0.025)+0.4)/4.0;
-if (getenablerefrushruler()) {
-setrulerreferenceangle(p_LineofRuler->GetAngle());
-move_dis = (p_LineofRuler->GetAngle())
-		* (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x())
-		/ 360.0;
 
-if (move_dis
-		< (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x())
-				/ 2.0) {
-	move_dis = (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x())
-			+ move_dis;
-} else if (move_dis
-		< (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x()) * 3.0
-				/ 2.0) {
-	move_dis = -(PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x())
-			+ move_dis;
-	;
-}
 
-tel_pano_dis = (p_LineofRuler->GetAngle()) / 360 * Len;
-cout << "tel_pano_dis=" << tel_pano_dis << endl;
-if (tel_pano_dis > Len * 3 / 4) {
-	tel_pano_dis -= Len;
-	tel_pano_dis += Len;
-} else
-	tel_pano_dis += Len;   //ORI POS is LEN left  so move right
-//pano_dis=move_dis+(PanelLoader.Getextent_pos_x()-PanelLoader.Getextent_neg_x())/2.0;
-pano_dis = move_dis;
-PanoViewCameraFrame.MoveRight(4.0 * last_pano_dis);
-PanoViewCameraFrame.MoveRight(-4.0 * pano_dis);
+void Render::repositioncamera() 
+{
+	float tel_pano_dis = 0.0;
+	static float last_tel_pano_dis = 0.0;
+	float Len = (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x());
+	float move_dis = 0.0;
+	float right_move_dis = 0.0;
+	float pano_dis = 0.0;
+	static float last_move_dis = 0.0;
+	static float last_pano_dis = 0.0;
+	static float last_right_move_dis = 0.0;	//((PanelLoader.Getextent_pos_x()-PanelLoader.Getextent_neg_x())*(3.0-0.025)+0.4)/4.0;
 
-for (int i = 0; i < 2; i++) {
-	PanoTelViewCameraFrame[i].MoveRight(8.0 * last_tel_pano_dis);
-	PanoTelViewCameraFrame[i].MoveRight(-8.0 * tel_pano_dis);
-}
-last_tel_pano_dis = tel_pano_dis;
+	if (getenablerefrushruler()) 
+	{
+		setrulerreferenceangle(p_LineofRuler->GetAngle());
+		move_dis = (p_LineofRuler->GetAngle()) * (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x()) / 360.0;
 
-LeftSmallPanoViewCameraFrame.MoveRight(4.0 * last_move_dis);
-LeftSmallPanoViewCameraFrame.MoveRight(-4.0 * move_dis);
+		if (move_dis < (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x())/ 2.0) 
+			move_dis = (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x()) + move_dis;
+		else if (move_dis < (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x()) * 3.0/ 2.0) 
+			move_dis = -(PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x()) + move_dis;
 
-LeftPanoViewCameraFrame.MoveRight(4.0 * last_move_dis);
-LeftPanoViewCameraFrame.MoveRight(-4.0 * move_dis);
+		tel_pano_dis = (p_LineofRuler->GetAngle()) / 360 * Len;
+		cout << "tel_pano_dis=" << tel_pano_dis << endl;
+		if (tel_pano_dis > Len * 3 / 4) {
+			tel_pano_dis -= Len;
+			tel_pano_dis += Len;
+		} 
+		else
+			tel_pano_dis += Len;   //ORI POS is LEN left  so move right
+		
+		//pano_dis=move_dis+(PanelLoader.Getextent_pos_x()-PanelLoader.Getextent_neg_x())/2.0;
+		pano_dis = move_dis;
+		PanoViewCameraFrame.MoveRight(4.0 * last_pano_dis);
+		PanoViewCameraFrame.MoveRight(-4.0 * pano_dis);
 
-right_move_dis = move_dis
-		- (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x());
+		for (int i = 0; i < 2; i++) {
+			PanoTelViewCameraFrame[i].MoveRight(8.0 * last_tel_pano_dis);
+			PanoTelViewCameraFrame[i].MoveRight(-8.0 * tel_pano_dis);
+	}
+	last_tel_pano_dis = tel_pano_dis;
 
-RightSmallPanoViewCameraFrame.MoveRight(-4.0 * last_right_move_dis);
-RightSmallPanoViewCameraFrame.MoveRight(4.0 * right_move_dis);
+	LeftSmallPanoViewCameraFrame.MoveRight(4.0 * last_move_dis);
+	LeftSmallPanoViewCameraFrame.MoveRight(-4.0 * move_dis);
 
-RightPanoViewCameraFrame.MoveRight(-4.0 * last_right_move_dis);
-RightPanoViewCameraFrame.MoveRight(4.0 * right_move_dis);
+	LeftPanoViewCameraFrame.MoveRight(4.0 * last_move_dis);
+	LeftPanoViewCameraFrame.MoveRight(-4.0 * move_dis);
 
-last_move_dis = move_dis;
-last_pano_dis = pano_dis;
-last_right_move_dis = right_move_dis;
-setenablerefrushruler(false);
-}
+	right_move_dis = move_dis
+			- (PanelLoader.Getextent_pos_x() - PanelLoader.Getextent_neg_x());
+
+	RightSmallPanoViewCameraFrame.MoveRight(-4.0 * last_right_move_dis);
+	RightSmallPanoViewCameraFrame.MoveRight(4.0 * right_move_dis);
+
+	RightPanoViewCameraFrame.MoveRight(-4.0 * last_right_move_dis);
+	RightPanoViewCameraFrame.MoveRight(4.0 * right_move_dis);
+
+	last_move_dis = move_dis;
+	last_pano_dis = pano_dis;
+	last_right_move_dis = right_move_dis;
+	setenablerefrushruler(false);
+	}
 }
 
 void Render::InitALPHA_ZOOM_SCALE(void) {
@@ -12517,21 +12226,26 @@ for (int i = 0; i < 2; i++) {
 
 }
 
-void Render::GenerateRender2FrontView() {
-static M3DVector3f camPanoView;
-static bool once = true;
-if (once) {
-once = false;
+void Render::GenerateRender2FrontView() 
+{
+	static M3DVector3f camPanoView;
+	static bool once = true;
+	
+	if (once) 
+	{
+		once = false;
 
-Render2FrontCameraFrame.RotateLocalX(0.0);
-Render2FrontCameraFrame.MoveForward(0.0);
-Render2FrontCameraFrame.MoveUp(0.0);
+		Render2FrontCameraFrame.RotateLocalX(0.0);
+		Render2FrontCameraFrame.MoveForward(0.0);
+		Render2FrontCameraFrame.MoveUp(0.0);
 
-Render2FrontCameraFrame.RotateLocalY(0.0);
-Render2FrontCameraFrame.MoveRight(0.0);
-Render2FrontCameraFrame.GetOrigin(camPanoView);
-}
-Render2FrontCameraFrame.SetOrigin(camPanoView);
+		Render2FrontCameraFrame.RotateLocalY(0.0);
+		Render2FrontCameraFrame.MoveRight(0.0);
+		Render2FrontCameraFrame.GetOrigin(camPanoView);
+	}
+	
+	Render2FrontCameraFrame.SetOrigin(camPanoView);
+	return;
 }
 
 void Render::GenerateSDIView() {
@@ -13029,44 +12743,6 @@ cout << "X=" << Pos[0] << "  Y=" << Pos[1] << endl;
 
 void Render::sendTrackSpeed(int w, int h) {
 #if USE_UART
-#if TRACK_MODE
-IPC_msg ipc_msg;
-static float lastrecvX=0,lastrecvY=0;
-static struct timeval mt;
-static bool Once=true;
-float tempX=0,tempY=0;
-float distance=0;
-float deltatime=0;
-struct timeval tv2;
-memset(&tv2,0,sizeof(timeval));
-gettimeofday(&tv2,NULL);
-deltatime= (1000000.0*(tv2.tv_sec - mt.tv_sec) +(tv2.tv_usec - mt.tv_usec));
-if(deltatime>1000000)
-{
-tempX=track_pos[0]+track_pos[2];	//接收值
-tempY=track_pos[1]+track_pos[3];
-distance=sqrt((tempX-lastrecvX)*(tempX-lastrecvX)+
-		(tempY-lastrecvY)*(tempY-lastrecvY));
-lastrecvX=tempX;
-lastrecvY=tempY;
-mt=tv2;
-ipc_msg.msg_type=IPC_MSG_TYPE_AUTOTRACKING;
-TrackSpeed=1000000.0*distance/deltatime;
-//printf("track_pos---0:=%f\t 1=%f\t 2=%f\t 3=%f\n",track_pos[0],track_pos[1],track_pos[2],track_pos[3]);
-//cout<<"Speed 1秒"<<TrackSpeed<<endl<<endl;
-if(Once)
-{
-	Once=false;
-}
-else
-{
-	ipc_msg.msg_type=IPC_MSG_TYPE_AUTOTRACKING;
-	ipc_msg.payload.ipc_tracking.palstance=TrackSpeed;
-	WriteMessage(&ipc_msg);
-}
-}
-//#endif
-#endif
 #endif
 }
 
