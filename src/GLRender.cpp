@@ -900,65 +900,44 @@ void Render::initPixle(void) {
 //zyb add map xy 2019 1205
 void Render::readPixleFile(const char* file, int index) {
 	char filename[64];
+	char outName[64];
 	memset(filename, 0, sizeof(filename));
 	sprintf(filename, "%s_%02d.ini", file, index);
+	sprintf(outName,"cameraMap%d.ini",index*2+LEFTORRIGHT);
 
-	cv::Mat mapX,mapY;
-	readMapXY(mapX,mapY,index*2+LEFTORRIGHT);
+	FILE *fp ;
+	if (index < 3)
+	{
+		fp = fopen(outName, "r");
+	}
+	else fp = fopen(filename, "r");
 
-	FILE *fp = fopen(filename, "r");
 	char buf[256];
 	float fx, fy;
 	if (fp == NULL) {
 		printf("open %s error !\n", filename);
 		return;
 	}
-
 	pixleList[index].clear();
 
 	char * retp = NULL;
 	do {
 		retp = fgets(buf, sizeof(buf), fp);
 		//		sscanf(buf,"outer loop \n");
-
 		retp = fgets(buf, sizeof(buf), fp);
 		if (retp == NULL)
 			break;
 		sscanf(buf, "\tvertexpixel\t%f\t%f", &fx, &fy);
 
-		if ((fx > 0 && fy > 0) && index < 3)
-		{
-			 float newfx = mapX.at<float>((int)fy,(int)fx);
-			 float newfy = mapY.at<float>((int)fy,(int)fx);
-			 fx = newfx;
-			 fy = newfy;
-		}
-
 		pixleList[index].push_back(cv::Point2f(fx, fy));
 
 		retp = fgets(buf, sizeof(buf), fp);
 		sscanf(buf, "\tvertexpixel\t%f\t%f", &fx, &fy);
 
-		if ((fx > 0 && fy > 0) && index < 3)
-		{
-			 float newfx = mapX.at<float>((int)fy,(int)fx);
-			 float newfy = mapY.at<float>((int)fy,(int)fx);
-			 fx = newfx;
-			 fy = newfy;
-		}
-
 		pixleList[index].push_back(cv::Point2f(fx, fy));
 
 		fgets(buf, sizeof(buf), fp);
 		sscanf(buf, "\tvertexpixel\t%f\t%f", &fx, &fy);
-
-		if ((fx > 0 && fy > 0) && index < 3)
-		{
-			 float newfx = mapX.at<float>((int)fy,(int)fx);
-			 float newfy = mapY.at<float>((int)fy,(int)fx);
-			 fx = newfx;
-			 fy = newfy;
-		}
 
 		pixleList[index].push_back(cv::Point2f(fx, fy));
 
