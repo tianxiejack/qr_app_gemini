@@ -141,8 +141,8 @@ typedef   void *  OSA_PTR;
 Uint32 OSA_getCurTimeInMsec();
 void   OSA_waitMsecs(Uint32 msecs);
 int    OSA_attachSignalHandler(int sigId, void (*handler)(int ) );
-Int32 OSA_mapMem(UInt32 physAddr, UInt32 memSize , Ptr *pMemVirtAddrPtr);
-Int32 OSA_unmapMem(Ptr pMemVirtAddrPtr,UInt32 memSize);
+Int32 OSA_mapMem(UInt32 physAddr, UInt32 memSize , ptr *pMemVirtAddrPtr);
+Int32 OSA_unmapMem(ptr pMemVirtAddrPtr,UInt32 memSize);
 
 int xstrtoi(char *hex);
 

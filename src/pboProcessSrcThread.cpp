@@ -31,7 +31,7 @@ void *pbo_process_thread(void *arg)
 {
 	GLEnv &env=env1;
 	static bool once4=true;
-	setCurrentThreadHighPriority(THREAD_L_GST);
+//	setCurrentThreadHighPriority(THREAD_L_GST);
 #if 1
     Mat testData(CURRENT_SCREEN_HEIGHT, CURRENT_SCREEN_WIDTH, CV_8UC3);
 #else
@@ -42,6 +42,8 @@ void *pbo_process_thread(void *arg)
 #endif
 	while(1)
 	{
+
+
 		OSA_semWait(render.GetPBORcr(env)->getSemPBO(),100000);
 		int processId=render.GetPBORcr(env)->getCurrentPBOIdx();
 #if GSTREAM_CAP

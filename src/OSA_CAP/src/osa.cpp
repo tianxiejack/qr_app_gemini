@@ -67,7 +67,7 @@ void OSA_waitMsecs(Uint32 msecs)
     } while(1);
 }
 
-Int32 OSA_mapMem(UInt32 physAddr, UInt32 memSize , Ptr *pMemVirtAddrPtr)
+Int32 OSA_mapMem(UInt32 physAddr, UInt32 memSize , ptr *pMemVirtAddrPtr)
 {
     unsigned int mmapMemAddr;
     unsigned int mmapMemSize;
@@ -102,12 +102,12 @@ Int32 OSA_mapMem(UInt32 physAddr, UInt32 memSize , Ptr *pMemVirtAddrPtr)
      printf(" ERROR: mmap() failed !!!\n");
      return -1;
    }
-    *pMemVirtAddrPtr = (Ptr)((UInt64)pMemVirtAddr + memOffset);
+    *pMemVirtAddrPtr = (ptr)((UInt64)pMemVirtAddr + memOffset);
     printf("mmap virt addresss:%p\n",*pMemVirtAddrPtr);
     return 0;
 }
 
-Int32 OSA_unmapMem(Ptr pMemVirtAddrPtr,UInt32 memSize)
+Int32 OSA_unmapMem(ptr pMemVirtAddrPtr,UInt32 memSize)
 {
     Int32 status;
     unsigned int mmapMemAddr;

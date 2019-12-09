@@ -21,6 +21,11 @@
 
 #include"GLEnv.h"
 
+//add by wsh
+#include "CUartProc.hpp"
+
+
+
 RenderMain mainWin;
 Common common;
 AlarmTarget mainAlarmTarget;
@@ -45,6 +50,7 @@ void mvDetectorDraw(std::vector<TRK_RECT_INFO> &resTarget,int chId)
 #endif
 int main(int argc, char** argv)
 {
+
 #if USE_CAP_SPI
 	SpiSet();
 	//InitIPCModule();
@@ -83,8 +89,6 @@ int main(int argc, char** argv)
 #endif
 
 
-
-
 //	start_overLap();
 //	startrecv( );
 
@@ -106,12 +110,22 @@ int main(int argc, char** argv)
 //	initcabinrecord();//初始化舱内视频记录
 //	initscreenrecord();//初始化录屏记录
 
+    	CUartProc* recv = new CUartProc("/dev/ttyTHS2", 115200, 0, 8, 'N', 1);
+    	recv->copen();
+    	OSA_thrCreate(&(recv->recv_thrID), recv->thrRecv, 0, 0, NULL);
+
+
+
+
 	mainWin.start(argc, argv);
+
 #if USE_GPIO
 	IPC_Destroy();
 	delete_GPIO_IPCMessage();
 #endif
 	//gpio_deinit();
+
+	OSA_thrDelete(&(recv->recv_thrID));
 
 	return 0;
 }
