@@ -60,12 +60,13 @@
 //#include "mvdectInterfaceV2.h"
 #include "thread_idle.h"
 
-
+//********************************************
 //add by wsh
 #include <osa.h>
 #include <osa_thr.h>
 #include "NetManager.h"
 static Int32	Rendert = OSA_getCurTimeInMsec();
+//********************************************
 
 #include "Xin_IPC_Yuan_Recv_Message.h"
 #include "ClicktoMoveForesight.h"
@@ -1313,12 +1314,15 @@ void Render::GetFPS() {
 // This function does any needed initialization on the rendering context.
 // This is the first opportunity to do any OpenGL related tasks.
 void Render::SetupRC(int windowWidth, int windowHeight) {
+//	****************************************************
+//	add by wsh		2019*12*10
 //	CUartProc* Precv = new CUartProc("/dev/ttyTHS2", 115200, 0, 8, 'N', 1);
 //	Precv->copen();
 //	OSA_thrCreate(&(Precv->recv_thrID), Precv->thrRecv, 0, 0, NULL);
 	OSA_ThrHndl recvid;
 	NetManager * net = new NetManager();
 	OSA_thrCreate(&recvid,net->thread_Getaccept, 0, 0, NULL);
+//	****************************************************
 
 	IPC_Init_All();
 	readmenu_tpic();

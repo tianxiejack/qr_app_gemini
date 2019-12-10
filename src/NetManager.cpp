@@ -26,23 +26,29 @@
 #include <errno.h>
 #include <net/if.h>
 #include <arpa/inet.h>
+
 using namespace std;
+using namespace cv;
 
 const double PI = 3.14159265358979323846;
-#define Kx			(0.03)
+//#define Kx			(0.03)
 extern float mx;
 extern float mz;
 
-typedef struct{
-	int connfd;
-	bool bConnecting;
-	OSA_ThrHndl getDataThrID;
-	OSA_ThrHndl sendDataThrID;
-}CConnectVECTOR;
+//typedef struct{
+//	int connfd;
+//	bool bConnecting;
+//	OSA_ThrHndl getDataThrID;
+//	OSA_ThrHndl sendDataThrID;
+//}CConnectVECTOR;
 
 static NetManager* gThis;
 
-NetManager::NetManager():pNetcom(NULL),existRecvThread(false),m_cmdlength(16)
+NetManager::NetManager()
+	:pNetcom(NULL),
+	 existRecvThread(false),
+	 m_cmdlength(16),
+	 m_K(0.f)
 {
 	ptz[0]=0.0f;
 	ptz[1]=0.0f;
@@ -53,6 +59,12 @@ NetManager::NetManager():pNetcom(NULL),existRecvThread(false),m_cmdlength(16)
 	memset(&mutexConn,0,sizeof(mutexConn));
 	OSA_mutexCreate(&mutexConn);
 	createPort();
+	bool flag = readParams("Coefficient.yml") ;
+	if(! flag)
+		printf("\t\tread param error\n");
+//	writeParams("Coefficient.yml");
+//	if(!  )
+//		printf("\t\tread param error\n");
 
 }
 
@@ -191,7 +203,7 @@ void NetManager::parsing()
 			temp[i] = m_rcvBuf[i+2];
 		}
 		memcpy(&ptz, temp, sizeof(ptz));
-		mx = Kx * (180/PI) * ptz[0];
+		mx = m_K * (180/PI) * ptz[0];
 		printf("p:%f, t:%f, mx:%f\n",ptz[0],ptz[1], mx);
 //		IPCSendMSG(ptz);
 	}
@@ -260,7 +272,33 @@ float NetManager::getVerticalAngle()	//获取垂直角度
 	return ver;
 }
 
+bool NetManager::readParams(const char* file)
+{
+	cv::FileStorage m_readfs(file,cv::FileStorage::READ);
 
+	if(m_readfs.isOpened())
+	{
+		m_K = (float)m_readfs["coefficient"];
+		printf("\tfrom param m_K:%f\n", m_K);
+//		getParams();
+		return true;
+	}
+	return false;
+}
+
+bool NetManager::writeParams(const char* file)
+{
+	cv::FileStorage m_writefs(file,FileStorage::WRITE);
+	float aaa = 0.03f;
+	if(m_writefs.isOpened())
+	{
+		m_writefs << "coefficient"      << aaa;
+		printf("\t\twrite data to yml\n");
+//		setParams();
+		return true;
+	}
+	return false;
+}
 
 
 

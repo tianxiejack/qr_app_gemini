@@ -13,6 +13,7 @@
 #include "osa_thr.h"
 #include "osa_mutex.h"
 #include "CNetProc.hpp"
+#include <opencv/cv.hpp>
 
 
 
@@ -32,6 +33,8 @@ public:
 	float getHorizontalAngle();	//获取水平角度
 	float getVerticalAngle();	//获取垂直角度
 
+	bool readParams(const char* file);
+	bool writeParams(const char* file);
 
 protected:
 	void findValidData(unsigned char *tmpRcvBuff, int sizeRcv);
@@ -49,8 +52,11 @@ private:
 	std::vector<unsigned char>  m_rcvBuf;
 	int m_cmdlength;
 	float ptz[3];
+	float m_K;
 	OSA_MutexHndl mutexConn;
 //	sendIpcMsgCallback pFunc_SendIpc;
+
+
 };
 
 

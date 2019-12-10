@@ -56,7 +56,7 @@ typedef void              Void;
 typedef unsigned short    Bool;
 typedef void            * ptr;       /* data pointer */
 typedef char            * String;    /* null terminated string */
-#define Ptr ptr
+//#define Ptr ptr
 
 typedef int            *  IArg;
 typedef unsigned int   *  UArg;
