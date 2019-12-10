@@ -21,7 +21,7 @@ using namespace cv;
 //#include "Camera.h"
 //#include "timing.h"
 //#include "struct.hpp"
-#include "osa_buf.h"
+#include <osa_buf.h>
 #include"queue_display.h"
 using namespace cv;
 //#define SHOW_TIMES

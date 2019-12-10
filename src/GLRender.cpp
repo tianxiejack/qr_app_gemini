@@ -39,6 +39,8 @@
 #include"signal.h"
 #include"unistd.h"
 
+
+
 #if USE_UART
 #include"Zodiac_Message.h"
 #endif
@@ -57,6 +59,13 @@
 #include"Thread_Priority.h"
 //#include "mvdectInterfaceV2.h"
 #include "thread_idle.h"
+
+
+//add by wsh
+#include <osa.h>
+#include <osa_thr.h>
+#include "NetManager.h"
+static Int32	Rendert = OSA_getCurTimeInMsec();
 
 #include "Xin_IPC_Yuan_Recv_Message.h"
 #include "ClicktoMoveForesight.h"
@@ -1304,6 +1313,13 @@ void Render::GetFPS() {
 // This function does any needed initialization on the rendering context.
 // This is the first opportunity to do any OpenGL related tasks.
 void Render::SetupRC(int windowWidth, int windowHeight) {
+//	CUartProc* Precv = new CUartProc("/dev/ttyTHS2", 115200, 0, 8, 'N', 1);
+//	Precv->copen();
+//	OSA_thrCreate(&(Precv->recv_thrID), Precv->thrRecv, 0, 0, NULL);
+	OSA_ThrHndl recvid;
+	NetManager * net = new NetManager();
+	OSA_thrCreate(&recvid,net->thread_Getaccept, 0, 0, NULL);
+
 	IPC_Init_All();
 	readmenu_tpic();
 
@@ -7164,6 +7180,7 @@ void Render::DrawGLScene()
 	unsigned char full_screen_data[1920 * 1080 * 4];
 
 	RenderScene();
+
 	glutSwapBuffers();
 	
 	/* swap the buffers to display, since double buffering is used.*/

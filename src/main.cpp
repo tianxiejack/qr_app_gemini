@@ -21,8 +21,7 @@
 
 #include"GLEnv.h"
 
-//add by wsh
-#include "CUartProc.hpp"
+
 
 
 
@@ -110,9 +109,6 @@ int main(int argc, char** argv)
 //	initcabinrecord();//初始化舱内视频记录
 //	initscreenrecord();//初始化录屏记录
 
-    	CUartProc* recv = new CUartProc("/dev/ttyTHS2", 115200, 0, 8, 'N', 1);
-    	recv->copen();
-    	OSA_thrCreate(&(recv->recv_thrID), recv->thrRecv, 0, 0, NULL);
 
 
 
@@ -125,7 +121,7 @@ int main(int argc, char** argv)
 #endif
 	//gpio_deinit();
 
-	OSA_thrDelete(&(recv->recv_thrID));
+//	OSA_thrDelete(&(recv->recv_thrID));
 
 	return 0;
 }

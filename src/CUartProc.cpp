@@ -83,9 +83,9 @@ int CUartProc::crecv(int fd, void *buf,int len)
 	}
 	else if(fs_sel)
 	{
-//		int recvValue = 0;
-
-		return  read(fd,buf,len);
+		int recvValue = 0;
+		read(fd,buf,len);
+		return  recvValue;//read(fd,buf,len);
 	}
 	else if(0 == fs_sel)
 	{
@@ -278,7 +278,7 @@ void* CUartProc::thrRecv(void* org)
 void CUartProc::RecvData()
 {
 	int sizerecv;
-	setCurrentThreadHighPriority(1);
+	//setCurrentThreadHighPriority(99);
 		struct timeval tmp;
 	while(1)
 	{
@@ -289,16 +289,19 @@ void CUartProc::RecvData()
 //				cout<<"-------------------time"<<endl;
 //
 //		LOGLN("\tgetDataTime :"<<( OSA_getCurTimeInMsec() - t )<< "\tms");
+		static int a = 0;
 		OSA_mutexLock(&m_hndl);
 		memset(m_recvdata, 0, sizeof(m_recvdata));
 //		t = OSA_getCurTimeInMsec();
 
 		sizerecv = crecv(comfd, m_recvdata,sizeof(m_recvdata));
 		LOGLN("\tgetDataTime :"<<( OSA_getCurTimeInMsec() - t )<< "\tms");
+
 		t = OSA_getCurTimeInMsec();
 ////		findValidData(m_recvdata, sizerecv);
 //
 		OSA_mutexUnlock(&m_hndl);
+		a++;
 	}
 }
 
