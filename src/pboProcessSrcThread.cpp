@@ -42,21 +42,19 @@ void *pbo_process_thread(void *arg)
 #endif
 	while(1)
 	{
-
-
 		OSA_semWait(render.GetPBORcr(env)->getSemPBO(),100000);
 		int processId=render.GetPBORcr(env)->getCurrentPBOIdx();
 #if GSTREAM_CAP
 		if(IsgstCap)
 			gstCapturePushData(record_handle, (char *)*render.GetPBORcr(env)->getPixelBuffer(processId) , CURRENT_SCREEN_WIDTH*CURRENT_SCREEN_HEIGHT*iniCC);
-		#else
+#else
 		static int a=0;
 		a++;
-					if(a==20)
-					{
-						memcpy(testData.data, (char *)*render.GetPBORcr(env)->getPixelBuffer(processId),CURRENT_SCREEN_HEIGHT*CURRENT_SCREEN_WIDTH*iniCC);
-						imwrite("./data/50TEST_PBO.bmp",testData);
-					}
+		if(a==20)
+		{
+			memcpy(testData.data, (char *)*render.GetPBORcr(env)->getPixelBuffer(processId),CURRENT_SCREEN_HEIGHT*CURRENT_SCREEN_WIDTH*iniCC);
+			imwrite("./data/50TEST_PBO.bmp",testData);
+		}
 #endif
 	}
 }

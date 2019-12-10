@@ -45,6 +45,7 @@
 									<listOptionValue builtIn="false" value="GSTREAM_CAP=0"/>
 									<listOptionValue builtIn="false" value="USE_UART=0"/>
 									<listOptionValue builtIn="false" value="USE_12=1"/>
+									<listOptionValue builtIn="false" value="COMM_UART=0"/>
 								</option>
 								<option id="nvcc.compiler.include.paths.622473429" name="Include paths (-I)" superClass="nvcc.compiler.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="../src/OSA_CAP/inc"/>
@@ -229,6 +230,7 @@
 									<listOptionValue builtIn="false" value="GSTREAM_CAP=0"/>
 									<listOptionValue builtIn="false" value="USE_UART=0"/>
 									<listOptionValue builtIn="false" value="USE_12=1"/>
+									<listOptionValue builtIn="false" value="COMM_UART=0"/>
 								</option>
 								<option id="nvcc.compiler.include.paths.243576489" name="Include paths (-I)" superClass="nvcc.compiler.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="../src/OSA_CAP/inc"/>

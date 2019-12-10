@@ -21,7 +21,7 @@ extern float mx;
 //extern float mz;
 static CUartProc* pThis;
 
-Int32 t;
+//Int32 t=0, t_prev=0;
 
 CUartProc::CUartProc(const string dev_name,const int baud_rate, const int flow, const int data_bits, const char parity, const int stop_bits)
 	:comfd(-1), m_cmdlength(12)
@@ -46,7 +46,7 @@ CUartProc::~CUartProc()
 
 int CUartProc::copen()
 {
-	if((comfd = open(devname.c_str(), O_RDWR| O_NOCTTY)) <= 0)
+	if((comfd = open(devname.c_str(), O_RDWR| O_NOCTTY | O_NDELAY)) <= 0)
 	{
 		printf("ERR: Can not open the Uart port --(%s)\r\n",devname.c_str());
 		return -1;
@@ -72,8 +72,8 @@ int CUartProc::crecv(int fd, void *buf,int len)
 	FD_ZERO(&fd_uartRead);
 	FD_SET(fd,&fd_uartRead);
 
-	timeout.tv_sec = 0;
-	timeout.tv_usec = 60*1000;//40000;
+	timeout.tv_sec = 1;
+	timeout.tv_usec = 0;//60*1000;//40000;
 
 	fs_sel = select(fd+1,&fd_uartRead,NULL,NULL,&timeout);
 	if(-1 == fs_sel)
@@ -83,8 +83,15 @@ int CUartProc::crecv(int fd, void *buf,int len)
 	}
 	else if(fs_sel)
 	{
-		int recvValue = 0;
-		read(fd,buf,len);
+		int recvValue = read(fd,buf,len);
+#if 0	// for dbg
+		t = OSA_getCurTimeInMsec();
+		if(t_prev == 0)
+			t_prev = t;
+		if(recvValue != 16 || (t - t_prev)>12)
+				printf("Info: %d Uart Recv data len=%d t-diff=%d\r\n", t, recvValue, (t - t_prev));
+		t_prev = t;
+#endif
 		return  recvValue;//read(fd,buf,len);
 	}
 	else if(0 == fs_sel)
@@ -290,17 +297,16 @@ void CUartProc::RecvData()
 //
 //		LOGLN("\tgetDataTime :"<<( OSA_getCurTimeInMsec() - t )<< "\tms");
 		static int a = 0;
-		OSA_mutexLock(&m_hndl);
 		memset(m_recvdata, 0, sizeof(m_recvdata));
 //		t = OSA_getCurTimeInMsec();
 
 		sizerecv = crecv(comfd, m_recvdata,sizeof(m_recvdata));
-		LOGLN("\tgetDataTime :"<<( OSA_getCurTimeInMsec() - t )<< "\tms");
+		/*LOGLN("\tgetDataTime :"<<( OSA_getCurTimeInMsec() - t )<< "\tms");*/
 
 		t = OSA_getCurTimeInMsec();
+		//OSA_mutexLock(&m_hndl);
 ////		findValidData(m_recvdata, sizerecv);
-//
-		OSA_mutexUnlock(&m_hndl);
+		//OSA_mutexUnlock(&m_hndl);
 		a++;
 	}
 }

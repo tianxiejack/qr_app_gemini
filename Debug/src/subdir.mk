@@ -6,6 +6,8 @@
 CPP_SRCS += \
 ../src/AlarmTarget.cpp \
 ../src/BMPCaptureGroup.cpp \
+../src/CNetProc.cpp \
+../src/CUartProc.cpp \
 ../src/Camera.cpp \
 ../src/Cap_Spi_Message.cpp \
 ../src/CaptureGroup.cpp \
@@ -30,6 +32,7 @@ CPP_SRCS += \
 ../src/Loader.cpp \
 ../src/MiscCaptureGroup.cpp \
 ../src/MvDetect.cpp \
+../src/NetManager.cpp \
 ../src/OitVehicle.cpp \
 ../src/PBOManager.cpp \
 ../src/PBO_FBO_Facade.cpp \
@@ -60,7 +63,6 @@ CPP_SRCS += \
 ../src/overLapBuffer.cpp \
 ../src/overLapRegion.cpp \
 ../src/pboProcessSrcThread.cpp \
-../src/recvUARTdata.cpp \
 ../src/recvwheeldata.cpp \
 ../src/scanner.cpp \
 ../src/set_button.cpp \
@@ -74,6 +76,8 @@ CPP_SRCS += \
 OBJS += \
 ./src/AlarmTarget.o \
 ./src/BMPCaptureGroup.o \
+./src/CNetProc.o \
+./src/CUartProc.o \
 ./src/Camera.o \
 ./src/Cap_Spi_Message.o \
 ./src/CaptureGroup.o \
@@ -98,6 +102,7 @@ OBJS += \
 ./src/Loader.o \
 ./src/MiscCaptureGroup.o \
 ./src/MvDetect.o \
+./src/NetManager.o \
 ./src/OitVehicle.o \
 ./src/PBOManager.o \
 ./src/PBO_FBO_Facade.o \
@@ -128,7 +133,6 @@ OBJS += \
 ./src/overLapBuffer.o \
 ./src/overLapRegion.o \
 ./src/pboProcessSrcThread.o \
-./src/recvUARTdata.o \
 ./src/recvwheeldata.o \
 ./src/scanner.o \
 ./src/set_button.o \
@@ -142,6 +146,8 @@ OBJS += \
 CPP_DEPS += \
 ./src/AlarmTarget.d \
 ./src/BMPCaptureGroup.d \
+./src/CNetProc.d \
+./src/CUartProc.d \
 ./src/Camera.d \
 ./src/Cap_Spi_Message.d \
 ./src/CaptureGroup.d \
@@ -166,6 +172,7 @@ CPP_DEPS += \
 ./src/Loader.d \
 ./src/MiscCaptureGroup.d \
 ./src/MvDetect.d \
+./src/NetManager.d \
 ./src/OitVehicle.d \
 ./src/PBOManager.d \
 ./src/PBO_FBO_Facade.d \
@@ -196,7 +203,6 @@ CPP_DEPS += \
 ./src/overLapBuffer.d \
 ./src/overLapRegion.d \
 ./src/pboProcessSrcThread.d \
-./src/recvUARTdata.d \
 ./src/recvwheeldata.d \
 ./src/scanner.d \
 ./src/set_button.d \
@@ -212,8 +218,8 @@ CPP_DEPS += \
 src/%.o: ../src/%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: NVCC Compiler'
-	/usr/local/cuda-8.0/bin/nvcc -DGAIN_MASK=1 -DVALIDATION_PERIOD_SECONDS=0 -DDISABLE_NEON_DEI=1 -DNO_ARM_NEON=1 -DENABLE_ENHANCE_FUNCTION=0 -DMVDECT=0 -DUSE_BMPCAP=0 -DWHOLE_PIC=1 -DUSE_GAIN=1 -DCAM_COUNT=8 -DUSE_CAP_SPI=0 -DTRACK_MODE=0 -DDOUBLE_SCREEN=0 -DTEST_GAIN=1 -DGSTREAM_CAP=0 -DUSE_UART=0 -DUSE_12=1 -I../src/OSA_CAP/inc -I../src/GLTool/include -I/usr/include/opencv -I/usr/include/gstreamer-1.0 -I/usr/include/GL -I/usr/include/glib-2.0 -I/usr/lib/aarch64-linux-gnu/glib-2.0/include -I/usr/lib/aarch64-linux-gnu/include -I/usr/include -I/usr/lib/aarch64-linux-gnu/gstreamer-1.0/include -O3 -ccbin aarch64-linux-gnu-g++ -gencode arch=compute_50,code=sm_50 -m64 -odir "src" -M -o "$(@:%.o=%.d)" "$<"
-	/usr/local/cuda-8.0/bin/nvcc -DGAIN_MASK=1 -DVALIDATION_PERIOD_SECONDS=0 -DDISABLE_NEON_DEI=1 -DNO_ARM_NEON=1 -DENABLE_ENHANCE_FUNCTION=0 -DMVDECT=0 -DUSE_BMPCAP=0 -DWHOLE_PIC=1 -DUSE_GAIN=1 -DCAM_COUNT=8 -DUSE_CAP_SPI=0 -DTRACK_MODE=0 -DDOUBLE_SCREEN=0 -DTEST_GAIN=1 -DGSTREAM_CAP=0 -DUSE_UART=0 -DUSE_12=1 -I../src/OSA_CAP/inc -I../src/GLTool/include -I/usr/include/opencv -I/usr/include/gstreamer-1.0 -I/usr/include/GL -I/usr/include/glib-2.0 -I/usr/lib/aarch64-linux-gnu/glib-2.0/include -I/usr/lib/aarch64-linux-gnu/include -I/usr/include -I/usr/lib/aarch64-linux-gnu/gstreamer-1.0/include -O3 --compile -m64 -ccbin aarch64-linux-gnu-g++  -x c++ -o  "$@" "$<"
+	/usr/local/cuda-8.0/bin/nvcc -DGAIN_MASK=1 -DVALIDATION_PERIOD_SECONDS=0 -DDISABLE_NEON_DEI=1 -DNO_ARM_NEON=1 -DENABLE_ENHANCE_FUNCTION=0 -DMVDECT=0 -DUSE_BMPCAP=0 -DWHOLE_PIC=1 -DUSE_GAIN=1 -DCAM_COUNT=8 -DUSE_CAP_SPI=0 -DTRACK_MODE=0 -DDOUBLE_SCREEN=0 -DTEST_GAIN=1 -DGSTREAM_CAP=0 -DUSE_UART=0 -DUSE_12=1 -DCOMM_UART=0 -I../src/OSA_CAP/inc -I../src/GLTool/include -I/usr/include/opencv -I/usr/include/gstreamer-1.0 -I/usr/include/GL -I/usr/include/glib-2.0 -I/usr/lib/aarch64-linux-gnu/glib-2.0/include -I/usr/lib/aarch64-linux-gnu/include -I/usr/include -I/usr/lib/aarch64-linux-gnu/gstreamer-1.0/include -O3 -ccbin aarch64-linux-gnu-g++ -gencode arch=compute_50,code=sm_50 -m64 -odir "src" -M -o "$(@:%.o=%.d)" "$<"
+	/usr/local/cuda-8.0/bin/nvcc -DGAIN_MASK=1 -DVALIDATION_PERIOD_SECONDS=0 -DDISABLE_NEON_DEI=1 -DNO_ARM_NEON=1 -DENABLE_ENHANCE_FUNCTION=0 -DMVDECT=0 -DUSE_BMPCAP=0 -DWHOLE_PIC=1 -DUSE_GAIN=1 -DCAM_COUNT=8 -DUSE_CAP_SPI=0 -DTRACK_MODE=0 -DDOUBLE_SCREEN=0 -DTEST_GAIN=1 -DGSTREAM_CAP=0 -DUSE_UART=0 -DUSE_12=1 -DCOMM_UART=0 -I../src/OSA_CAP/inc -I../src/GLTool/include -I/usr/include/opencv -I/usr/include/gstreamer-1.0 -I/usr/include/GL -I/usr/include/glib-2.0 -I/usr/lib/aarch64-linux-gnu/glib-2.0/include -I/usr/lib/aarch64-linux-gnu/include -I/usr/include -I/usr/lib/aarch64-linux-gnu/gstreamer-1.0/include -O3 --compile -m64 -ccbin aarch64-linux-gnu-g++  -x c++ -o  "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

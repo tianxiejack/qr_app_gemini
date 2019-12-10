@@ -12,7 +12,6 @@ RM := rm -rf
 -include src/subdir.mk
 -include src/OSA_CAP/src/subdir.mk
 -include src/GLTool/src/subdir.mk
--include config/subdir.mk
 
 OS_SUFFIX := $(subst Linux,linux,$(subst Darwin/x86_64,darwin,$(shell uname -s)/$(shell uname -m)))
 

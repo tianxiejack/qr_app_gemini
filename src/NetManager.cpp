@@ -300,10 +300,3 @@ bool NetManager::writeParams(const char* file)
 	return false;
 }
 
-
-
-
-
-
-
-

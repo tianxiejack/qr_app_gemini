@@ -306,9 +306,9 @@ void PBOReceiver::getDataPBO(int startX,int startY,int w,int h, GLuint idx)
 		}
 	pPixelBuffer[nextIndex] = (GLubyte*)glMapBufferARB(GL_PIXEL_PACK_BUFFER_ARB, GL_READ_ONLY_ARB);
 	nowPboId=nextIndex;
-			if(pPixelBuffer[nextIndex])
+	if(pPixelBuffer[nextIndex])
 	{
-				OSA_semSignal(pSemPBO);
+		OSA_semSignal(pSemPBO);
 		static bool once=true;
 		if(once)
 		{

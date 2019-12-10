@@ -28,5 +28,4 @@ SUBDIRS := \
 src \
 src/OSA_CAP/src \
 src/GLTool/src \
-config \
 

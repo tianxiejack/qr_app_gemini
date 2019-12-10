@@ -64,6 +64,7 @@
 //add by wsh
 #include <osa.h>
 #include <osa_thr.h>
+#include "CUartProc.hpp"
 #include "NetManager.h"
 static Int32	Rendert = OSA_getCurTimeInMsec();
 //********************************************
@@ -1316,12 +1317,15 @@ void Render::GetFPS() {
 void Render::SetupRC(int windowWidth, int windowHeight) {
 //	****************************************************
 //	add by wsh		2019*12*10
-//	CUartProc* Precv = new CUartProc("/dev/ttyTHS2", 115200, 0, 8, 'N', 1);
-//	Precv->copen();
-//	OSA_thrCreate(&(Precv->recv_thrID), Precv->thrRecv, 0, 0, NULL);
+#if COMM_UART
+	CUartProc* Precv = new CUartProc("/dev/ttyTHS2", 115200, 0, 8, 'N', 1);
+	Precv->copen();
+	OSA_thrCreate(&(Precv->recv_thrID), Precv->thrRecv, 0, 0, NULL);
+#else
 	OSA_ThrHndl recvid;
 	NetManager * net = new NetManager();
 	OSA_thrCreate(&recvid,net->thread_Getaccept, 0, 0, NULL);
+#endif
 //	****************************************************
 
 	IPC_Init_All();
@@ -7128,7 +7132,7 @@ void Render::RenderScene(void)
 	static bool setpriorityOnce = true;
 	if (setpriorityOnce) 
 	{
-		setCurrentThreadHighPriority(THREAD_L_M_RENDER);
+		//etCurrentThreadHighPriority(THREAD_L_M_RENDER);
 		setpriorityOnce = false;
 	}
 	GLEnv &env = env1;
