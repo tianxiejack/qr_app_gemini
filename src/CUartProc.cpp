@@ -21,7 +21,7 @@ extern float mx;
 //extern float mz;
 static CUartProc* pThis;
 
-//Int32 t=0, t_prev=0;
+Int32 t=0, t_prev=0;
 
 CUartProc::CUartProc(const string dev_name,const int baud_rate, const int flow, const int data_bits, const char parity, const int stop_bits)
 	:comfd(-1), m_cmdlength(12)
